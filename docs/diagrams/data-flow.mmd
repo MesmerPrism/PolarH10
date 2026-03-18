@@ -1,0 +1,48 @@
+%% Data flow - from Polar H10 hardware through the stack to disk / UI
+%% Hand-authored
+
+flowchart TD
+    H10["Polar H10 chest strap"]
+
+    subgraph BLE["BLE / GATT"]
+        ADV["Advertisement\ndevice name - address - RSSI"]
+        HRS["Heart Rate Service\n0x180D"]
+        PMD["PMD Service\nFB005C80-..."]
+        CTRL["PMD Control Point\nget-settings - start - stop"]
+        DATA["PMD Data\nECG frames - ACC frames"]
+    end
+
+    subgraph Decode["Decoders"]
+        DHR["HrRrDecoder\n-> bpm + RR intervals"]
+        DECG["EcgDecoder\n-> uV samples @ 130 Hz"]
+        DACC["AccDecoder\n-> x/y/z mG @ 25-200 Hz"]
+    end
+
+    subgraph Session["PolarH10Session"]
+        SHR["HeartRateReceived event"]
+        SECG["EcgSamplesReceived event"]
+        SACC["AccSamplesReceived event"]
+    end
+
+    subgraph Output["Consumers"]
+        REC["PolarSessionRecorder\nhr.csv - ecg.csv - acc.csv\nprotocol.jsonl"]
+        CHART["WaveformChart\nlive waveform rendering"]
+        LOG["RuntimeLogManager / HUD"]
+    end
+
+    H10 --> ADV
+    H10 --> HRS
+    H10 --> PMD
+    PMD --> CTRL
+    PMD --> DATA
+
+    HRS --> DHR --> SHR
+    DATA --> DECG --> SECG
+    DATA --> DACC --> SACC
+
+    SHR --> REC
+    SECG --> REC
+    SACC --> REC
+    SHR --> LOG
+    SECG --> CHART
+    SACC --> CHART

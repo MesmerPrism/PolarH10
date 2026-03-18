@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PolarH10 Diagram Viewer</title>
+  <link rel="stylesheet" href="../assets/site.css" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'strict' });
+    window.__mermaid = mermaid;
+  </script>
+</head>
+<body class="viewer-page">
+  <div class="page-art" aria-hidden="true">
+    <span class="tube red one"></span>
+    <span class="tube blue two"></span>
+    <span class="tube pink three"></span>
+    <span class="tube green four"></span>
+    <span class="tube red five"></span>
+    <span class="tube yellow six"></span>
+  </div>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy"><small>Unofficial Reference</small><strong>PolarH10</strong></span>
+      </a>
+      <nav class="top-nav" aria-label="Primary">
+        <a href="../index.html">Home</a>
+        <a href="../reference/index.html">Docs</a>
+        <a class="active" href="viewer.html">Diagrams</a>
+        <a href="https://github.com/MesmerPrism/PolarH10">GitHub</a>
+      </nav>
+    </header>
+
+    <section class="panel viewer-shell">
+      <div class="eyebrow">Mermaid Viewer</div>
+      <h1 class="page-title">Repository and code maps.</h1>
+      <p class="page-intro">Browse the Mermaid diagram set shipped with the repo. The viewer reads the manifest, loads rendered SVG when available, and falls back to live Mermaid rendering from source.</p>
+
+      <div class="viewer-layout">
+        <aside class="viewer-nav">
+          <header>
+            <h2>Diagrams</h2>
+            <p class="caption">Manifest-driven navigation for the current Mermaid set.</p>
+          </header>
+          <div id="nav-list"></div>
+        </aside>
+
+        <main class="viewer-main">
+          <div class="viewer-toolbar">
+            <h2 id="title">Select a diagram</h2>
+            <button id="btn-source" class="button" title="Toggle Mermaid source" type="button">Source</button>
+            <button id="btn-fullscreen" class="button" title="Fullscreen" type="button">Fullscreen</button>
+          </div>
+          <div id="viewer" class="viewer-stage"><div class="empty-state">Choose a diagram from the sidebar.</div></div>
+          <div id="source-panel" class="source-stage" hidden><pre id="source-code"></pre></div>
+        </main>
+      </div>
+    </section>
+
+    <footer class="footer">Rendered from docs/diagrams and kept in sync with the repo manifest.</footer>
+  </div>
+
+  <script>
+    (async () => {
+      const navList = document.getElementById('nav-list');
+      const viewer = document.getElementById('viewer');
+      const srcPanel = document.getElementById('source-panel');
+      const srcCode = document.getElementById('source-code');
+      const titleEl = document.getElementById('title');
+      const btnSrc = document.getElementById('btn-source');
+      const btnFs = document.getElementById('btn-fullscreen');
+
+      let manifest;
+      try {
+        const response = await fetch('manifest.json');
+        manifest = await response.json();
+      } catch {
+        viewer.innerHTML = '<div class="empty-state">Could not load manifest.json.</div>';
+        return;
+      }
+
+      const groups = {};
+      for (const diagram of manifest.diagrams) {
+        const category = diagram.category || 'other';
+        (groups[category] = groups[category] || []).push(diagram);
+      }
+
+      for (const [category, diagrams] of Object.entries(groups)) {
+        const label = document.createElement('div');
+        label.className = 'category-label';
+        label.textContent = category;
+        navList.appendChild(label);
+
+        for (const diagram of diagrams) {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'nav-item';
+          item.dataset.id = diagram.id;
+          item.innerHTML = `<div>${diagram.title}</div>${diagram.description ? `<div class="desc">${diagram.description}</div>` : ''}`;
+          item.addEventListener('click', () => selectDiagram(diagram));
+          navList.appendChild(item);
+        }
+      }
+
+      let showSource = false;
+      btnSrc.addEventListener('click', () => {
+        showSource = !showSource;
+        viewer.hidden = showSource;
+        srcPanel.hidden = !showSource;
+        btnSrc.textContent = showSource ? 'Diagram' : 'Source';
+      });
+
+      btnFs.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+          return;
+        }
+
+        document.exitFullscreen();
+      });
+
+      const hashId = location.hash.replace('#', '');
+      if (hashId) {
+        const target = manifest.diagrams.find((diagram) => diagram.id === hashId);
+        if (target) {
+          await selectDiagram(target);
+        }
+      }
+
+      async function selectDiagram(diagram) {
+        navList.querySelectorAll('.nav-item').forEach((element) => {
+          element.classList.toggle('active', element.dataset.id === diagram.id);
+        });
+
+        titleEl.textContent = diagram.title;
+        location.hash = diagram.id;
+
+        const svgPath = diagram.source.replace(/\.mmd$/, '.svg');
+        let usedSvg = false;
+
+        try {
+          const svgResponse = await fetch(svgPath);
+          if (svgResponse.ok) {
+            viewer.innerHTML = await svgResponse.text();
+            usedSvg = true;
+          }
+        } catch {
+          usedSvg = false;
+        }
+
+        try {
+          const sourceResponse = await fetch(diagram.source);
+          const sourceText = await sourceResponse.text();
+          srcCode.textContent = sourceText;
+
+          if (!usedSvg) {
+            viewer.innerHTML = '';
+            const container = document.createElement('div');
+            container.className = 'mermaid';
+            viewer.appendChild(container);
+            const rendered = await window.__mermaid.render(`mm-${diagram.id}`, sourceText);
+            container.innerHTML = rendered.svg;
+          }
+        } catch {
+          if (!usedSvg) {
+            viewer.innerHTML = `<div class="empty-state">Error loading ${diagram.source}.</div>`;
+          }
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

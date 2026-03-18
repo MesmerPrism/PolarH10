@@ -49,6 +49,10 @@ $RECYCLE.BIN/
 *.lnk
 .DS_Store
 
+## Node (diagram toolchain)
+node_modules/
+/site/
+
 ## Local captures and third-party reference files
 session/
 tmp-live-check/

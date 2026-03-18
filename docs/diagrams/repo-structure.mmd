@@ -1,0 +1,43 @@
+%% Repo structure overview - hand-authored
+%% Shows top-level organisation of the PolarH10 workspace
+
+flowchart TB
+    R["PolarH10"]
+
+    subgraph Source["Source (src/)"]
+        P1["PolarH10.Protocol\ndecoders - builders - recording"]
+        P2["PolarH10.Transport.Abstractions\nBLE interfaces"]
+        P3["PolarH10.Transport.Windows\nWinRT GATT - session - coordinator"]
+        P4["PolarH10.Cli\nSystem.CommandLine CLI"]
+        P5["PolarH10.App\nWPF reference monitor"]
+    end
+
+    subgraph Tests["Tests (tests/)"]
+        T1["Protocol.Tests\nunit decoders"]
+        T2["Playback.Tests\nsession & legacy compat"]
+        T3["Transport.Windows.Tests\nsmoke tests"]
+    end
+
+    subgraph Docs["Documentation (docs/)"]
+        D1["protocol/\nGATT map - PMD - ECG - ACC - HR"]
+        D2["getting-started.md - cli.md"]
+        D3["diagrams/\nMermaid sources & SVGs"]
+    end
+
+    subgraph Tooling["Tooling"]
+        TL1["tools/\ncapture-fixture - csv-validate"]
+        TL2["package.json\nMermaid CLI scripts"]
+        TL3[".github/workflows/"]
+    end
+
+    subgraph Samples["Samples"]
+        S1["protocol-transcripts/"]
+        S2["sample-sessions/"]
+    end
+
+    R --> Source
+    R --> Tests
+    R --> Docs
+    R --> Tooling
+    R --> Samples
+    TL2 --> D3

@@ -1,0 +1,25 @@
+{
+  "diagrams": [
+    {
+      "id": "repo-structure",
+      "title": "Repository Structure",
+      "source": "repo-structure.mmd",
+      "category": "architecture",
+      "description": "Top-level organisation of the PolarH10 workspace"
+    },
+    {
+      "id": "code-architecture",
+      "title": "Code Architecture",
+      "source": "code-architecture.mmd",
+      "category": "architecture",
+      "description": "Layered subsystem design: protocol, transport, session, consumers"
+    },
+    {
+      "id": "data-flow",
+      "title": "Data Flow",
+      "source": "data-flow.mmd",
+      "category": "architecture",
+      "description": "Signal path from Polar H10 hardware through decoders to disk and UI"
+    }
+  ]
+}

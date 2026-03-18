@@ -1,0 +1,70 @@
+%% Code architecture - subsystem level, hand-authored
+%% Shows the layered design: protocol -> transport -> session -> consumers
+
+flowchart LR
+    subgraph Protocol["Protocol Layer (platform-independent)"]
+        EC["PolarEcgDecoder\n24-bit uV samples"]
+        AC["PolarAccDecoder\nmG + compressed deltas"]
+        HR["PolarHrRrDecoder\nBLE HR/RR parsing"]
+        PMD["PolarPmdCommandBuilder\nsettings - start - stop"]
+        CP["PolarPmdControlPointParser\nresponse decoding"]
+        GID["PolarGattIds\nservice & char UUIDs"]
+    end
+
+    subgraph Transport["Transport Abstractions"]
+        IS["IBleScanner"]
+        IC["IBleConnection"]
+        IG["IGattServiceHandle\nIGattCharacteristicHandle"]
+    end
+
+    subgraph Windows["Windows Transport (WinRT)"]
+        WS["WindowsBleScanner\nadvertisement watcher"]
+        WC["WindowsBleConnection\nGATT session"]
+        WG["WindowsGattServiceHandle\nWindowsGattCharacteristicHandle"]
+        SE["PolarH10Session\nPMD lifecycle - streaming"]
+        CO["PolarMultiDeviceCoordinator\nmulti-device orchestration"]
+    end
+
+    subgraph Recording["Recording & Playback"]
+        RE["PolarSessionRecorder\nCSV + JSONL export"]
+        SD["SessionDiscovery\nscan runs & sessions"]
+        MA["CaptureRunManifest\nrun.json multi-device"]
+        DR["PolarDeviceRegistry\naddress <-> alias"]
+    end
+
+    subgraph CLI["CLI (System.CommandLine)"]
+        C1["scan - monitor - doctor"]
+        C2["record - stream - replay"]
+        C3["sessions - protocol"]
+    end
+
+    subgraph GUI["WPF App"]
+        G1["MainWindow\nmulti-device dashboard"]
+        G2["WaveformChart\nlive ECG / ACC"]
+    end
+
+    PMD --> SE
+    CP --> SE
+    EC --> SE
+    AC --> SE
+    HR --> SE
+    GID --> SE
+    IS -.-> WS
+    IC -.-> WC
+    IG -.-> WG
+    WC --> SE
+    WG --> SE
+    SE --> CO
+    SE --> RE
+    RE --> SD
+    RE --> MA
+    CO --> C1
+    CO --> C2
+    SE --> C1
+    SE --> C2
+    SD --> C3
+    CO --> G1
+    SE --> G1
+    G1 --> G2
+    DR --> RE
+    DR --> G1

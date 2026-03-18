@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "polarh10-diagrams",
+  "description": "Mermaid diagram pipeline for PolarH10",
+  "scripts": {
+    "diagram:render:all": "powershell -ExecutionPolicy Bypass -File ./Tools/diagrams/render-all-mermaid.ps1",
+    "diagram:sync:readme": "powershell -ExecutionPolicy Bypass -File ./Tools/diagrams/sync-readme-mermaid.ps1",
+    "diagram:watch": "chokidar \"docs/diagrams/*.mmd\" \"docs/diagrams/manifest.json\" -c \"npm run diagram:render:all && npm run diagram:sync:readme\"",
+    "diagram:serve": "browser-sync start --server docs --files \"docs/diagrams/*.svg,docs/diagrams/*.html\" --startPath \"diagrams/viewer.html\"",
+    "diagram:dev": "concurrently \"npm:diagram:watch\" \"npm:diagram:serve\"",
+    "pages:build": "node ./tools/site/build-pages.mjs",
+    "pages:watch": "chokidar \"docs/**/*.md\" \"docs/assets/*\" \"docs/diagrams/*\" -c \"npm run diagram:render:all && npm run pages:build\"",
+    "pages:serve": "browser-sync start --server site --files \"site/**/*\" --startPath \"index.html\"",
+    "pages:dev": "concurrently \"npm:pages:watch\" \"npm:pages:serve\""
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.4.0",
+    "browser-sync": "^3.0.0",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.0.0",
+    "marked": "^15.0.7"
+  }
+}
