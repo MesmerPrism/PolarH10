@@ -12,6 +12,7 @@ const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
+const assetVersion = '20260319-brutal-site';
 
 const docGroups = [
   {
@@ -85,6 +86,12 @@ function renderMarkdown(markdown, sourceRel) {
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
     return `<a href="${escapeHtml(safeHref)}"${titleAttr}>${text}</a>`;
   };
+  renderer.image = ({ href, title, text }) => {
+    const safeHref = href ? rewriteHref(href, sourceRel) : '';
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    const alt = text ? escapeHtml(text) : '';
+    return `<img src="${escapeHtml(safeHref)}" alt="${alt}"${titleAttr} />`;
+  };
 
   marked.setOptions({
     gfm: true,
@@ -115,7 +122,16 @@ function rewriteHref(href, sourceRel) {
     return relativeHref + hash;
   }
 
-  return href;
+  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/')) {
+    const currentDir = path.posix.join('reference', path.posix.dirname(sourceRel));
+    let relativeHref = path.posix.relative(currentDir, resolved);
+    if (!relativeHref) {
+      relativeHref = path.posix.basename(resolved);
+    }
+    return relativeHref + hash;
+  }
+
+  return href + hash;
 }
 
 function renderPage({ title, bodyClass, navKey, pageTitle, pageIntro, sidebar, content, currentDir }) {
@@ -131,7 +147,7 @@ function renderPage({ title, bodyClass, navKey, pageTitle, pageIntro, sidebar, c
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(title)} | PolarH10</title>
   <meta name="description" content="PolarH10 reference docs and architecture diagrams." />
-  <link rel="stylesheet" href="${asset('assets/site.css')}" />
+  <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
 </head>
 <body class="${bodyClass}">
   ${renderArt()}
@@ -163,7 +179,7 @@ function renderHomePage() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PolarH10 GitHub Pages</title>
   <meta name="description" content="Protocol-first Polar H10 tooling, diagrams, and documentation for GitHub Pages." />
-  <link rel="stylesheet" href="assets/site.css" />
+  <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
 </head>
 <body>
   ${renderArt()}
@@ -291,7 +307,7 @@ function render404Page() {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>404 - Page Not Found | PolarH10</title>
   <meta name="description" content="This page could not be found." />
-  <link rel="stylesheet" href="assets/site.css" />
+  <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
 </head>
 <body>
   ${renderArt()}

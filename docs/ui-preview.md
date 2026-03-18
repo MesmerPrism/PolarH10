@@ -1,6 +1,6 @@
 # WPF UI Preview
 
-This page captures the current brutal tDR-inspired redesign pass for the WPF reference app on branch `codex/brutal-tdr-ui`.
+This page captures the current brutal tDR-inspired redesign pass for the WPF reference app now merged into `main`.
 
 ![Brutal tDR-inspired WPF preview](assets/brutal-tdr-preview.png)
 
