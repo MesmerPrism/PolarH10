@@ -1,0 +1,8 @@
+{"timestampUtc":"2025-01-15T10:30:00.000Z","direction":"out","label":"CCCD_WRITE","characteristicUuid":"00002a37-0000-1000-8000-00805f9b34fb","payloadHex":"0100"}
+{"timestampUtc":"2025-01-15T10:30:00.050Z","direction":"out","label":"CCCD_WRITE","characteristicUuid":"fb005c81-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"0200"}
+{"timestampUtc":"2025-01-15T10:30:00.100Z","direction":"out","label":"CCCD_WRITE","characteristicUuid":"fb005c82-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"0100"}
+{"timestampUtc":"2025-01-15T10:30:00.200Z","direction":"out","label":"PMD_GET_SETTINGS","characteristicUuid":"fb005c81-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"0100"}
+{"timestampUtc":"2025-01-15T10:30:00.350Z","direction":"in","label":"PMD_SETTINGS_RESPONSE","characteristicUuid":"fb005c81-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"f00100000001028200010e00"}
+{"timestampUtc":"2025-01-15T10:30:00.500Z","direction":"out","label":"PMD_START_ECG","characteristicUuid":"fb005c81-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"020000018200010e00"}
+{"timestampUtc":"2025-01-15T10:30:00.600Z","direction":"in","label":"PMD_START_RESPONSE","characteristicUuid":"fb005c81-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"f0020000"}
+{"timestampUtc":"2025-01-15T10:30:10.000Z","direction":"out","label":"PMD_STOP","characteristicUuid":"fb005c81-02e7-f387-1cad-8acd2d8df0c8","payloadHex":"0300"}

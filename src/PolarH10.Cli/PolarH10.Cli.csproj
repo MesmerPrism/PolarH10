@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>PolarH10.Cli</RootNamespace>
+    <AssemblyName>polarh10</AssemblyName>
+    <Description>Command-line interface for the Polar H10: scan, monitor, record, stream, doctor, replay.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Abstractions\PolarH10.Transport.Abstractions.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Windows\PolarH10.Transport.Windows.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>PolarH10.Transport.Windows</RootNamespace>
+    <AssemblyName>PolarH10.Transport.Windows</AssemblyName>
+    <Description>Windows BLE/GATT transport adapter for the Polar H10 using WinRT APIs.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Abstractions\PolarH10.Transport.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

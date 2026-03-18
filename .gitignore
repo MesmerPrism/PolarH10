@@ -1,0 +1,57 @@
+## Build results
+[Bb]uild/
+[Oo]bj/
+[Bb]in/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+log/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+[Tt]est[Rr]esult*/
+[Dd]ebugPublic/
+[Rr]eleases/
+BenchmarkDotNet.Artifacts/
+
+## Project files
+*.csproj.user
+project.lock.json
+
+## Rider
+.idea/
+
+## dotnet tool
+.config/dotnet-tools.json
+
+## OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+.DS_Store
+
+## Local captures and third-party reference files
+session/
+tmp-live-check/
+Polar Measurement Data Specification for 3rd Party.pdf
+The Newer, the More Secure Standards-Compliant Bluetooth Low Energy Man-in-the-Middle Attacks on Fitness Trackers.pdf
+PolarH10 Public Repo.txt

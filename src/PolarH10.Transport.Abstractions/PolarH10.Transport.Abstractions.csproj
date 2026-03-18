@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>PolarH10.Transport.Abstractions</RootNamespace>
+    <AssemblyName>PolarH10.Transport.Abstractions</AssemblyName>
+    <Description>BLE transport abstraction interfaces for Polar H10. Implement these to add support for new platforms.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>PolarH10.Protocol</RootNamespace>
+    <AssemblyName>PolarH10.Protocol</AssemblyName>
+    <Description>Platform-independent Polar H10 BLE protocol layer: UUID constants, PMD command builders, HR/RR/ECG/ACC decoders, session recording, and CSV/JSONL export.</Description>
+  </PropertyGroup>
+</Project>

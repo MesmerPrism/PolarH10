@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>PolarH10.App</RootNamespace>
+    <AssemblyName>PolarH10.App</AssemblyName>
+    <Description>Live reference monitor GUI for the Polar H10.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Abstractions\PolarH10.Transport.Abstractions.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Windows\PolarH10.Transport.Windows.csproj" />
+  </ItemGroup>
+</Project>
