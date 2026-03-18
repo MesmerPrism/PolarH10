@@ -22,6 +22,7 @@ $repoRoot    = Resolve-Path (Join-Path $scriptDir '..\..')
 $diagramDir  = Join-Path $repoRoot 'docs\diagrams'
 $manifestPath = Join-Path $diagramDir 'manifest.json'
 $configPath  = Join-Path $diagramDir 'mermaid.config.json'
+$puppeteerConfigPath = Join-Path $scriptDir 'puppeteer.config.json'
 
 if (-not (Test-Path $manifestPath)) {
     Write-Error "Manifest not found at $manifestPath"
@@ -59,6 +60,12 @@ foreach ($entry in $manifest.diagrams) {
     $mmdcArgs = @('-i', $src, '-o', $out)
     if (Test-Path $configPath) {
         $mmdcArgs += @('-c', $configPath)
+    }
+    $runningOnLinux = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+        [System.Runtime.InteropServices.OSPlatform]::Linux
+    )
+    if ($runningOnLinux -and (Test-Path $puppeteerConfigPath)) {
+        $mmdcArgs += @('-p', $puppeteerConfigPath)
     }
     $mmdcArgs += @('--quiet')
 
