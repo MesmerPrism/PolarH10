@@ -8,6 +8,7 @@
     "diagram:watch": "chokidar \"docs/diagrams/*.mmd\" \"docs/diagrams/manifest.json\" -c \"npm run diagram:render:all && npm run diagram:sync:readme\"",
     "diagram:serve": "browser-sync start --server docs --files \"docs/diagrams/*.svg,docs/diagrams/*.html\" --startPath \"diagrams/viewer.html\"",
     "diagram:dev": "concurrently \"npm:diagram:watch\" \"npm:diagram:serve\"",
+    "ui:preview:capture": "node ./tools/diagrams/invoke-powershell.mjs ../site/capture-wpf-preview.ps1",
     "pages:build": "node ./tools/site/build-pages.mjs",
     "pages:watch": "chokidar \"docs/**/*.md\" \"docs/assets/*\" \"docs/diagrams/*\" -c \"npm run diagram:render:all && npm run pages:build\"",
     "pages:serve": "browser-sync start --server site --files \"site/**/*\" --startPath \"index.html\"",

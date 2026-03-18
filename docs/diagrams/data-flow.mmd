@@ -1,33 +1,32 @@
-%% Data flow - from Polar H10 hardware through the stack to disk / UI
-%% Hand-authored
+%% Live data path from the Polar H10 into runtime consumers.
 
-flowchart TD
-    H10["Polar H10 chest strap"]
+flowchart LR
+    H10["POLAR H10<br/>CHEST STRAP"]
 
-    subgraph BLE["BLE / GATT"]
-        ADV["Advertisement\ndevice name - address - RSSI"]
-        HRS["Heart Rate Service\n0x180D"]
-        PMD["PMD Service\nFB005C80-..."]
-        CTRL["PMD Control Point\nget-settings - start - stop"]
-        DATA["PMD Data\nECG frames - ACC frames"]
+    subgraph Link["BLE / GATT LINK"]
+        ADV["Advertisement<br/>name · address · RSSI"]
+        HRS["Heart Rate Service<br/>0x180D"]
+        PMD["PMD Service<br/>FB005C80-..."]
+        CTRL["PMD control point<br/>get-settings · start · stop"]
+        DATA["PMD data<br/>ECG frames · ACC frames"]
     end
 
-    subgraph Decode["Decoders"]
-        DHR["HrRrDecoder\n-> bpm + RR intervals"]
-        DECG["EcgDecoder\n-> uV samples @ 130 Hz"]
-        DACC["AccDecoder\n-> x/y/z mG @ 25-200 Hz"]
+    subgraph Decode["DECODERS"]
+        DHR["HrRrDecoder<br/>bpm + RR intervals"]
+        DECG["EcgDecoder<br/>uV samples @ 130 Hz"]
+        DACC["AccDecoder<br/>x / y / z mG"]
     end
 
-    subgraph Session["PolarH10Session"]
-        SHR["HeartRateReceived event"]
-        SECG["EcgSamplesReceived event"]
-        SACC["AccSamplesReceived event"]
+    subgraph Session["SESSION EVENTS"]
+        SHR["HeartRateReceived"]
+        SECG["EcgFrameReceived"]
+        SACC["AccFrameReceived"]
     end
 
-    subgraph Output["Consumers"]
-        REC["PolarSessionRecorder\nhr.csv - ecg.csv - acc.csv\nprotocol.jsonl"]
-        CHART["WaveformChart\nlive waveform rendering"]
-        LOG["RuntimeLogManager / HUD"]
+    subgraph Output["CONSUMERS"]
+        REC["PolarSessionRecorder<br/>hr.csv · ecg.csv · acc.csv · protocol.jsonl"]
+        CHART["WaveformChart<br/>live telemetry surfaces"]
+        LOG["Runtime logs<br/>WPF + CLI diagnostics"]
     end
 
     H10 --> ADV
@@ -46,3 +45,16 @@ flowchart TD
     SHR --> LOG
     SECG --> CHART
     SACC --> CHART
+    CTRL --> LOG
+
+    classDef hardware fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
+    classDef link fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef decode fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
+    classDef session fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    classDef output fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    class H10 hardware;
+    class ADV,HRS,PMD,CTRL,DATA link;
+    class DHR,DECG,DACC decode;
+    class SHR,SECG,SACC session;
+    class REC,CHART,LOG output;
+    linkStyle default stroke:#4B4F52,stroke-width:1.6px;

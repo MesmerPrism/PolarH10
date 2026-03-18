@@ -14,6 +14,6 @@ This page captures the current brutal tDR-inspired redesign pass for the WPF ref
 
 ## Notes
 
-- The screenshot is generated from the current local build of `PolarH10.App`.
+- The screenshot is generated from the current local build of `PolarH10.App` using the scripted preview mode in `tools/site/capture-wpf-preview.ps1`.
 - This preview focuses on the main shell, tab system, telemetry panels, and chart language.
 - Runtime data states will populate once a device is connected.

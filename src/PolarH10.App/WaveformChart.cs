@@ -120,6 +120,15 @@ public sealed class WaveformChart : FrameworkElement
         dc.DrawRectangle(HeaderBrush, null, new Rect(0, 0, width, headerHeight));
         dc.DrawLine(HeaderRulePen, new Point(0, headerHeight), new Point(width, headerHeight));
 
+        if (!HasVisibleData())
+        {
+            DrawGrid(dc, left, top, chartWidth, chartHeight);
+            DrawEmptyState(dc, dpi, left, top, chartWidth, chartHeight);
+            DrawHeader(dc, dpi);
+            dc.DrawRectangle(null, BorderPen, new Rect(left, top, chartWidth, chartHeight));
+            return;
+        }
+
         if (NormalizePerSeries)
         {
             DrawNormalizedChart(dc, dpi, left, top, chartWidth, chartHeight);
@@ -130,6 +139,17 @@ public sealed class WaveformChart : FrameworkElement
         }
 
         dc.DrawRectangle(null, BorderPen, new Rect(left, top, chartWidth, chartHeight));
+    }
+
+    private bool HasVisibleData()
+    {
+        foreach (var s in _series)
+        {
+            if (s.Visible && s.Count > 0)
+                return true;
+        }
+
+        return false;
     }
 
     private void DrawNormalizedChart(
@@ -171,6 +191,12 @@ public sealed class WaveformChart : FrameworkElement
             var text = MakeText($"{s.Name} {currentValue:F0}", 10, s.Pen.Brush, dpi, UiTypeface);
             dc.DrawText(text, new Point(legendX, 3));
             legendX += text.Width + 18;
+        }
+
+        if (!string.IsNullOrEmpty(Title))
+        {
+            var titleText = MakeText(Title, 11, TitleBrush, dpi, TitleTypeface);
+            dc.DrawText(titleText, new Point(10, 3));
         }
     }
 
@@ -228,9 +254,31 @@ public sealed class WaveformChart : FrameworkElement
 
         if (!string.IsNullOrEmpty(Title))
         {
-            var titleText = MakeText(Title, 11, TitleBrush, dpi, TitleTypeface);
-            dc.DrawText(titleText, new Point(10, 3));
+            DrawHeader(dc, dpi);
         }
+    }
+
+    private void DrawEmptyState(
+        DrawingContext dc,
+        double dpi,
+        double left,
+        double top,
+        double chartWidth,
+        double chartHeight)
+    {
+        var stateText = MakeText("AWAITING TELEMETRY", 12, MutedBrush, dpi, UiTypeface);
+        var x = left + Math.Max((chartWidth - stateText.Width) / 2.0, 8);
+        var y = top + Math.Max((chartHeight - stateText.Height) / 2.0, 8);
+        dc.DrawText(stateText, new Point(x, y));
+    }
+
+    private void DrawHeader(DrawingContext dc, double dpi)
+    {
+        if (string.IsNullOrEmpty(Title))
+            return;
+
+        var titleText = MakeText(Title, 11, TitleBrush, dpi, TitleTypeface);
+        dc.DrawText(titleText, new Point(10, 3));
     }
 
     private static void DrawGrid(DrawingContext dc, double left, double top, double chartWidth, double chartHeight)

@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Polar H10 // Telemetry Unit"
-        Width="1280"
-        Height="900"
+        Width="1360"
+        Height="940"
         MinWidth="1160"
         MinHeight="820"
         WindowStartupLocation="CenterScreen">
@@ -112,7 +112,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -258,9 +258,9 @@
                     <TabItem Header="01 LIVE">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
-                                <Grid Margin="0,0,0,10">
+                                <Grid Margin="0,0,0,12">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="1.2*" />
+                                        <ColumnDefinition Width="1.15*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
@@ -295,20 +295,79 @@
 
                                 <TextBlock Text="SIGNAL WINDOWS // LIVE TELEMETRY"
                                            Style="{StaticResource SectionTitleStyle}"
-                                           Margin="0,0,0,10" />
+                                           Margin="0,0,0,8" />
 
-                                <Border x:Name="HrChartHost" Style="{StaticResource PanelFrameStyle}" Height="126" Padding="0" />
-                                <Border x:Name="RrChartHost" Style="{StaticResource PanelFrameStyle}" Height="126" Padding="0" />
-                                <Border x:Name="EcgChartHost" Style="{StaticResource PanelFrameStyle}" Height="170" Padding="0" />
-                                <Border x:Name="AccXChartHost" Style="{StaticResource PanelFrameStyle}" Height="126" Padding="0" />
-                                <Border x:Name="AccYChartHost" Style="{StaticResource PanelFrameStyle}" Height="126" Padding="0" />
-                                <Border x:Name="AccZChartHost" Style="{StaticResource PanelFrameStyle}" Height="126" Padding="0" />
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border x:Name="HrChartHost"
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            Style="{StaticResource PanelFrameStyle}"
+                                            Height="120"
+                                            Padding="0"
+                                            Margin="0,0,10,10" />
+                                    <Border x:Name="RrChartHost"
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Style="{StaticResource PanelFrameStyle}"
+                                            Height="120"
+                                            Padding="0"
+                                            Margin="0,0,0,10" />
+                                    <Border x:Name="EcgChartHost"
+                                            Grid.Row="1"
+                                            Grid.ColumnSpan="2"
+                                            Style="{StaticResource PanelFrameStyle}"
+                                            Height="188"
+                                            Padding="0"
+                                            Margin="0,0,0,10" />
+
+                                    <TextBlock Grid.Row="2"
+                                               Grid.ColumnSpan="2"
+                                               Text="MOTION AXES // ACC VECTOR"
+                                               Style="{StaticResource SectionTitleStyle}"
+                                               Margin="0,0,0,8" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border x:Name="AccXChartHost"
+                                            Grid.Column="0"
+                                            Style="{StaticResource PanelFrameStyle}"
+                                            Height="118"
+                                            Padding="0"
+                                            Margin="0,0,10,0" />
+                                    <Border x:Name="AccYChartHost"
+                                            Grid.Column="1"
+                                            Style="{StaticResource PanelFrameStyle}"
+                                            Height="118"
+                                            Padding="0"
+                                            Margin="0,0,10,0" />
+                                    <Border x:Name="AccZChartHost"
+                                            Grid.Column="2"
+                                            Style="{StaticResource PanelFrameStyle}"
+                                            Height="118"
+                                            Padding="0" />
+                                </Grid>
 
                                 <TextBlock Text="EVENT TRACE // LIVE LOG"
                                            Style="{StaticResource SectionTitleStyle}"
-                                           Margin="0,6,0,10" />
+                                           Margin="0,4,0,8" />
                                 <ListBox x:Name="LiveLogList"
-                                         Height="138"
+                                         Height="122"
                                          Style="{StaticResource ConsoleListStyle}"
                                          ItemContainerStyle="{StaticResource ConsoleListItemStyle}" />
                             </StackPanel>

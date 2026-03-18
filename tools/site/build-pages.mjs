@@ -12,7 +12,7 @@ const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
-const assetVersion = '20260319-brutal-site';
+const assetVersion = '20260319-brutal-site-2';
 
 const docGroups = [
   {
@@ -262,6 +262,12 @@ function renderHomePage() {
           <h3>Protocol to transport to consumers</h3>
           <p>Shows how decoders, BLE transport, sessions, recording, CLI, and WPF fit together.</p>
           <img src="diagrams/code-architecture.svg" alt="Code architecture diagram" />
+        </a>
+        <a class="preview-card" href="diagrams/viewer.html#session-lifecycle">
+          <div class="meta">Runtime lifecycle</div>
+          <h3>Operator flow from scan to shutdown</h3>
+          <p>Shows the link sequence from discovery through PMD start, recording, and teardown.</p>
+          <img src="diagrams/session-lifecycle.svg" alt="Session lifecycle diagram" />
         </a>
       </div>
     </section>

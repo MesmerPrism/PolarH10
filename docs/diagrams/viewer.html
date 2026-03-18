@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolarH10 Diagram Viewer</title>
-  <link rel="stylesheet" href="../assets/site.css?v=20260319-brutal-site" />
+  <link rel="stylesheet" href="../assets/site.css?v=20260319-brutal-site-2" />
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'strict' });
     window.__mermaid = mermaid;
   </script>
 </head>
@@ -54,6 +53,20 @@
             <button id="btn-source" class="button" title="Toggle Mermaid source" type="button">Source</button>
             <button id="btn-fullscreen" class="button" title="Fullscreen" type="button">Fullscreen</button>
           </div>
+          <div id="viewer-meta" class="viewer-meta" hidden>
+            <div class="viewer-meta-item">
+              <span class="meta-key">Brief</span>
+              <p id="viewer-description" class="viewer-description"></p>
+            </div>
+            <div class="viewer-meta-item">
+              <span class="meta-key">Category</span>
+              <strong id="viewer-category"></strong>
+            </div>
+            <div class="viewer-meta-item">
+              <span class="meta-key">Source</span>
+              <code id="viewer-source"></code>
+            </div>
+          </div>
           <div id="viewer" class="viewer-stage"><div class="empty-state">Choose a diagram from the sidebar.</div></div>
           <div id="source-panel" class="source-stage" hidden><pre id="source-code"></pre></div>
         </main>
@@ -70,8 +83,24 @@
       const srcPanel = document.getElementById('source-panel');
       const srcCode = document.getElementById('source-code');
       const titleEl = document.getElementById('title');
+      const viewerMeta = document.getElementById('viewer-meta');
+      const viewerDescription = document.getElementById('viewer-description');
+      const viewerCategory = document.getElementById('viewer-category');
+      const viewerSource = document.getElementById('viewer-source');
       const btnSrc = document.getElementById('btn-source');
       const btnFs = document.getElementById('btn-fullscreen');
+
+      try {
+        const configResponse = await fetch('mermaid.config.json');
+        if (configResponse.ok) {
+          const config = await configResponse.json();
+          window.__mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', ...config });
+        } else {
+          window.__mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+        }
+      } catch {
+        window.__mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+      }
 
       let manifest;
       try {
@@ -136,6 +165,10 @@
         });
 
         titleEl.textContent = diagram.title;
+        viewerDescription.textContent = diagram.description || 'Diagram notes unavailable.';
+        viewerCategory.textContent = (diagram.category || 'other').toUpperCase();
+        viewerSource.textContent = diagram.source;
+        viewerMeta.hidden = false;
         location.hash = diagram.id;
 
         const svgPath = diagram.source.replace(/\.mmd$/, '.svg');

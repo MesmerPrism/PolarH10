@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using PolarH10.Protocol;
 using PolarH10.Transport.Windows;
@@ -16,9 +17,14 @@ public partial class MainWindow : Window
     private static readonly Color TelemetryCyan = Color.FromRgb(0x00, 0xA7, 0xA0);
     private static readonly Color Paper = Color.FromRgb(0xF1, 0xEE, 0xE6);
     private static readonly Color Graphite = Color.FromRgb(0x8A, 0x8E, 0x91);
+    private static readonly bool IsPreviewMode = string.Equals(
+        Environment.GetEnvironmentVariable("POLARH10_PREVIEW"),
+        "1",
+        StringComparison.Ordinal);
 
     private readonly PolarDeviceRegistry _deviceRegistry = new(PolarDeviceRegistry.DefaultFilePath);
     private readonly PolarMultiDeviceCoordinator _coordinator;
+    private readonly string? _capturePath = Environment.GetEnvironmentVariable("POLARH10_CAPTURE_PATH");
 
     // Scan state
     private readonly Dictionary<string, (string Name, int Rssi)> _seenDevices = new();
@@ -46,6 +52,7 @@ public partial class MainWindow : Window
     private int _ovHr, _ovRr, _ovEcg, _ovAccX, _ovAccY, _ovAccZ;
 
     private DispatcherTimer _refreshTimer = null!;
+    private bool _previewPrepared;
 
     public MainWindow()
     {
@@ -69,6 +76,8 @@ public partial class MainWindow : Window
                 _chartStates.Remove(ctx.BluetoothAddress);
                 RefreshDeviceList();
             });
+
+        Loaded += OnLoaded;
     }
 
     // ── Chart init (same per-signal charts, rebound when selection changes) ──
@@ -393,6 +402,9 @@ public partial class MainWindow : Window
     // ── Connect ─────────────────────────────────────────────────
     private async void OnConnectClick(object sender, RoutedEventArgs e)
     {
+        if (IsPreviewMode)
+            return;
+
         if (_selectedAddress is null) return;
         var address = _selectedAddress;
 
@@ -440,6 +452,9 @@ public partial class MainWindow : Window
     // ── Disconnect ──────────────────────────────────────────────
     private async void OnDisconnectClick(object sender, RoutedEventArgs e)
     {
+        if (IsPreviewMode)
+            return;
+
         if (_selectedAddress is null) return;
         var address = _selectedAddress;
 
@@ -455,6 +470,9 @@ public partial class MainWindow : Window
     // ── Alias editing ───────────────────────────────────────────
     private void OnSetAliasClick(object sender, RoutedEventArgs e)
     {
+        if (IsPreviewMode)
+            return;
+
         if (_selectedAddress is null) return;
         var alias = AliasBox.Text.Trim();
 
@@ -486,6 +504,9 @@ public partial class MainWindow : Window
     // ── Recording ───────────────────────────────────────────────
     private void OnStartRecordClick(object sender, RoutedEventArgs e)
     {
+        if (IsPreviewMode)
+            return;
+
         if (_selectedAddress is null) return;
 
         try
@@ -511,6 +532,9 @@ public partial class MainWindow : Window
 
     private async void OnStopRecordClick(object sender, RoutedEventArgs e)
     {
+        if (IsPreviewMode)
+            return;
+
         if (_selectedAddress is null) return;
         var address = _selectedAddress;
 
@@ -589,5 +613,161 @@ public partial class MainWindow : Window
         if (DiagLogList.Items.Count > 500)
             DiagLogList.Items.RemoveAt(0);
         DiagLogList.ScrollIntoView(DiagLogList.Items[^1]);
+    }
+
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (!IsPreviewMode || _previewPrepared)
+            return;
+
+        _previewPrepared = true;
+        Width = 1520;
+        Height = 1100;
+
+        SeedPreviewState();
+        UpdateLayout();
+
+        await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        await Task.Delay(250);
+
+        if (!string.IsNullOrWhiteSpace(_capturePath))
+        {
+            SavePreviewCapture(_capturePath);
+            Application.Current.Shutdown();
+        }
+    }
+
+    private void SeedPreviewState()
+    {
+        DeviceListBox.Items.Clear();
+        LiveLogList.Items.Clear();
+        DiagLogList.Items.Clear();
+
+        var previewDevices = new[]
+        {
+            ("A0:9F:1D:42:11:7C", "UNIT ALPHA [LIVE]"),
+            ("A0:9F:1D:42:11:91", "UNIT BETA [LINK]"),
+            ("A0:9F:1D:42:12:04", "LAB HARNESS [OFFLINE]"),
+        };
+
+        foreach (var (address, label) in previewDevices)
+        {
+            DeviceListBox.Items.Add(new ListBoxItem
+            {
+                Content = label,
+                Tag = address,
+            });
+        }
+
+        DeviceListBox.SelectedIndex = 0;
+        _selectedAddress = previewDevices[0].Item1;
+
+        ScanStatusText.Text = "3 DEVICE(S)";
+        SelectedDeviceLabel.Text = "UNIT ALPHA // TELEMETRY LINK";
+        AliasBox.Text = "ALPHA-01";
+        StatusText.Text = "LIVE";
+        ConnectButton.IsEnabled = false;
+        DisconnectButton.IsEnabled = true;
+        StartRecordButton.IsEnabled = true;
+        StopRecordButton.IsEnabled = false;
+        OutputFolderBox.Text = @".\session\preview";
+        RecordStatusText.Text = "OUTPUT ARMED";
+
+        HrValueText.Text = "72 BPM";
+        RrValueText.Text = "RR // 828 MS, 833 MS, 829 MS";
+        HrCountText.Text = "HR // 256";
+        EcgCountText.Text = "ECG FRAMES // 514";
+        AccCountText.Text = "ACC FRAMES // 384";
+
+        foreach (var message in new[]
+        {
+            "[UNIT ALPHA] Preview feed armed",
+            "[UNIT ALPHA] ECG stream locked at 130 Hz",
+            "[UNIT ALPHA] ACC stream locked at 100 Hz",
+            "[UNIT ALPHA] Recorder idle // output target armed",
+        })
+        {
+            AddLiveLog(message);
+        }
+
+        foreach (var message in new[]
+        {
+            "[A0:9F:1D:42:11:7C] CTRL op=0x01 meas=0x00 err=0x00 ok=True",
+            "[A0:9F:1D:42:11:7C] CTRL op=0x02 meas=0x00 err=0x00 ok=True",
+            "[A0:9F:1D:42:11:7C] PMD ECG stream active",
+            "[A0:9F:1D:42:11:7C] PMD ACC stream active",
+        })
+        {
+            AddDiagLog(message);
+        }
+
+        LiveLogList.UpdateLayout();
+        DiagLogList.UpdateLayout();
+        PopulatePreviewCharts();
+    }
+
+    private void PopulatePreviewCharts()
+    {
+        const int sampleCount = 240;
+
+        for (var i = 0; i < sampleCount; i++)
+        {
+            var t = i / 11.0;
+            var hr = 72 + Math.Sin(i / 18.0) * 2.2 + Math.Cos(i / 31.0) * 1.1;
+            var rr = 828 + Math.Sin(i / 13.0) * 14 + Math.Cos(i / 29.0) * 9;
+            var ecg =
+                Math.Sin(t) * 210 +
+                Math.Sin(t * 2.4) * 34 +
+                Math.Sin(t * 6.8) * 12 +
+                (i % 32 == 0 ? 280 : 0);
+            var accX = Math.Sin(i / 9.0) * 180 + Math.Cos(i / 17.0) * 40;
+            var accY = Math.Cos(i / 11.0) * 150 + Math.Sin(i / 21.0) * 45;
+            var accZ = Math.Sin(i / 7.0) * 120 + Math.Cos(i / 19.0) * 55;
+
+            _hrChart.Push(_hrSeries, hr);
+            _rrChart.Push(_rrSeries, rr);
+            _ecgChart.Push(_ecgSeries, ecg);
+            _accXChart.Push(_accXSeries, accX);
+            _accYChart.Push(_accYSeries, accY);
+            _accZChart.Push(_accZSeries, accZ);
+
+            _overlayChart.Push(_ovHr, hr);
+            _overlayChart.Push(_ovRr, rr);
+            _overlayChart.Push(_ovEcg, ecg);
+            _overlayChart.Push(_ovAccX, accX);
+            _overlayChart.Push(_ovAccY, accY);
+            _overlayChart.Push(_ovAccZ, accZ);
+        }
+
+        _hrChart.Refresh();
+        _rrChart.Refresh();
+        _ecgChart.Refresh();
+        _accXChart.Refresh();
+        _accYChart.Refresh();
+        _accZChart.Refresh();
+        _overlayChart.Refresh();
+    }
+
+    private void SavePreviewCapture(string outputPath)
+    {
+        RootGrid.UpdateLayout();
+
+        var width = Math.Max((int)Math.Ceiling(RootGrid.ActualWidth), 1);
+        var height = Math.Max((int)Math.Ceiling(RootGrid.ActualHeight), 1);
+        var renderTarget = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+        renderTarget.Render(RootGrid);
+
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(renderTarget));
+
+        var fullPath = Path.GetFullPath(outputPath);
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        using var stream = File.Create(fullPath);
+        encoder.Save(stream);
     }
 }

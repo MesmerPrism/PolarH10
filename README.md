@@ -25,36 +25,36 @@ Windows. Streams ECG, accelerometer, and heart rate data without the Polar SDK.
 <!-- MERMAID:BEGIN repo-structure -->
 
 ```mermaid
-flowchart TB
-    R["PolarH10"]
+flowchart LR
+    R["POLARH10<br/>WINDOWS H10 WORKSPACE"]
 
-    subgraph Source["Source (src/)"]
-        P1["PolarH10.Protocol\ndecoders - builders - recording"]
-        P2["PolarH10.Transport.Abstractions\nBLE interfaces"]
-        P3["PolarH10.Transport.Windows\nWinRT GATT - session - coordinator"]
-        P4["PolarH10.Cli\nSystem.CommandLine CLI"]
-        P5["PolarH10.App\nWPF reference monitor"]
+    subgraph Source["src/ // runtime code"]
+        P1["Protocol<br/>decoders · PMD · recording"]
+        P2["Transport.Abstractions<br/>BLE contracts"]
+        P3["Transport.Windows<br/>scanner · GATT · session"]
+        P4["Cli<br/>diagnostics · capture"]
+        P5["App<br/>WPF telemetry monitor"]
     end
 
-    subgraph Tests["Tests (tests/)"]
-        T1["Protocol.Tests\nunit decoders"]
-        T2["Playback.Tests\nsession & legacy compat"]
-        T3["Transport.Windows.Tests\nsmoke tests"]
+    subgraph Tests["tests/ // verification"]
+        T1["Protocol.Tests<br/>unit decoders"]
+        T2["Playback.Tests<br/>session compatibility"]
+        T3["Transport.Windows.Tests<br/>smoke coverage"]
     end
 
-    subgraph Docs["Documentation (docs/)"]
-        D1["protocol/\nGATT map - PMD - ECG - ACC - HR"]
-        D2["getting-started.md - cli.md"]
-        D3["diagrams/\nMermaid sources & SVGs"]
+    subgraph Docs["docs/ // published reference"]
+        D1["protocol/<br/>GATT · PMD · ECG · ACC · HR"]
+        D2["getting-started.md<br/>cli.md · references.md"]
+        D3["diagrams/<br/>mmd sources · svg output"]
     end
 
-    subgraph Tooling["Tooling"]
-        TL1["tools/\ncapture-fixture - csv-validate"]
-        TL2["package.json\nMermaid CLI scripts"]
-        TL3[".github/workflows/"]
+    subgraph Tooling["tools/ + workflow"]
+        TL1["tools/<br/>fixtures · validators · Pages build"]
+        TL2["package.json<br/>Mermaid CLI scripts"]
+        TL3[".github/workflows/<br/>Pages deploy"]
     end
 
-    subgraph Samples["Samples"]
+    subgraph Samples["sample data"]
         S1["protocol-transcripts/"]
         S2["sample-sessions/"]
     end
@@ -64,7 +64,23 @@ flowchart TB
     R --> Docs
     R --> Tooling
     R --> Samples
+    TL1 --> D3
     TL2 --> D3
+    TL3 --> D3
+
+    classDef hub fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
+    classDef source fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
+    classDef tests fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef docs fill:#F7F1BA,stroke:#D8D61A,color:#111315,stroke-width:1.5px;
+    classDef tooling fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    classDef sample fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    class R hub;
+    class P1,P2,P3,P4,P5 source;
+    class T1,T2,T3 tests;
+    class D1,D2,D3 docs;
+    class TL1,TL2,TL3 tooling;
+    class S1,S2 sample;
+    linkStyle default stroke:#4B4F52,stroke-width:1.6px;
 ```
 
 <!-- MERMAID:END repo-structure -->
@@ -75,45 +91,40 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph Protocol["Protocol Layer (platform-independent)"]
-        EC["PolarEcgDecoder\n24-bit uV samples"]
-        AC["PolarAccDecoder\nmG + compressed deltas"]
-        HR["PolarHrRrDecoder\nBLE HR/RR parsing"]
-        PMD["PolarPmdCommandBuilder\nsettings - start - stop"]
-        CP["PolarPmdControlPointParser\nresponse decoding"]
-        GID["PolarGattIds\nservice & char UUIDs"]
+    subgraph Protocol["PROTOCOL CORE"]
+        EC["PolarEcgDecoder<br/>24-bit uV samples"]
+        AC["PolarAccDecoder<br/>mG + compressed deltas"]
+        HR["PolarHrRrDecoder<br/>HR / RR parsing"]
+        PMD["PolarPmdCommandBuilder<br/>settings · start · stop"]
+        CP["PolarPmdControlPointParser<br/>response decoding"]
+        GID["PolarGattIds<br/>service + characteristic UUIDs"]
     end
 
-    subgraph Transport["Transport Abstractions"]
+    subgraph Transport["TRANSPORT CONTRACTS"]
         IS["IBleScanner"]
         IC["IBleConnection"]
-        IG["IGattServiceHandle\nIGattCharacteristicHandle"]
+        IG["IGattServiceHandle<br/>IGattCharacteristicHandle"]
     end
 
-    subgraph Windows["Windows Transport (WinRT)"]
-        WS["WindowsBleScanner\nadvertisement watcher"]
-        WC["WindowsBleConnection\nGATT session"]
-        WG["WindowsGattServiceHandle\nWindowsGattCharacteristicHandle"]
-        SE["PolarH10Session\nPMD lifecycle - streaming"]
-        CO["PolarMultiDeviceCoordinator\nmulti-device orchestration"]
+    subgraph Windows["WINDOWS BLE"]
+        WS["WindowsBleScanner<br/>advertisement watcher"]
+        WC["WindowsBleConnection<br/>GATT session"]
+        WG["WindowsGattServiceHandle<br/>WindowsGattCharacteristicHandle"]
+        SE["PolarH10Session<br/>PMD lifecycle + streaming"]
+        CO["PolarMultiDeviceCoordinator<br/>device orchestration"]
     end
 
-    subgraph Recording["Recording & Playback"]
-        RE["PolarSessionRecorder\nCSV + JSONL export"]
-        SD["SessionDiscovery\nscan runs & sessions"]
-        MA["CaptureRunManifest\nrun.json multi-device"]
-        DR["PolarDeviceRegistry\naddress <-> alias"]
+    subgraph Recording["RECORDING + STATE"]
+        RE["PolarSessionRecorder<br/>CSV + JSONL export"]
+        SD["SessionDiscovery<br/>scan runs + sessions"]
+        MA["CaptureRunManifest<br/>run.json multi-device"]
+        DR["PolarDeviceRegistry<br/>address / alias registry"]
     end
 
-    subgraph CLI["CLI (System.CommandLine)"]
-        C1["scan - monitor - doctor"]
-        C2["record - stream - replay"]
-        C3["sessions - protocol"]
-    end
-
-    subgraph GUI["WPF App"]
-        G1["MainWindow\nmulti-device dashboard"]
-        G2["WaveformChart\nlive ECG / ACC"]
+    subgraph Surfaces["OPERATOR SURFACES"]
+        C1["CLI<br/>scan · doctor · record · replay"]
+        G1["WPF monitor<br/>selection · tabs · diagnostics"]
+        G2["WaveformChart<br/>live telemetry rendering"]
     end
 
     PMD --> SE
@@ -131,16 +142,25 @@ flowchart LR
     SE --> RE
     RE --> SD
     RE --> MA
-    CO --> C1
-    CO --> C2
-    SE --> C1
-    SE --> C2
-    SD --> C3
-    CO --> G1
-    SE --> G1
-    G1 --> G2
     DR --> RE
     DR --> G1
+    CO --> C1
+    CO --> G1
+    SE --> C1
+    SE --> G1
+    G1 --> G2
+
+    classDef core fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
+    classDef contracts fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef windows fill:#111315,stroke:#8A8E91,color:#F1EEE6,stroke-width:1.5px;
+    classDef record fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    classDef surface fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    class EC,AC,HR,PMD,CP,GID core;
+    class IS,IC,IG contracts;
+    class WS,WC,WG,SE,CO windows;
+    class RE,SD,MA,DR record;
+    class C1,G1,G2 surface;
+    linkStyle default stroke:#4B4F52,stroke-width:1.6px;
 ```
 
 <!-- MERMAID:END code-architecture -->
@@ -150,33 +170,33 @@ flowchart LR
 <!-- MERMAID:BEGIN data-flow -->
 
 ```mermaid
-flowchart TD
-    H10["Polar H10 chest strap"]
+flowchart LR
+    H10["POLAR H10<br/>CHEST STRAP"]
 
-    subgraph BLE["BLE / GATT"]
-        ADV["Advertisement\ndevice name - address - RSSI"]
-        HRS["Heart Rate Service\n0x180D"]
-        PMD["PMD Service\nFB005C80-..."]
-        CTRL["PMD Control Point\nget-settings - start - stop"]
-        DATA["PMD Data\nECG frames - ACC frames"]
+    subgraph Link["BLE / GATT LINK"]
+        ADV["Advertisement<br/>name · address · RSSI"]
+        HRS["Heart Rate Service<br/>0x180D"]
+        PMD["PMD Service<br/>FB005C80-..."]
+        CTRL["PMD control point<br/>get-settings · start · stop"]
+        DATA["PMD data<br/>ECG frames · ACC frames"]
     end
 
-    subgraph Decode["Decoders"]
-        DHR["HrRrDecoder\n-> bpm + RR intervals"]
-        DECG["EcgDecoder\n-> uV samples @ 130 Hz"]
-        DACC["AccDecoder\n-> x/y/z mG @ 25-200 Hz"]
+    subgraph Decode["DECODERS"]
+        DHR["HrRrDecoder<br/>bpm + RR intervals"]
+        DECG["EcgDecoder<br/>uV samples @ 130 Hz"]
+        DACC["AccDecoder<br/>x / y / z mG"]
     end
 
-    subgraph Session["PolarH10Session"]
-        SHR["HeartRateReceived event"]
-        SECG["EcgSamplesReceived event"]
-        SACC["AccSamplesReceived event"]
+    subgraph Session["SESSION EVENTS"]
+        SHR["HeartRateReceived"]
+        SECG["EcgFrameReceived"]
+        SACC["AccFrameReceived"]
     end
 
-    subgraph Output["Consumers"]
-        REC["PolarSessionRecorder\nhr.csv - ecg.csv - acc.csv\nprotocol.jsonl"]
-        CHART["WaveformChart\nlive waveform rendering"]
-        LOG["RuntimeLogManager / HUD"]
+    subgraph Output["CONSUMERS"]
+        REC["PolarSessionRecorder<br/>hr.csv · ecg.csv · acc.csv · protocol.jsonl"]
+        CHART["WaveformChart<br/>live telemetry surfaces"]
+        LOG["Runtime logs<br/>WPF + CLI diagnostics"]
     end
 
     H10 --> ADV
@@ -195,6 +215,19 @@ flowchart TD
     SHR --> LOG
     SECG --> CHART
     SACC --> CHART
+    CTRL --> LOG
+
+    classDef hardware fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
+    classDef link fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef decode fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
+    classDef session fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    classDef output fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    class H10 hardware;
+    class ADV,HRS,PMD,CTRL,DATA link;
+    class DHR,DECG,DACC decode;
+    class SHR,SECG,SACC session;
+    class REC,CHART,LOG output;
+    linkStyle default stroke:#4B4F52,stroke-width:1.6px;
 ```
 
 <!-- MERMAID:END data-flow -->

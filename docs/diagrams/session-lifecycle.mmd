@@ -1,0 +1,21 @@
+%% Runtime lifecycle from discovery through streaming and capture.
+
+flowchart LR
+    S1["01 SCAN<br/>watch Polar advertisements"] --> S2["02 SELECT DEVICE<br/>choose alias + target link"]
+    S2 --> S3["03 OPEN GATT<br/>services · characteristics · notifications"]
+    S3 --> S4["04 NEGOTIATE PMD<br/>settings query + stream start"]
+    S4 --> S5["05 LIVE TELEMETRY<br/>HR · RR · ECG · ACC"]
+    S5 --> S6["06 OPTIONAL RECORD<br/>CSV + JSONL + run manifest"]
+    S5 --> S7["07 DIAGNOSTICS<br/>doctor / monitor / runtime log"]
+    S6 --> S8["08 STOP / CUT LINK<br/>flush files + release session"]
+    S7 --> S8
+
+    classDef step fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
+    classDef active fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
+    classDef io fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    classDef output fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    class S1,S2,S3,S4 step;
+    class S5 active;
+    class S7 io;
+    class S6,S8 output;
+    linkStyle default stroke:#4B4F52,stroke-width:1.6px;

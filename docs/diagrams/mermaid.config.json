@@ -1,12 +1,40 @@
 {
-  "theme": "default",
+  "theme": "base",
   "themeVariables": {
     "fontSize": "14px",
-    "fontFamily": "Segoe UI, Helvetica, Arial, sans-serif"
+    "fontFamily": "IBM Plex Sans Condensed, Bahnschrift Condensed, Helvetica, Arial, sans-serif",
+    "primaryColor": "#F1EEE6",
+    "primaryTextColor": "#111315",
+    "primaryBorderColor": "#111315",
+    "secondaryColor": "#E6E1D7",
+    "secondaryTextColor": "#111315",
+    "secondaryBorderColor": "#4B4F52",
+    "tertiaryColor": "#111315",
+    "tertiaryTextColor": "#F1EEE6",
+    "tertiaryBorderColor": "#8A8E91",
+    "mainBkg": "#F1EEE6",
+    "nodeBorder": "#111315",
+    "clusterBkg": "#ECE7DD",
+    "clusterBorder": "#4B4F52",
+    "lineColor": "#4B4F52",
+    "edgeLabelBackground": "#F1EEE6",
+    "labelBackground": "#F1EEE6",
+    "textColor": "#111315",
+    "titleColor": "#111315",
+    "signalColor": "#D92C2C",
+    "errorBkgColor": "#F05A22",
+    "errorTextColor": "#111315"
   },
+  "themeCSS": ".node rect,.node circle,.node ellipse,.node polygon,.node path,.label-container,.cluster rect{rx:0!important;ry:0!important;shape-rendering:crispEdges;} .cluster text,.nodeLabel,.edgeLabel{font-weight:600;} .edgeLabel rect,.labelBkg{fill:#F1EEE6!important;stroke:#111315!important;stroke-width:1px!important;} .flowchart-link,.edgePath path{stroke:#4B4F52!important;stroke-width:1.6px!important;} .marker path{fill:#4B4F52!important;stroke:#4B4F52!important;} .cluster span,.nodeLabel p{line-height:1.3!important;}",
   "flowchart": {
-    "useMaxWidth": true,
-    "htmlLabels": true,
-    "curve": "basis"
+    "useMaxWidth": false,
+    "htmlLabels": false,
+    "curve": "linear",
+    "nodeSpacing": 35,
+    "rankSpacing": 55,
+    "padding": 18
+  },
+  "sequence": {
+    "useMaxWidth": false
   }
 }

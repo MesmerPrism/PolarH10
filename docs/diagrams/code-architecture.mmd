@@ -1,46 +1,41 @@
-%% Code architecture - subsystem level, hand-authored
-%% Shows the layered design: protocol -> transport -> session -> consumers
+%% Code architecture - subsystem level.
+%% Optimized for Pages viewer and GitHub README rendering.
 
 flowchart LR
-    subgraph Protocol["Protocol Layer (platform-independent)"]
-        EC["PolarEcgDecoder\n24-bit uV samples"]
-        AC["PolarAccDecoder\nmG + compressed deltas"]
-        HR["PolarHrRrDecoder\nBLE HR/RR parsing"]
-        PMD["PolarPmdCommandBuilder\nsettings - start - stop"]
-        CP["PolarPmdControlPointParser\nresponse decoding"]
-        GID["PolarGattIds\nservice & char UUIDs"]
+    subgraph Protocol["PROTOCOL CORE"]
+        EC["PolarEcgDecoder<br/>24-bit uV samples"]
+        AC["PolarAccDecoder<br/>mG + compressed deltas"]
+        HR["PolarHrRrDecoder<br/>HR / RR parsing"]
+        PMD["PolarPmdCommandBuilder<br/>settings · start · stop"]
+        CP["PolarPmdControlPointParser<br/>response decoding"]
+        GID["PolarGattIds<br/>service + characteristic UUIDs"]
     end
 
-    subgraph Transport["Transport Abstractions"]
+    subgraph Transport["TRANSPORT CONTRACTS"]
         IS["IBleScanner"]
         IC["IBleConnection"]
-        IG["IGattServiceHandle\nIGattCharacteristicHandle"]
+        IG["IGattServiceHandle<br/>IGattCharacteristicHandle"]
     end
 
-    subgraph Windows["Windows Transport (WinRT)"]
-        WS["WindowsBleScanner\nadvertisement watcher"]
-        WC["WindowsBleConnection\nGATT session"]
-        WG["WindowsGattServiceHandle\nWindowsGattCharacteristicHandle"]
-        SE["PolarH10Session\nPMD lifecycle - streaming"]
-        CO["PolarMultiDeviceCoordinator\nmulti-device orchestration"]
+    subgraph Windows["WINDOWS BLE"]
+        WS["WindowsBleScanner<br/>advertisement watcher"]
+        WC["WindowsBleConnection<br/>GATT session"]
+        WG["WindowsGattServiceHandle<br/>WindowsGattCharacteristicHandle"]
+        SE["PolarH10Session<br/>PMD lifecycle + streaming"]
+        CO["PolarMultiDeviceCoordinator<br/>device orchestration"]
     end
 
-    subgraph Recording["Recording & Playback"]
-        RE["PolarSessionRecorder\nCSV + JSONL export"]
-        SD["SessionDiscovery\nscan runs & sessions"]
-        MA["CaptureRunManifest\nrun.json multi-device"]
-        DR["PolarDeviceRegistry\naddress <-> alias"]
+    subgraph Recording["RECORDING + STATE"]
+        RE["PolarSessionRecorder<br/>CSV + JSONL export"]
+        SD["SessionDiscovery<br/>scan runs + sessions"]
+        MA["CaptureRunManifest<br/>run.json multi-device"]
+        DR["PolarDeviceRegistry<br/>address / alias registry"]
     end
 
-    subgraph CLI["CLI (System.CommandLine)"]
-        C1["scan - monitor - doctor"]
-        C2["record - stream - replay"]
-        C3["sessions - protocol"]
-    end
-
-    subgraph GUI["WPF App"]
-        G1["MainWindow\nmulti-device dashboard"]
-        G2["WaveformChart\nlive ECG / ACC"]
+    subgraph Surfaces["OPERATOR SURFACES"]
+        C1["CLI<br/>scan · doctor · record · replay"]
+        G1["WPF monitor<br/>selection · tabs · diagnostics"]
+        G2["WaveformChart<br/>live telemetry rendering"]
     end
 
     PMD --> SE
@@ -58,13 +53,22 @@ flowchart LR
     SE --> RE
     RE --> SD
     RE --> MA
-    CO --> C1
-    CO --> C2
-    SE --> C1
-    SE --> C2
-    SD --> C3
-    CO --> G1
-    SE --> G1
-    G1 --> G2
     DR --> RE
     DR --> G1
+    CO --> C1
+    CO --> G1
+    SE --> C1
+    SE --> G1
+    G1 --> G2
+
+    classDef core fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
+    classDef contracts fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef windows fill:#111315,stroke:#8A8E91,color:#F1EEE6,stroke-width:1.5px;
+    classDef record fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    classDef surface fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    class EC,AC,HR,PMD,CP,GID core;
+    class IS,IC,IG contracts;
+    class WS,WC,WG,SE,CO windows;
+    class RE,SD,MA,DR record;
+    class C1,G1,G2 surface;
+    linkStyle default stroke:#4B4F52,stroke-width:1.6px;

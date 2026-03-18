@@ -20,6 +20,13 @@
       "source": "data-flow.mmd",
       "category": "architecture",
       "description": "Signal path from Polar H10 hardware through decoders to disk and UI"
+    },
+    {
+      "id": "session-lifecycle",
+      "title": "Session Lifecycle",
+      "source": "session-lifecycle.mmd",
+      "category": "runtime",
+      "description": "Operator-facing lifecycle from scan and link setup to streaming, recording, and shutdown"
     }
   ]
 }
