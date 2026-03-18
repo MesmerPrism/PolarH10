@@ -634,6 +634,22 @@ a:hover {
   background: var(--paper);
 }
 
+.viewer-stage:fullscreen,
+.source-stage:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  margin: 0;
+  padding: 18px;
+  border: 0;
+  background: var(--carbon);
+}
+
+.viewer-stage:fullscreen > svg,
+.viewer-stage:fullscreen .mermaid > svg {
+  min-width: auto;
+}
+
 .empty-state {
   display: grid;
   place-items: center;

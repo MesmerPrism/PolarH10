@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolarH10 Diagram Viewer</title>
-  <link rel="stylesheet" href="../assets/site.css?v=20260319-brutal-site-2" />
+  <link rel="stylesheet" href="../assets/site.css?v=20260319-brutal-site-3" />
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     window.__mermaid = mermaid;
@@ -90,6 +90,16 @@
       const btnSrc = document.getElementById('btn-source');
       const btnFs = document.getElementById('btn-fullscreen');
 
+      function getFullscreenTarget() {
+        return showSource ? srcPanel : viewer;
+      }
+
+      function syncFullscreenButton() {
+        const activeTarget = getFullscreenTarget();
+        const isTargetFullscreen = document.fullscreenElement === activeTarget;
+        btnFs.textContent = isTargetFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+      }
+
       try {
         const configResponse = await fetch('mermaid.config.json');
         if (configResponse.ok) {
@@ -136,20 +146,32 @@
 
       let showSource = false;
       btnSrc.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
         showSource = !showSource;
         viewer.hidden = showSource;
         srcPanel.hidden = !showSource;
         btnSrc.textContent = showSource ? 'Diagram' : 'Source';
+        syncFullscreenButton();
       });
 
-      btnFs.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
+      btnFs.addEventListener('click', async () => {
+        const target = getFullscreenTarget();
+
+        if (document.fullscreenElement === target) {
+          await document.exitFullscreen();
           return;
         }
 
-        document.exitFullscreen();
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        }
+
+        await target.requestFullscreen();
       });
+
+      document.addEventListener('fullscreenchange', syncFullscreenButton);
 
       const hashId = location.hash.replace('#', '');
       if (hashId) {
