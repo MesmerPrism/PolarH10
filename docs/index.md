@@ -9,6 +9,7 @@ BLE/GATT — without depending on Polar's mobile SDK at runtime.
 
 ## Contents
 
+- [WPF UI Preview](ui-preview.md)
 - [Getting Started on Windows](getting-started.md)
 - [CLI Reference](cli.md)
 - [Protocol Overview](protocol/overview.md)

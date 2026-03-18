@@ -18,6 +18,7 @@ const docGroups = [
     title: 'Start Here',
     items: [
       { file: 'index.md', label: 'Documentation Home', description: 'Overview of the reference set.' },
+      { file: 'ui-preview.md', label: 'WPF UI Preview', description: 'Current brutal tDR-inspired redesign pass.' },
       { file: 'getting-started.md', label: 'Getting Started', description: 'Build, run, and verify the toolchain.' },
       { file: 'cli.md', label: 'CLI Reference', description: 'Scan, doctor, record, replay, and stream flows.' },
       { href: '../diagrams/viewer.html', label: 'Diagram Viewer', description: 'Architecture and repo maps rendered from Mermaid.' }
@@ -178,6 +179,7 @@ function renderHomePage() {
           transport layer, and WPF reference app.
         </p>
         <div class="action-row">
+          <a class="button primary" href="reference/ui-preview.html">Open UI Preview</a>
           <a class="button primary" href="reference/index.html">Browse Docs</a>
           <a class="button" href="diagrams/viewer.html">Open Diagram Viewer</a>
           <a class="button" href="${repoUrl}">View Repository</a>
@@ -255,6 +257,11 @@ function renderHomePage() {
           <div class="kicker">Build + run</div>
           <h3>Getting Started</h3>
           <p>Environment prerequisites, first build, and live-device verification.</p>
+        </a>
+        <a class="path-card" href="reference/ui-preview.html">
+          <div class="kicker">Design preview</div>
+          <h3>WPF UI Preview</h3>
+          <p>Review the brutal tDR-inspired monitor redesign before deciding on further iteration.</p>
         </a>
         <a class="path-card" href="reference/cli.html">
           <div class="kicker">Command surface</div>

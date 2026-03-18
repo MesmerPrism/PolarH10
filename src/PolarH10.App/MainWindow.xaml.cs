@@ -10,6 +10,13 @@ namespace PolarH10.App;
 
 public partial class MainWindow : Window
 {
+    private static readonly Color SignalRed = Color.FromRgb(0xD9, 0x2C, 0x2C);
+    private static readonly Color HazardYellow = Color.FromRgb(0xD8, 0xD6, 0x1A);
+    private static readonly Color SafetyOrange = Color.FromRgb(0xF0, 0x5A, 0x22);
+    private static readonly Color TelemetryCyan = Color.FromRgb(0x00, 0xA7, 0xA0);
+    private static readonly Color Paper = Color.FromRgb(0xF1, 0xEE, 0xE6);
+    private static readonly Color Graphite = Color.FromRgb(0x8A, 0x8E, 0x91);
+
     private readonly PolarDeviceRegistry _deviceRegistry = new(PolarDeviceRegistry.DefaultFilePath);
     private readonly PolarMultiDeviceCoordinator _coordinator;
 
@@ -67,31 +74,31 @@ public partial class MainWindow : Window
     // ── Chart init (same per-signal charts, rebound when selection changes) ──
     private void InitializeCharts()
     {
-        _hrChart = CreateSingleChart("Heart Rate (BPM)", Colors.Red, 120, out _hrSeries);
+        _hrChart = CreateSingleChart("01 HR // BPM", SignalRed, 120, out _hrSeries);
         HrChartHost.Child = _hrChart;
 
-        _rrChart = CreateSingleChart("RR Interval (ms)", Colors.RoyalBlue, 120, out _rrSeries);
+        _rrChart = CreateSingleChart("02 RR // MS", HazardYellow, 120, out _rrSeries);
         RrChartHost.Child = _rrChart;
 
-        _ecgChart = CreateSingleChart("ECG (\u00b5V)", Colors.Green, 650, out _ecgSeries);
+        _ecgChart = CreateSingleChart("03 ECG // UV", TelemetryCyan, 650, out _ecgSeries);
         EcgChartHost.Child = _ecgChart;
 
-        _accXChart = CreateSingleChart("ACC X (mG)", Colors.DarkOrange, 500, out _accXSeries);
+        _accXChart = CreateSingleChart("04 ACC X // MG", SafetyOrange, 500, out _accXSeries);
         AccXChartHost.Child = _accXChart;
 
-        _accYChart = CreateSingleChart("ACC Y (mG)", Colors.Purple, 500, out _accYSeries);
+        _accYChart = CreateSingleChart("05 ACC Y // MG", Paper, 500, out _accYSeries);
         AccYChartHost.Child = _accYChart;
 
-        _accZChart = CreateSingleChart("ACC Z (mG)", Colors.SaddleBrown, 500, out _accZSeries);
+        _accZChart = CreateSingleChart("06 ACC Z // MG", Graphite, 500, out _accZSeries);
         AccZChartHost.Child = _accZChart;
 
         _overlayChart = new WaveformChart { NormalizePerSeries = true };
-        _ovHr   = _overlayChart.AddSeries("HR",    Colors.Red,         300);
-        _ovRr   = _overlayChart.AddSeries("RR",    Colors.RoyalBlue,   300);
-        _ovEcg  = _overlayChart.AddSeries("ECG",   Colors.Green,       650);
-        _ovAccX = _overlayChart.AddSeries("ACC X", Colors.DarkOrange,  500);
-        _ovAccY = _overlayChart.AddSeries("ACC Y", Colors.Purple,      500);
-        _ovAccZ = _overlayChart.AddSeries("ACC Z", Colors.SaddleBrown, 500);
+        _ovHr   = _overlayChart.AddSeries("HR",    SignalRed,     300);
+        _ovRr   = _overlayChart.AddSeries("RR",    HazardYellow,  300);
+        _ovEcg  = _overlayChart.AddSeries("ECG",   TelemetryCyan, 650);
+        _ovAccX = _overlayChart.AddSeries("ACC X", SafetyOrange,  500);
+        _ovAccY = _overlayChart.AddSeries("ACC Y", Paper,         500);
+        _ovAccZ = _overlayChart.AddSeries("ACC Z", Graphite,      500);
         OverlayChartHost.Child = _overlayChart;
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
@@ -148,7 +155,7 @@ public partial class MainWindow : Window
             {
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    StatusText.Text = connected ? "Connected" : "Disconnected";
+                    StatusText.Text = connected ? "LINKED" : "OFFLINE";
                     ConnectButton.IsEnabled = !connected;
                     DisconnectButton.IsEnabled = connected;
                 }
@@ -177,11 +184,11 @@ public partial class MainWindow : Window
 
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    HrValueText.Text = $"{sample.HeartRateBpm} bpm";
+                    HrValueText.Text = $"{sample.HeartRateBpm} BPM";
                     RrValueText.Text = sample.RrIntervalsMs.Length > 0
-                        ? $"RR: {string.Join(", ", sample.RrIntervalsMs.Select(r => $"{r:F0}ms"))}"
-                        : "RR: --";
-                    HrCountText.Text = $"HR: {cs.HrCount}";
+                        ? $"RR // {string.Join(", ", sample.RrIntervalsMs.Select(r => $"{r:F0} MS"))}"
+                        : "RR // --";
+                    HrCountText.Text = $"HR // {cs.HrCount}";
 
                     _hrChart.Push(_hrSeries, sample.HeartRateBpm);
                     _overlayChart.Push(_ovHr, sample.HeartRateBpm);
@@ -204,7 +211,7 @@ public partial class MainWindow : Window
 
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    EcgCountText.Text = $"ECG frames: {cs.EcgCount}";
+                    EcgCountText.Text = $"ECG FRAMES // {cs.EcgCount}";
                     foreach (var uv in frame.MicroVolts)
                     {
                         _ecgChart.Push(_ecgSeries, uv);
@@ -228,7 +235,7 @@ public partial class MainWindow : Window
 
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    AccCountText.Text = $"ACC frames: {cs.AccCount}";
+                    AccCountText.Text = $"ACC FRAMES // {cs.AccCount}";
                     foreach (var s in frame.Samples)
                     {
                         _accXChart.Push(_accXSeries, s.X);
@@ -262,10 +269,10 @@ public partial class MainWindow : Window
             var ctx = _coordinator.GetDevice(addr);
             var statusTag = ctx?.Status switch
             {
-                DeviceConnectionStatus.Connecting => " [Connecting...]",
-                DeviceConnectionStatus.Connected => " [Connected]",
-                DeviceConnectionStatus.Streaming => " [Streaming]",
-                DeviceConnectionStatus.Error => " [Error]",
+                DeviceConnectionStatus.Connecting => " [ARMING]",
+                DeviceConnectionStatus.Connected => " [LINK]",
+                DeviceConnectionStatus.Streaming => " [LIVE]",
+                DeviceConnectionStatus.Error => " [FAULT]",
                 _ => "",
             };
 
@@ -300,29 +307,36 @@ public partial class MainWindow : Window
         var isConnected = ctx?.Status is DeviceConnectionStatus.Connected or DeviceConnectionStatus.Streaming;
         ConnectButton.IsEnabled = !isConnected;
         DisconnectButton.IsEnabled = isConnected;
-        StatusText.Text = ctx?.Status.ToString() ?? "Not connected";
+        StatusText.Text = ctx?.Status switch
+        {
+            DeviceConnectionStatus.Connecting => "ARMING",
+            DeviceConnectionStatus.Connected => "LINKED",
+            DeviceConnectionStatus.Streaming => "LIVE",
+            DeviceConnectionStatus.Error => "FAULT",
+            _ => "OFFLINE",
+        };
 
         // Update counters
         if (_chartStates.TryGetValue(address, out var cs))
         {
-            HrCountText.Text = $"HR: {cs.HrCount}";
-            EcgCountText.Text = $"ECG frames: {cs.EcgCount}";
-            AccCountText.Text = $"ACC frames: {cs.AccCount}";
+            HrCountText.Text = $"HR // {cs.HrCount}";
+            EcgCountText.Text = $"ECG FRAMES // {cs.EcgCount}";
+            AccCountText.Text = $"ACC FRAMES // {cs.AccCount}";
         }
         else
         {
-            HrCountText.Text = "HR: 0";
-            EcgCountText.Text = "ECG frames: 0";
-            AccCountText.Text = "ACC frames: 0";
-            HrValueText.Text = "-- bpm";
-            RrValueText.Text = "RR: --";
+            HrCountText.Text = "HR // 0";
+            EcgCountText.Text = "ECG FRAMES // 0";
+            AccCountText.Text = "ACC FRAMES // 0";
+            HrValueText.Text = "-- BPM";
+            RrValueText.Text = "RR // --";
         }
 
         // Update recording UI
         var isRecording = ctx?.Recorder != null;
         StartRecordButton.IsEnabled = isConnected && !isRecording;
         StopRecordButton.IsEnabled = isRecording;
-        RecordStatusText.Text = isRecording ? "Recording..." : "Not recording";
+        RecordStatusText.Text = isRecording ? "RECORDING ACTIVE" : "NOT RECORDING";
     }
 
     // ── Scan ────────────────────────────────────────────────────
@@ -383,7 +397,7 @@ public partial class MainWindow : Window
         var address = _selectedAddress;
 
         ConnectButton.IsEnabled = false;
-        StatusText.Text = "Connecting...";
+        StatusText.Text = "ARMING";
         AddLiveLog($"Connecting to {DisplayName(address)}...");
 
         try
@@ -416,7 +430,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            StatusText.Text = "Connection failed";
+            StatusText.Text = "FAULT";
             ConnectButton.IsEnabled = true;
             AddLiveLog($"Error: {ex.Message}");
             AddDiagLog($"[{address}] Exception: {ex}");
@@ -431,7 +445,7 @@ public partial class MainWindow : Window
 
         await _coordinator.DisconnectAsync(address);
 
-        StatusText.Text = "Disconnected";
+        StatusText.Text = "OFFLINE";
         ConnectButton.IsEnabled = true;
         DisconnectButton.IsEnabled = false;
         AddLiveLog($"Disconnected from {DisplayName(address)}");
@@ -485,7 +499,7 @@ public partial class MainWindow : Window
             _coordinator.StartRecording(_selectedAddress);
             StartRecordButton.IsEnabled = false;
             StopRecordButton.IsEnabled = true;
-            RecordStatusText.Text = "Recording...";
+            RecordStatusText.Text = "RECORDING ACTIVE";
             AddLiveLog($"[{DisplayName(_selectedAddress)}] Recording started");
             RefreshDeviceList();
         }
