@@ -3,8 +3,8 @@
   "name": "polarh10-diagrams",
   "description": "Mermaid diagram pipeline for PolarH10",
   "scripts": {
-    "diagram:render:all": "powershell -ExecutionPolicy Bypass -File ./Tools/diagrams/render-all-mermaid.ps1",
-    "diagram:sync:readme": "powershell -ExecutionPolicy Bypass -File ./Tools/diagrams/sync-readme-mermaid.ps1",
+    "diagram:render:all": "node ./tools/diagrams/invoke-powershell.mjs render-all-mermaid.ps1",
+    "diagram:sync:readme": "node ./tools/diagrams/invoke-powershell.mjs sync-readme-mermaid.ps1",
     "diagram:watch": "chokidar \"docs/diagrams/*.mmd\" \"docs/diagrams/manifest.json\" -c \"npm run diagram:render:all && npm run diagram:sync:readme\"",
     "diagram:serve": "browser-sync start --server docs --files \"docs/diagrams/*.svg,docs/diagrams/*.html\" --startPath \"diagrams/viewer.html\"",
     "diagram:dev": "concurrently \"npm:diagram:watch\" \"npm:diagram:serve\"",
