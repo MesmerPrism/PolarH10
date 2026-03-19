@@ -4,26 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolarH10 Diagram Viewer</title>
-  <link rel="stylesheet" href="../assets/site.css?v=20260319-brutal-site-4" />
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    window.__mermaid = mermaid;
-  </script>
+  <link rel="stylesheet" href="../assets/site.css?v=20260319-polaroid-site-6" />
 </head>
 <body class="viewer-page">
   <div class="page-art" aria-hidden="true">
-    <span class="tube red one"></span>
-    <span class="tube blue two"></span>
-    <span class="tube pink three"></span>
-    <span class="tube green four"></span>
+    <span class="tube blue one"></span>
+    <span class="tube green two"></span>
+    <span class="tube yellow three"></span>
+    <span class="tube orange four"></span>
     <span class="tube red five"></span>
-    <span class="tube yellow six"></span>
   </div>
   <div class="site-shell">
     <header class="site-header">
       <a class="brand" href="../index.html">
         <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-copy"><small>Unofficial Reference</small><strong>PolarH10</strong></span>
+        <span class="brand-copy"><small>Windows Telemetry Toolkit</small><strong>PolarH10</strong></span>
       </a>
       <nav class="top-nav" aria-label="Primary">
         <a href="../index.html">Home</a>
@@ -35,8 +30,8 @@
 
     <section class="panel viewer-shell">
       <div class="eyebrow">Mermaid Viewer</div>
-      <h1 class="page-title">Repository and code maps.</h1>
-      <p class="page-intro">Browse the Mermaid diagram set shipped with the repo. The viewer reads the manifest, loads rendered SVG when available, and falls back to live Mermaid rendering from source.</p>
+      <h1 class="page-title">Repository and runtime maps.</h1>
+      <p class="page-intro">Browse the Mermaid set shipped with the repo. Each diagram opens fit to the available frame, then supports drag, wheel, and pinch interaction without losing the source view or fullscreen mode.</p>
 
       <div class="viewer-layout">
         <aside class="viewer-nav">
@@ -50,9 +45,15 @@
         <main class="viewer-main">
           <div class="viewer-toolbar">
             <h2 id="title">Select a diagram</h2>
-            <button id="btn-source" class="button" title="Toggle Mermaid source" type="button">Source</button>
-            <button id="btn-fullscreen" class="button" title="Fullscreen" type="button">Fullscreen</button>
+            <div class="viewer-controls">
+              <button id="btn-zoom-out" class="button" title="Zoom out" type="button" disabled>-</button>
+              <button id="btn-fit" class="button" title="Fit diagram to frame" type="button" disabled>Fit</button>
+              <button id="btn-zoom-in" class="button" title="Zoom in" type="button" disabled>+</button>
+              <button id="btn-source" class="button" title="Toggle Mermaid source" type="button">Source</button>
+              <button id="btn-fullscreen" class="button" title="Fullscreen" type="button">Fullscreen</button>
+            </div>
           </div>
+          <p class="viewer-hint"><span id="viewer-zoom" class="viewer-zoom">100%</span><span>Wheel or pinch to zoom, drag to pan, and use Fit to snap back to the full diagram.</span></p>
           <div id="viewer-meta" class="viewer-meta" hidden>
             <div class="viewer-meta-item">
               <span class="meta-key">Brief</span>
@@ -76,7 +77,10 @@
     <footer class="footer">Rendered from docs/diagrams and kept in sync with the repo manifest.</footer>
   </div>
 
-  <script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    import Panzoom from 'https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.6.1/+esm';
+
     (async () => {
       const navList = document.getElementById('nav-list');
       const viewer = document.getElementById('viewer');
@@ -87,8 +91,35 @@
       const viewerDescription = document.getElementById('viewer-description');
       const viewerCategory = document.getElementById('viewer-category');
       const viewerSource = document.getElementById('viewer-source');
+      const viewerZoom = document.getElementById('viewer-zoom');
+      const btnZoomOut = document.getElementById('btn-zoom-out');
+      const btnFit = document.getElementById('btn-fit');
+      const btnZoomIn = document.getElementById('btn-zoom-in');
       const btnSrc = document.getElementById('btn-source');
       const btnFs = document.getElementById('btn-fullscreen');
+
+      let showSource = false;
+      let manifest;
+      let activeDiagram = null;
+      let panzoom = null;
+      let activeSurface = null;
+      let activeSvg = null;
+      let resizeObserver = null;
+      let wheelHandler = null;
+      let panzoomChangeHandler = null;
+      let userAdjustedView = false;
+      let programmaticChange = false;
+
+      function updateZoomLabel(scale = 1) {
+        viewerZoom.textContent = `${Math.round(scale * 100)}%`;
+      }
+
+      function updateZoomControls() {
+        const enabled = Boolean(panzoom) && !showSource;
+        btnZoomOut.disabled = !enabled;
+        btnFit.disabled = !enabled;
+        btnZoomIn.disabled = !enabled;
+      }
 
       function getFullscreenTarget() {
         return showSource ? srcPanel : viewer;
@@ -96,23 +127,177 @@
 
       function syncFullscreenButton() {
         const activeTarget = getFullscreenTarget();
-        const isTargetFullscreen = document.fullscreenElement === activeTarget;
-        btnFs.textContent = isTargetFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+        btnFs.textContent = document.fullscreenElement === activeTarget ? 'Exit fullscreen' : 'Fullscreen';
+        updateZoomControls();
+      }
+
+      function cleanupPanzoom() {
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+          resizeObserver = null;
+        }
+
+        if (activeSurface && wheelHandler) {
+          activeSurface.removeEventListener('wheel', wheelHandler);
+        }
+
+        if (activeSvg && panzoomChangeHandler) {
+          activeSvg.removeEventListener('panzoomchange', panzoomChangeHandler);
+        }
+
+        if (panzoom) {
+          if (typeof panzoom.resetStyle === 'function') {
+            panzoom.resetStyle();
+          }
+          panzoom.destroy();
+        }
+
+        panzoom = null;
+        activeSurface = null;
+        activeSvg = null;
+        wheelHandler = null;
+        panzoomChangeHandler = null;
+        userAdjustedView = false;
+        programmaticChange = false;
+        updateZoomLabel(1);
+        updateZoomControls();
+      }
+
+      function getSvgSize(svg) {
+        const viewBox = svg.viewBox && svg.viewBox.baseVal;
+        if (viewBox && viewBox.width && viewBox.height) {
+          return { width: viewBox.width, height: viewBox.height };
+        }
+
+        const width = parseFloat(svg.getAttribute('width')) || svg.getBoundingClientRect().width || 1;
+        const height = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height || 1;
+        return { width, height };
+      }
+
+      function calculateFit(surface, svg) {
+        const padding = 24;
+        const surfaceRect = surface.getBoundingClientRect();
+        const { width, height } = getSvgSize(svg);
+        const usableWidth = Math.max(surfaceRect.width - padding * 2, 1);
+        const usableHeight = Math.max(surfaceRect.height - padding * 2, 1);
+        const scale = Math.min(usableWidth / width, usableHeight / height, 1);
+
+        return {
+          scale: Number.isFinite(scale) && scale > 0 ? scale : 1,
+          x: (surfaceRect.width - width * scale) / (2 * scale),
+          y: (surfaceRect.height - height * scale) / (2 * scale)
+        };
+      }
+
+      function attachPanzoom(surface, svg) {
+        cleanupPanzoom();
+
+        const fit = calculateFit(surface, svg);
+        const minScale = Math.max(0.05, fit.scale * 0.65);
+        const maxScale = Math.max(6, fit.scale * 10);
+
+        activeSurface = surface;
+        activeSvg = svg;
+        svg.setAttribute('draggable', 'false');
+
+        if (!surface.isConnected || !svg.isConnected) {
+          return;
+        }
+
+        panzoom = Panzoom(svg, {
+          canvas: true,
+          cursor: 'grab',
+          overflow: 'hidden',
+          origin: '0 0',
+          pinchAndPan: true,
+          startScale: fit.scale,
+          startX: fit.x,
+          startY: fit.y,
+          minScale,
+          maxScale,
+          step: 0.18,
+          touchAction: 'none'
+        });
+
+        wheelHandler = (event) => {
+          if (!panzoom || showSource) {
+            return;
+          }
+
+          event.preventDefault();
+          panzoom.zoomWithWheel(event);
+        };
+
+        panzoomChangeHandler = () => {
+          updateZoomLabel(panzoom ? panzoom.getScale() : 1);
+          if (!programmaticChange) {
+            userAdjustedView = true;
+          }
+        };
+
+        surface.addEventListener('wheel', wheelHandler, { passive: false });
+        svg.addEventListener('panzoomchange', panzoomChangeHandler);
+
+        resizeObserver = new ResizeObserver(() => {
+          if (!activeSurface || !activeSvg) {
+            return;
+          }
+
+          if (document.fullscreenElement === viewer || !userAdjustedView) {
+            requestAnimationFrame(() => fitActiveDiagram());
+          }
+        });
+        resizeObserver.observe(surface);
+
+        programmaticChange = true;
+        updateZoomLabel(panzoom.getScale());
+        programmaticChange = false;
+        userAdjustedView = false;
+        updateZoomControls();
+      }
+
+      function fitActiveDiagram() {
+        if (!activeSurface || !activeSvg) {
+          return;
+        }
+
+        attachPanzoom(activeSurface, activeSvg);
+      }
+
+      function mountDiagram(svgMarkup) {
+        viewer.innerHTML = '';
+
+        const frame = document.createElement('div');
+        frame.className = 'diagram-frame';
+        const surface = document.createElement('div');
+        surface.className = 'diagram-surface';
+        frame.appendChild(surface);
+        viewer.appendChild(frame);
+
+        surface.innerHTML = svgMarkup;
+        const svg = surface.querySelector('svg');
+
+        if (!svg) {
+          viewer.innerHTML = '<div class="empty-state">Could not render SVG content.</div>';
+          cleanupPanzoom();
+          return;
+        }
+
+        requestAnimationFrame(() => attachPanzoom(surface, svg));
       }
 
       try {
         const configResponse = await fetch('mermaid.config.json');
         if (configResponse.ok) {
           const config = await configResponse.json();
-          window.__mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', ...config });
+          mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', ...config });
         } else {
-          window.__mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+          mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
         }
       } catch {
-        window.__mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+        mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
       }
 
-      let manifest;
       try {
         const response = await fetch('manifest.json');
         manifest = await response.json();
@@ -144,15 +329,16 @@
         }
       }
 
-      let showSource = false;
-      btnSrc.addEventListener('click', () => {
+      btnSrc.addEventListener('click', async () => {
         if (document.fullscreenElement) {
-          document.exitFullscreen();
+          await document.exitFullscreen();
         }
+
         showSource = !showSource;
         viewer.hidden = showSource;
         srcPanel.hidden = !showSource;
         btnSrc.textContent = showSource ? 'Diagram' : 'Source';
+        updateZoomControls();
         syncFullscreenButton();
       });
 
@@ -171,17 +357,46 @@
         await target.requestFullscreen();
       });
 
-      document.addEventListener('fullscreenchange', syncFullscreenButton);
+      btnZoomIn.addEventListener('click', () => {
+        if (!panzoom) {
+          return;
+        }
+
+        userAdjustedView = true;
+        panzoom.zoomIn();
+      });
+
+      btnZoomOut.addEventListener('click', () => {
+        if (!panzoom) {
+          return;
+        }
+
+        userAdjustedView = true;
+        panzoom.zoomOut();
+      });
+
+      btnFit.addEventListener('click', () => {
+        fitActiveDiagram();
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        syncFullscreenButton();
+        if (!showSource && activeSvg) {
+          requestAnimationFrame(() => fitActiveDiagram());
+        }
+      });
 
       const hashId = location.hash.replace('#', '');
-      if (hashId) {
-        const target = manifest.diagrams.find((diagram) => diagram.id === hashId);
-        if (target) {
-          await selectDiagram(target);
-        }
+      const defaultDiagram = hashId
+        ? manifest.diagrams.find((diagram) => diagram.id === hashId) || manifest.diagrams[0]
+        : manifest.diagrams[0];
+
+      if (defaultDiagram) {
+        await selectDiagram(defaultDiagram);
       }
 
       async function selectDiagram(diagram) {
+        activeDiagram = diagram;
         navList.querySelectorAll('.nav-item').forEach((element) => {
           element.classList.toggle('active', element.dataset.id === diagram.id);
         });
@@ -194,16 +409,15 @@
         location.hash = diagram.id;
 
         const svgPath = diagram.source.replace(/\.mmd$/, '.svg');
-        let usedSvg = false;
+        let renderedSvg = '';
 
         try {
           const svgResponse = await fetch(svgPath);
           if (svgResponse.ok) {
-            viewer.innerHTML = await svgResponse.text();
-            usedSvg = true;
+            renderedSvg = await svgResponse.text();
           }
         } catch {
-          usedSvg = false;
+          renderedSvg = '';
         }
 
         try {
@@ -211,19 +425,20 @@
           const sourceText = await sourceResponse.text();
           srcCode.textContent = sourceText;
 
-          if (!usedSvg) {
-            viewer.innerHTML = '';
-            const container = document.createElement('div');
-            container.className = 'mermaid';
-            viewer.appendChild(container);
-            const rendered = await window.__mermaid.render(`mm-${diagram.id}`, sourceText);
-            container.innerHTML = rendered.svg;
+          if (!renderedSvg) {
+            const rendered = await mermaid.render(`mm-${diagram.id}`, sourceText);
+            renderedSvg = rendered.svg;
           }
         } catch {
-          if (!usedSvg) {
+          if (!renderedSvg) {
+            cleanupPanzoom();
             viewer.innerHTML = `<div class="empty-state">Error loading ${diagram.source}.</div>`;
+            return;
           }
         }
+
+        mountDiagram(renderedSvg);
+        syncFullscreenButton();
       }
     })();
   </script>

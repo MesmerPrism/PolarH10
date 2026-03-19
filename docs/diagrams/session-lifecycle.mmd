@@ -10,16 +10,16 @@ flowchart LR
     S6 --> S8["08 STOP / CUT LINK<br/>flush files + release session"]
     S7 --> S8
 
-    classDef acquire fill:#DDF6FF,stroke:#18C2FF,color:#171B27,stroke-width:1.5px;
-    classDef link fill:#EAE6FF,stroke:#4E35C5,color:#171B27,stroke-width:1.5px;
-    classDef active fill:#171B27,stroke:#18C2FF,color:#F7FBFC,stroke-width:2px;
-    classDef record fill:#FFF0B8,stroke:#FF8A1A,color:#171B27,stroke-width:1.5px;
-    classDef diagnostics fill:#EEF7FC,stroke:#2E66FF,color:#171B27,stroke-width:1.5px;
-    classDef stop fill:#FFE7DD,stroke:#F0343C,color:#171B27,stroke-width:1.5px;
+    classDef acquire fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
+    classDef link fill:#EEF6E8,stroke:#7DBA44,color:#1F2226,stroke-width:1.5px;
+    classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
+    classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
+    classDef diagnostics fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
+    classDef stop fill:#FFE1D9,stroke:#EC4736,color:#1F2226,stroke-width:1.5px;
     class S1,S2 acquire;
     class S3,S4 link;
     class S5 active;
     class S6 record;
     class S7 diagnostics;
     class S8 stop;
-    linkStyle default stroke:#4B556D,stroke-width:1.8px;
+    linkStyle default stroke:#626A72,stroke-width:1.8px;

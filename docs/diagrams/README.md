@@ -37,7 +37,7 @@ Mermaid JS CDN even without pre-rendered SVGs.
 - Keep the README diagram compact and structural; move dense operational views into `docs/diagrams/`.
 - Prefer flowcharts for repo layout and runtime handoff diagrams.
 - Keep labels short enough for GitHub-native Mermaid rendering.
-- Use the shared brutal theme in `mermaid.config.json` instead of per-diagram visual drift.
+- Use the shared Polaroid-inspired theme in `mermaid.config.json` instead of per-diagram visual drift.
 
 ## Files
 
@@ -45,6 +45,6 @@ Mermaid JS CDN even without pre-rendered SVGs.
 | --------------------- | -------------------------------------------- |
 | `manifest.json`       | Registry of all diagrams — drives the viewer |
 | `mermaid.config.json` | Shared Mermaid render config                 |
-| `viewer.html`         | Manifest-driven fullscreen viewer            |
+| `viewer.html`         | Manifest-driven viewer with pan/zoom + fullscreen |
 | `*.mmd`               | Mermaid diagram sources                      |
 | `*.svg`               | Pre-rendered SVGs (generated, do not edit)   |
