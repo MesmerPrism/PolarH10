@@ -1,6 +1,6 @@
 # WPF UI Preview
 
-This page captures the current brutal tDR-inspired redesign pass for the WPF reference app now merged into `main`.
+`PolarH10.App` is the operator-facing desktop monitor in this repo. This page shows the current brutal tDR-inspired pass applied to the shell, telemetry surfaces, and diagnostics layout.
 
 ![Brutal tDR-inspired WPF preview](assets/brutal-tdr-preview.png)
 
@@ -11,6 +11,7 @@ This page captures the current brutal tDR-inspired redesign pass for the WPF ref
 - indexed tab strip and denser labeling for a more authored telemetry feel
 - dark instrument-style chart windows with sharper trace treatment
 - restrained layout that keeps the app usable as a monitoring tool
+- emphasis on live signal reading over generic dashboard cards or decorative chrome
 
 ## Notes
 

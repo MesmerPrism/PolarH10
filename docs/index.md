@@ -1,17 +1,21 @@
-# Polar H10 Direct — Documentation
+# PolarH10 App + Protocol Reference
 
-> **Unofficial** Polar H10 reference connector.
+> **Unofficial** Windows-first Polar H10 telemetry toolkit.
 > Not affiliated with or endorsed by Polar Electro Oy.
 
-Welcome to the documentation for `polar-h10-direct`, a protocol-first Windows
-reference implementation that communicates with the Polar H10 chest strap over
-BLE/GATT — without depending on Polar's mobile SDK at runtime.
+Start with the app surfaces and operator flow. Move into protocol detail and
+Mermaid system maps once you need implementation boundaries, data flow, and BLE
+internals.
 
-## Contents
+## Read This First
 
-- [WPF UI Preview](ui-preview.md)
+- [App Overview](app-overview.md)
 - [Getting Started on Windows](getting-started.md)
+- [WPF UI Preview](ui-preview.md)
 - [CLI Reference](cli.md)
+
+## Protocol + System Reference
+
 - [Protocol Overview](protocol/overview.md)
 - [GATT Service & Characteristic Map](protocol/gatt-map.md)
 - [PMD Control Point Command Flow](protocol/pmd-commands.md)
@@ -19,4 +23,5 @@ BLE/GATT — without depending on Polar's mobile SDK at runtime.
 - [ACC Frame Format](protocol/acc-format.md)
 - [Heart Rate Measurement Decoding](protocol/hr-measurement.md)
 - [Platform Guides](platform-guides/index.md)
+- [Diagram Viewer](../diagrams/viewer.html)
 - [Citations & References](references.md)

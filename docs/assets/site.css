@@ -1,16 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
-  --paper: #f1eee6;
-  --paper-2: #e6e1d7;
-  --carbon: #111315;
-  --graphite: #4b4f52;
-  --grid: #8a8e91;
-  --line: #26292c;
-  --yellow: #d8d61a;
-  --red: #d92c2c;
-  --orange: #f05a22;
-  --cyan: #00a7a0;
+  --paper: #eef2f4;
+  --paper-2: #dde6ec;
+  --paper-3: #f7fbfc;
+  --carbon: #171b27;
+  --carbon-2: #23293a;
+  --graphite: #4b556d;
+  --grid: #76829d;
+  --line: #263046;
+  --yellow: #ffe22b;
+  --red: #f0343c;
+  --orange: #ff8a1a;
+  --hot: #ff5c31;
+  --cyan: #18c2ff;
+  --aqua: #72e8ff;
+  --cobalt: #2e66ff;
+  --violet: #4e35c5;
   --max-width: 1320px;
   --radius: 2px;
   --shadow: none;
@@ -30,14 +36,27 @@ body {
   font-family: 'IBM Plex Sans Condensed', sans-serif;
   color: var(--carbon);
   background:
-    linear-gradient(180deg, rgba(241, 238, 230, 0.98), rgba(241, 238, 230, 0.98)),
+    radial-gradient(circle at 76% 12%, rgba(240, 52, 60, 0.18), transparent 14%),
+    radial-gradient(circle at 18% 72%, rgba(24, 194, 255, 0.14), transparent 18%),
+    linear-gradient(90deg, transparent 0 71%, rgba(240, 52, 60, 0.08) 71%, rgba(255, 226, 43, 0.16) 72%, rgba(24, 194, 255, 0.08) 73%, transparent 74%),
+    linear-gradient(0deg, transparent 0 48%, rgba(255, 226, 43, 0.08) 48%, transparent 48.4%),
+    radial-gradient(circle, rgba(23, 27, 39, 0.16) 0 1px, transparent 1px 10px),
+    linear-gradient(180deg, rgba(247, 251, 252, 0.98), rgba(238, 242, 244, 0.98)),
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 47px,
-      rgba(17, 19, 21, 0.035) 47px,
-      rgba(17, 19, 21, 0.035) 48px
+      rgba(23, 27, 39, 0.03) 47px,
+      rgba(23, 27, 39, 0.03) 48px
     );
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto,
+    12px 12px,
+    auto,
+    auto;
 }
 
 body::selection {
@@ -75,8 +94,10 @@ a:hover {
   margin-top: 10px;
   border: 1px solid var(--line);
   border-top: 6px solid var(--yellow);
-  background: var(--carbon);
-  color: var(--paper);
+  background:
+    linear-gradient(180deg, rgba(35, 41, 58, 0.98), rgba(23, 27, 39, 0.98)),
+    var(--carbon);
+  color: var(--paper-3);
 }
 
 .brand {
@@ -91,8 +112,10 @@ a:hover {
   height: 42px;
   flex: 0 0 auto;
   background:
-    linear-gradient(90deg, var(--yellow) 0 10px, transparent 10px 12px, var(--red) 12px 24px, transparent 24px 26px, var(--cyan) 26px 100%);
-  border: 1px solid var(--paper);
+    linear-gradient(135deg, transparent 0 22%, var(--yellow) 22% 32%, var(--orange) 32% 42%, var(--red) 42% 52%, var(--carbon) 52% 100%),
+    linear-gradient(90deg, var(--cobalt) 0 8px, transparent 8px 12px, var(--cyan) 12px 22px, transparent 22px 26px, var(--paper-3) 26px 100%),
+    var(--carbon);
+  border: 1px solid var(--paper-3);
 }
 
 .brand-copy {
@@ -106,7 +129,7 @@ a:hover {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--grid);
+  color: #a3b0cb;
 }
 
 .brand-copy strong {
@@ -131,13 +154,14 @@ a:hover {
   border: 1px solid transparent;
   font-size: 16px;
   font-weight: 600;
-  color: var(--paper);
+  color: var(--paper-3);
 }
 
 .top-nav a.active,
 .top-nav a:hover {
   border-color: var(--yellow);
   color: var(--yellow);
+  background: rgba(255, 226, 43, 0.08);
 }
 
 .hero,
@@ -167,7 +191,7 @@ a:hover {
 .viewer-main {
   border: 1px solid var(--line);
   border-radius: 0;
-  background: var(--paper);
+  background: var(--paper-3);
   box-shadow: var(--shadow);
 }
 
@@ -186,14 +210,14 @@ a:hover {
 .sidebar,
 .viewer-nav {
   background: var(--carbon);
-  color: var(--paper);
+  color: var(--paper-3);
 }
 
 .hero-aside p,
 .sidebar p,
 .viewer-nav p,
 .viewer-nav .caption {
-  color: #b8bcc0;
+  color: #bcc7de;
 }
 
 .eyebrow,
@@ -210,7 +234,7 @@ a:hover {
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--grid);
+  color: var(--graphite);
 }
 
 .hero-aside .eyebrow,
@@ -223,7 +247,7 @@ a:hover {
 .page-title {
   margin: 0 0 10px;
   font-size: clamp(2.9rem, 7vw, 6.1rem);
-  line-height: 0.9;
+  line-height: 0.88;
   letter-spacing: -0.06em;
   text-transform: uppercase;
 }
@@ -263,9 +287,9 @@ a:hover {
   justify-content: center;
   min-height: 42px;
   padding: 0 14px;
-  border: 1px solid var(--carbon);
+  border: 1px solid var(--line);
   border-radius: 0;
-  background: var(--paper);
+  background: var(--paper-3);
   color: var(--carbon);
   font-size: 15px;
   font-weight: 700;
@@ -273,15 +297,15 @@ a:hover {
 }
 
 .button:hover {
-  background: var(--yellow);
+  background: var(--cyan);
   color: var(--carbon);
-  border-color: var(--yellow);
+  border-color: var(--cyan);
 }
 
 .button.primary {
   background: var(--carbon);
-  color: var(--paper);
-  border-color: var(--carbon);
+  color: var(--paper-3);
+  border-color: var(--yellow);
 }
 
 .button.primary:hover {
@@ -298,16 +322,22 @@ a:hover {
 }
 
 .stats {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   margin-top: 18px;
 }
 
 .card-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .preview-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.step-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
 }
 
 .stat,
@@ -315,10 +345,11 @@ a:hover {
 .doc-list a,
 .preview-card,
 .path-card,
+.step-card,
 .nav-item {
   border: 1px solid var(--line);
   border-radius: 0;
-  background: var(--paper);
+  background: var(--paper-3);
   padding: 14px;
 }
 
@@ -326,7 +357,7 @@ a:hover {
 .sidebar .nav-item,
 .viewer-nav .nav-item {
   background: transparent;
-  color: var(--paper);
+  color: var(--paper-3);
   border-color: var(--graphite);
 }
 
@@ -342,9 +373,10 @@ a:hover {
 
 .stat strong {
   display: block;
-  font-size: 2rem;
-  line-height: 1;
+  font-size: 1.05rem;
+  line-height: 1.15;
   margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 .stat span {
@@ -356,6 +388,88 @@ a:hover {
 
 .section {
   margin-top: 16px;
+}
+
+.tone-dark {
+  background:
+    linear-gradient(180deg, rgba(35, 41, 58, 0.98), rgba(23, 27, 39, 0.98)),
+    var(--carbon);
+  color: var(--paper-3);
+  border-color: var(--line);
+}
+
+.tone-dark p,
+.tone-dark .stat span,
+.tone-dark .meta,
+.tone-dark .kicker,
+.tone-dark .eyebrow {
+  color: #c7d0e5;
+}
+
+.tone-dark .eyebrow {
+  color: var(--yellow);
+}
+
+.tone-cool {
+  background: linear-gradient(180deg, #f7fdff, #def4ff);
+  border-color: #66cdf4;
+  box-shadow: inset 0 4px 0 var(--cyan);
+}
+
+.tone-violet {
+  background: linear-gradient(180deg, #f6f3ff, #e6ddff);
+  border-color: #7b62ea;
+  box-shadow: inset 0 4px 0 var(--violet);
+}
+
+.tone-warm {
+  background: linear-gradient(180deg, #fff9e0, #ffe8c0);
+  border-color: #ffb44d;
+  box-shadow: inset 0 4px 0 var(--orange);
+}
+
+.tone-signal {
+  background: linear-gradient(180deg, #fff0ed, #ffd9d1);
+  border-color: #ff8575;
+  box-shadow: inset 0 4px 0 var(--red);
+}
+
+.hero-home .hero-copy .stats {
+  margin-top: 22px;
+}
+
+.hero-preview {
+  background: linear-gradient(180deg, rgba(247, 251, 252, 0.98), rgba(226, 234, 239, 0.98));
+}
+
+.hero-preview img {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+}
+
+.feature-list {
+  margin-top: 14px;
+}
+
+.feature-list li {
+  display: grid;
+  gap: 6px;
+}
+
+.step-card {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.step-no {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 .section-heading,
@@ -380,6 +494,7 @@ a:hover {
 
 .path-card h3,
 .preview-card h3,
+.step-card h3,
 .prose h3 {
   margin: 0 0 8px;
   font-size: 1.25rem;
@@ -396,6 +511,7 @@ a:hover {
 }
 
 .preview-card img,
+.hero-preview img,
 .prose img {
   display: block;
   width: 100%;
@@ -404,7 +520,7 @@ a:hover {
   margin-top: 12px;
   border: 1px solid var(--line);
   border-radius: 0;
-  background: var(--paper-2);
+  background: var(--paper-3);
 }
 
 .sidebar {
@@ -466,7 +582,7 @@ a:hover {
 
 .content-panel {
   min-width: 0;
-  background: var(--paper);
+  background: linear-gradient(180deg, rgba(247, 251, 252, 0.98), rgba(233, 239, 243, 0.98));
 }
 
 .prose {
@@ -506,7 +622,7 @@ a:hover {
   font-size: 0.92em;
   background: var(--paper-2);
   padding: 0.12rem 0.3rem;
-  border: 1px solid rgba(17, 19, 21, 0.1);
+  border: 1px solid rgba(23, 27, 39, 0.12);
 }
 
 .prose pre,
@@ -540,7 +656,7 @@ a:hover {
 .prose td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(17, 19, 21, 0.12);
+  border-bottom: 1px solid rgba(23, 27, 39, 0.12);
 }
 
 .prose th {
@@ -590,7 +706,7 @@ a:hover {
 }
 
 .viewer-stage {
-  background: var(--paper-2);
+  background: var(--paper-3);
 }
 
 .source-stage {
@@ -604,7 +720,7 @@ a:hover {
   margin-bottom: 14px;
   padding: 14px;
   border: 1px solid var(--line);
-  background: var(--paper-2);
+  background: linear-gradient(180deg, rgba(247, 251, 252, 0.98), rgba(226, 234, 239, 0.98));
 }
 
 .viewer-meta p,
@@ -639,7 +755,7 @@ a:hover {
   height: auto;
   padding: 18px;
   border: 1px solid var(--line);
-  background: var(--paper-2);
+  background: var(--paper-3);
 }
 
 .viewer-stage:fullscreen,

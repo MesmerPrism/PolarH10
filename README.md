@@ -68,19 +68,25 @@ flowchart LR
     TL2 --> D3
     TL3 --> D3
 
-    classDef hub fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
-    classDef source fill:#F6F1E7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
-    classDef tests fill:#E7E0D6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
-    classDef docs fill:#E9E4C8,stroke:#8A8250,color:#111315,stroke-width:1.5px;
-    classDef tooling fill:#EADDD5,stroke:#8B6656,color:#111315,stroke-width:1.5px;
-    classDef sample fill:#E0E8E4,stroke:#607C78,color:#111315,stroke-width:1.5px;
+    style Source fill:#FFF4EF,stroke:#F0343C,stroke-width:1.5px;
+    style Tests fill:#F1F0FF,stroke:#4E35C5,stroke-width:1.5px;
+    style Docs fill:#EEF7FC,stroke:#2E66FF,stroke-width:1.5px;
+    style Tooling fill:#FFF6D8,stroke:#FF8A1A,stroke-width:1.5px;
+    style Samples fill:#E8FAFF,stroke:#18C2FF,stroke-width:1.5px;
+
+    classDef hub fill:#171B27,stroke:#FFE22B,color:#F7FBFC,stroke-width:2px;
+    classDef source fill:#FFE7DD,stroke:#F0343C,color:#171B27,stroke-width:1.5px;
+    classDef tests fill:#E7EAFF,stroke:#4E35C5,color:#171B27,stroke-width:1.5px;
+    classDef docs fill:#F7FBFC,stroke:#2E66FF,color:#171B27,stroke-width:1.5px;
+    classDef tooling fill:#FFF0B8,stroke:#FF8A1A,color:#171B27,stroke-width:1.5px;
+    classDef sample fill:#DDF6FF,stroke:#18C2FF,color:#171B27,stroke-width:1.5px;
     class R hub;
     class P1,P2,P3,P4,P5 source;
     class T1,T2,T3 tests;
     class D1,D2,D3 docs;
     class TL1,TL2,TL3 tooling;
     class S1,S2 sample;
-    linkStyle default stroke:#4B4F52,stroke-width:1.6px;
+    linkStyle default stroke:#4B556D,stroke-width:1.8px;
 ```
 
 <!-- MERMAID:END repo-structure -->
@@ -150,19 +156,25 @@ flowchart LR
     SE --> G1
     G1 --> G2
 
-    classDef core fill:#F6F1E7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
-    classDef contracts fill:#E7E0D6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
-    classDef windows fill:#E3DED6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
-    classDef active fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
-    classDef record fill:#EADDD5,stroke:#8B6656,color:#111315,stroke-width:1.5px;
-    classDef surface fill:#E0E8E4,stroke:#607C78,color:#111315,stroke-width:1.5px;
+    style Protocol fill:#FFF1EB,stroke:#F0343C,stroke-width:1.5px;
+    style Transport fill:#F2EFFF,stroke:#4E35C5,stroke-width:1.5px;
+    style Windows fill:#E8F8FF,stroke:#18C2FF,stroke-width:1.5px;
+    style Recording fill:#FFF6D8,stroke:#FF8A1A,stroke-width:1.5px;
+    style Surfaces fill:#EEF7FC,stroke:#2E66FF,stroke-width:1.5px;
+
+    classDef core fill:#FFE7DD,stroke:#F0343C,color:#171B27,stroke-width:1.5px;
+    classDef contracts fill:#EAE6FF,stroke:#4E35C5,color:#171B27,stroke-width:1.5px;
+    classDef windows fill:#DDF6FF,stroke:#18C2FF,color:#171B27,stroke-width:1.5px;
+    classDef active fill:#171B27,stroke:#18C2FF,color:#F7FBFC,stroke-width:2px;
+    classDef record fill:#FFF0B8,stroke:#FF8A1A,color:#171B27,stroke-width:1.5px;
+    classDef surface fill:#E7F2FF,stroke:#2E66FF,color:#171B27,stroke-width:1.5px;
     class EC,AC,HR,PMD,CP,GID core;
     class IS,IC,IG contracts;
     class WS,WC,WG windows;
     class SE,CO active;
     class RE,SD,MA,DR record;
     class C1,G1,G2 surface;
-    linkStyle default stroke:#4B4F52,stroke-width:1.6px;
+    linkStyle default stroke:#4B556D,stroke-width:1.8px;
 ```
 
 <!-- MERMAID:END code-architecture -->
@@ -219,17 +231,22 @@ flowchart LR
     SACC --> CHART
     CTRL --> LOG
 
-    classDef hardware fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
-    classDef link fill:#E7E0D6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
-    classDef decode fill:#F6F1E7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
-    classDef session fill:#E0E8E4,stroke:#607C78,color:#111315,stroke-width:1.5px;
-    classDef output fill:#EADDD5,stroke:#8B6656,color:#111315,stroke-width:1.5px;
+    style Link fill:#EAF8FF,stroke:#18C2FF,stroke-width:1.5px;
+    style Decode fill:#FFF1EB,stroke:#F0343C,stroke-width:1.5px;
+    style Session fill:#F2EFFF,stroke:#4E35C5,stroke-width:1.5px;
+    style Output fill:#FFF6D8,stroke:#FF8A1A,stroke-width:1.5px;
+
+    classDef hardware fill:#171B27,stroke:#FFE22B,color:#F7FBFC,stroke-width:2px;
+    classDef link fill:#DDF6FF,stroke:#18C2FF,color:#171B27,stroke-width:1.5px;
+    classDef decode fill:#FFE7DD,stroke:#F0343C,color:#171B27,stroke-width:1.5px;
+    classDef session fill:#EAE6FF,stroke:#4E35C5,color:#171B27,stroke-width:1.5px;
+    classDef output fill:#FFF0B8,stroke:#FF8A1A,color:#171B27,stroke-width:1.5px;
     class H10 hardware;
     class ADV,HRS,PMD,CTRL,DATA link;
     class DHR,DECG,DACC decode;
     class SHR,SECG,SACC session;
     class REC,CHART,LOG output;
-    linkStyle default stroke:#4B4F52,stroke-width:1.6px;
+    linkStyle default stroke:#4B556D,stroke-width:1.8px;
 ```
 
 <!-- MERMAID:END data-flow -->

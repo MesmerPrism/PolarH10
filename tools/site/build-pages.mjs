@@ -12,17 +12,18 @@ const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
-const assetVersion = '20260319-brutal-site-4';
+const assetVersion = '20260319-brutal-site-5';
 
 const docGroups = [
   {
     title: 'Start Here',
     items: [
-      { file: 'index.md', label: 'Documentation Home', description: 'Overview of the reference set.' },
-      { file: 'ui-preview.md', label: 'WPF UI Preview', description: 'Current brutal tDR-inspired redesign pass.' },
+      { file: 'index.md', label: 'Documentation Home', description: 'App-first entry point into the reference set.' },
+      { file: 'app-overview.md', label: 'App Overview', description: 'What the WPF monitor and CLI are for in practice.' },
+      { file: 'ui-preview.md', label: 'WPF UI Preview', description: 'Current operator-facing visual language and layout.' },
       { file: 'getting-started.md', label: 'Getting Started', description: 'Build, run, and verify the toolchain.' },
       { file: 'cli.md', label: 'CLI Reference', description: 'Scan, doctor, record, replay, and stream flows.' },
-      { href: '../diagrams/viewer.html', label: 'Diagram Viewer', description: 'Architecture and repo maps rendered from Mermaid.' }
+      { href: '../diagrams/viewer.html', label: 'Diagram Viewer', description: 'Architecture, data path, and runtime maps.' }
     ]
   },
   {
@@ -66,8 +67,8 @@ for (const filePath of markdownFiles) {
     bodyClass: 'doc-page',
     navKey: 'reference',
     pageTitle: title,
-    pageIntro: title === 'Polar H10 Direct - Documentation'
-      ? 'Reference material for the PolarH10 connector, organized for direct browsing on GitHub Pages.'
+    pageIntro: rel === 'index.md'
+      ? 'Start with the app surfaces and operator flow, then drill into protocol, diagnostics, and Mermaid system maps when you need internals.'
       : null,
     sidebar: renderSidebar(rel),
     content: `<article class="prose">${html}</article>`,
@@ -158,7 +159,7 @@ function renderPage({ title, bodyClass, navKey, pageTitle, pageIntro, sidebar, c
         ${sidebar}
       </aside>
       <main class="panel content-panel">
-        <div class="eyebrow">GitHub Pages Reference</div>
+        <div class="eyebrow">PolarH10 Reference</div>
         <h1 class="page-title">${escapeHtml(pageTitle)}</h1>
         ${pageIntro ? `<p class="page-intro">${escapeHtml(pageIntro)}</p>` : ''}
         ${content}
@@ -177,123 +178,157 @@ function renderHomePage() {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PolarH10 GitHub Pages</title>
-  <meta name="description" content="Protocol-first Polar H10 tooling, diagrams, and documentation for GitHub Pages." />
+  <title>PolarH10 Windows Telemetry</title>
+  <meta name="description" content="Windows-native Polar H10 telemetry monitor, CLI capture tooling, protocol docs, and Mermaid system maps." />
   <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
 </head>
 <body>
   ${renderArt()}
   <div class="site-shell">
     ${renderHeader(topNav, 'index.html')}
-    <section class="hero">
-      <div class="panel hero-copy">
-        <div class="eyebrow">GitHub Pages Site</div>
-        <h1>PolarH10<br />stack, docs,<br />and diagrams.</h1>
+    <section class="hero hero-home">
+      <div class="panel hero-copy tone-dark">
+        <div class="eyebrow">Windows Telemetry Monitor + Capture Stack</div>
+        <h1>Scan.<br />Link.<br />Stream.<br />Record.</h1>
         <p>
-          A Pages-ready front door for the PolarH10 repository: protocol references,
-          subsystem maps, Mermaid diagrams, and the fastest path into the CLI,
-          transport layer, and WPF reference app.
+          PolarH10 is a Windows-native toolchain for the Polar H10 chest strap. The WPF app and CLI let you
+          discover nearby straps over BLE/GATT, inspect live HR, ECG, and ACC data, run diagnostics before capture,
+          and record reusable sessions without depending on Polar&apos;s mobile SDK at runtime.
         </p>
         <div class="action-row">
-          <a class="button primary" href="reference/ui-preview.html">Open UI Preview</a>
-          <a class="button primary" href="reference/index.html">Browse Docs</a>
-          <a class="button" href="diagrams/viewer.html">Open Diagram Viewer</a>
-          <a class="button" href="${repoUrl}">View Repository</a>
+          <a class="button primary" href="reference/app-overview.html">Open App Overview</a>
+          <a class="button primary" href="reference/getting-started.html">Get Started</a>
+          <a class="button" href="reference/ui-preview.html">View WPF UI</a>
+          <a class="button" href="diagrams/viewer.html">System Maps</a>
         </div>
         <div class="stats">
-          <div class="stat"><strong>5</strong><span>runtime projects in src/</span></div>
-          <div class="stat"><strong>91</strong><span>tests passing in the current suite</span></div>
-          <div class="stat"><strong>3</strong><span>Mermaid diagrams shipped into Pages</span></div>
+          <div class="stat tone-cool"><strong>Live telemetry</strong><span>HR · RR · ECG · ACC in the WPF monitor.</span></div>
+          <div class="stat tone-violet"><strong>Dual surfaces</strong><span>Use the WPF app for operators and the CLI for diagnostics.</span></div>
+          <div class="stat tone-warm"><strong>Capture path</strong><span>CSV + JSONL session export, replay, and manifests.</span></div>
+          <div class="stat tone-signal"><strong>System maps</strong><span>4 Mermaid diagrams covering repo, architecture, flow, and lifecycle.</span></div>
         </div>
       </div>
-      <aside class="panel hero-aside">
-        <div class="eyebrow">What is here</div>
-        <ul class="note-list">
+      <aside class="panel hero-preview">
+        <div class="eyebrow">Reference App // Operator View</div>
+        <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview" />
+        <ul class="note-list feature-list">
           <li>
-            <strong>Repo navigation</strong>
-            <p>Jump from the landing page into docs, diagrams, protocol reference, and implementation boundaries.</p>
+            <strong>Device control</strong>
+            <p>Scan nearby straps, assign aliases, and switch the active unit without losing the current context.</p>
           </li>
           <li>
-            <strong>Architecture at subsystem level</strong>
-            <p>The Mermaid set stays focused on transport, session flow, recording, and UI consumers instead of exploding into file-by-file diagrams.</p>
+            <strong>Live telemetry tabs</strong>
+            <p>Inspect heart rate, respiratory timing, ECG, and ACC as immediate runtime surfaces instead of abstract metrics.</p>
           </li>
           <li>
-            <strong>Pages deployment</strong>
-            <p>GitHub Actions builds the diagrams, converts markdown into HTML, and deploys the generated static site.</p>
+            <strong>Diagnostics + capture</strong>
+            <p>Use doctor-style validation, runtime logs, and direct recording flows before you commit to a longer session.</p>
           </li>
         </ul>
       </aside>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">Repository Paths</h2>
-      <p class="section-subtitle">The codebase is split cleanly between protocol decoding, Windows BLE transport, capture tooling, and the two user-facing surfaces.</p>
-      <div class="card-grid">
-        <div class="path-card">
-          <div class="kicker">src/PolarH10.Protocol</div>
-          <h3>Protocol core</h3>
-          <p>Pure C# decoders, PMD builders, session export, and capture manifests.</p>
+      <h2 class="section-heading">First Session Path</h2>
+      <p class="section-subtitle">The shortest route from a strap on your desk to usable telemetry on Windows.</p>
+      <div class="step-grid">
+        <div class="step-card tone-cool">
+          <div class="step-no">01</div>
+          <h3>Scan nearby straps</h3>
+          <p>Find advertisements, check addresses and aliases, and confirm that the intended H10 is actually visible.</p>
         </div>
-        <div class="path-card">
-          <div class="kicker">src/PolarH10.Transport.Windows</div>
-          <h3>Windows BLE stack</h3>
-          <p>Scanner, GATT connection, session orchestration, and multi-device coordination.</p>
+        <div class="step-card tone-violet">
+          <div class="step-no">02</div>
+          <h3>Open the link</h3>
+          <p>Connect over GATT, verify the service surface, and negotiate PMD settings before you trust the stream.</p>
         </div>
-        <div class="path-card">
-          <div class="kicker">src/PolarH10.Cli + src/PolarH10.App</div>
-          <h3>Operator surfaces</h3>
-          <p>CLI commands for diagnostics and recording, plus the WPF reference monitor.</p>
+        <div class="step-card tone-signal">
+          <div class="step-no">03</div>
+          <h3>Inspect live data</h3>
+          <p>Use the WPF monitor for charts and diagnostics or the CLI when you need a more direct validation surface.</p>
+        </div>
+        <div class="step-card tone-warm">
+          <div class="step-no">04</div>
+          <h3>Capture and replay</h3>
+          <p>Write HR, ECG, ACC, and protocol logs to disk, then replay those sessions when you need deterministic review.</p>
         </div>
       </div>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">Diagram Previews</h2>
-      <p class="section-subtitle">The Pages site publishes the same Mermaid sources used in the repo, with a manifest-driven viewer for direct browsing.</p>
+      <h2 class="section-heading">What The App Gives You</h2>
+      <p class="section-subtitle">This repo is most useful when you read it as an operator tool and a protocol reference at the same time.</p>
+      <div class="card-grid feature-grid">
+        <a class="path-card tone-cool" href="reference/app-overview.html">
+          <div class="kicker">App surface</div>
+          <h3>Operator overview</h3>
+          <p>See how the WPF monitor is structured and what each major panel, tab, and diagnostic area is for.</p>
+        </a>
+        <a class="path-card tone-signal" href="reference/ui-preview.html">
+          <div class="kicker">Live UI</div>
+          <h3>Telemetry monitor</h3>
+          <p>Review the current WPF visual system, chart treatment, and app shell before you dive into code.</p>
+        </a>
+        <a class="path-card tone-warm" href="reference/cli.html">
+          <div class="kicker">Direct control</div>
+          <h3>CLI diagnostics</h3>
+          <p>Use scan, doctor, record, replay, and stream commands when you want a precise, scriptable path.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/protocol/overview.html">
+          <div class="kicker">Wire format</div>
+          <h3>Protocol reference</h3>
+          <p>Cross-check services, control points, and frame formats once the app flow makes sense.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section panel section-panel">
+      <h2 class="section-heading">System Maps</h2>
+      <p class="section-subtitle">Use the diagrams after the app overview. They are there to explain roles, boundaries, and runtime paths, not to replace onboarding.</p>
       <div class="preview-grid">
-        <a class="preview-card" href="diagrams/viewer.html#repo-structure">
+        <a class="preview-card tone-violet" href="diagrams/viewer.html#repo-structure">
           <div class="meta">Repository structure</div>
-          <h3>Top-level code and docs layout</h3>
-          <p>Maps the repo across source, tests, docs, tools, and samples.</p>
+          <h3>What belongs where</h3>
+          <p>Use this when you need to understand how protocol, app, tooling, docs, and test projects are split.</p>
           <img src="diagrams/repo-structure.svg" alt="Repository structure diagram" />
         </a>
-        <a class="preview-card" href="diagrams/viewer.html#code-architecture">
+        <a class="preview-card tone-cool" href="diagrams/viewer.html#code-architecture">
           <div class="meta">Code architecture</div>
-          <h3>Protocol to transport to consumers</h3>
-          <p>Shows how decoders, BLE transport, sessions, recording, CLI, and WPF fit together.</p>
+          <h3>How runtime roles fit together</h3>
+          <p>Maps protocol decoders, Windows BLE transport, orchestration, recording, and the user-facing surfaces.</p>
           <img src="diagrams/code-architecture.svg" alt="Code architecture diagram" />
         </a>
-        <a class="preview-card" href="diagrams/viewer.html#session-lifecycle">
+        <a class="preview-card tone-warm" href="diagrams/viewer.html#session-lifecycle">
           <div class="meta">Runtime lifecycle</div>
-          <h3>Operator flow from scan to shutdown</h3>
-          <p>Shows the link sequence from discovery through PMD start, recording, and teardown.</p>
+          <h3>What a real session does</h3>
+          <p>Follow the route from discovery to PMD start, live telemetry, recording, diagnostics, and teardown.</p>
           <img src="diagrams/session-lifecycle.svg" alt="Session lifecycle diagram" />
         </a>
       </div>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">Start Navigating</h2>
+      <h2 class="section-heading">Reference Paths</h2>
       <div class="card-grid">
-        <a class="path-card" href="reference/getting-started.html">
+        <a class="path-card tone-cool" href="reference/getting-started.html">
           <div class="kicker">Build + run</div>
           <h3>Getting Started</h3>
           <p>Environment prerequisites, first build, and live-device verification.</p>
         </a>
-        <a class="path-card" href="reference/ui-preview.html">
-          <div class="kicker">Design preview</div>
-          <h3>WPF UI Preview</h3>
-          <p>Review the brutal tDR-inspired monitor redesign before deciding on further iteration.</p>
+        <a class="path-card tone-signal" href="reference/app-overview.html">
+          <div class="kicker">Operator model</div>
+          <h3>App Overview</h3>
+          <p>Start here if you need to understand what the app is doing before you read the lower-level docs.</p>
         </a>
-        <a class="path-card" href="reference/cli.html">
+        <a class="path-card tone-warm" href="reference/ui-preview.html">
+          <div class="kicker">Visual system</div>
+          <h3>WPF UI Preview</h3>
+          <p>Review the current monitor shell, telemetry layout, and chart language in one page.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/cli.html">
           <div class="kicker">Command surface</div>
           <h3>CLI Reference</h3>
           <p>Scan, doctor, record, replay, and sessions command behavior.</p>
-        </a>
-        <a class="path-card" href="reference/protocol/overview.html">
-          <div class="kicker">Wire format</div>
-          <h3>Protocol Overview</h3>
-          <p>Polar services, PMD control flow, and signal frame decoding.</p>
         </a>
       </div>
     </section>
@@ -346,7 +381,7 @@ function renderSidebar(currentRel) {
     return `<section><div class="category-label">${escapeHtml(group.title)}</div>${items}</section>`;
   }).join('');
 
-  return `<h2>Documentation</h2><p>Browse the generated Pages version of the repo docs and jump directly into the Mermaid viewer.</p>${groups}`;
+  return `<h2>Documentation</h2><p>Read the app surfaces first, then move into protocol detail, diagnostics, and Mermaid system maps.</p>${groups}`;
 }
 
 function renderTopNav(activeKey, homeHref, docsHref, diagramsHref) {
@@ -367,14 +402,14 @@ function renderHeader(topNav, homeHref) {
   return `<header class="site-header">
     <a class="brand" href="${homeHref}">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-copy"><small>Unofficial Reference</small><strong>PolarH10</strong></span>
+      <span class="brand-copy"><small>Windows Telemetry Toolkit</small><strong>PolarH10</strong></span>
     </a>
     <nav class="top-nav" aria-label="Primary">${topNav}</nav>
   </header>`;
 }
 
 function renderFooter() {
-  return `<footer class="footer">Built from the repo docs, Mermaid sources, and generated SVG output for GitHub Pages.</footer>`;
+  return `<footer class="footer">PolarH10 WPF monitor, CLI capture tooling, protocol docs, and Mermaid system maps. Unofficial reference build; not affiliated with Polar Electro Oy.</footer>`;
 }
 
 function renderArt() {
