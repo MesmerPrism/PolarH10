@@ -18,13 +18,13 @@
   --yellow: #f3c333;
   --orange: #f28f28;
   --red: #ec4736;
-  --shadow: 0 20px 44px rgba(39, 45, 53, 0.1);
-  --shadow-soft: 0 12px 28px rgba(39, 45, 53, 0.08);
+  --shadow: 0 4px 12px rgba(39, 45, 53, 0.08);
+  --shadow-soft: 0 2px 8px rgba(39, 45, 53, 0.06);
   --focus: rgba(37, 138, 203, 0.28);
   --max-width: 1280px;
-  --radius-lg: 22px;
-  --radius-md: 16px;
-  --radius-sm: 12px;
+  --radius-lg: 10px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
 }
 
 *,
@@ -115,8 +115,8 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 18px 22px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 244, 236, 0.98));
+  padding: 16px 18px;
+  background: var(--paper);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
@@ -134,8 +134,8 @@ button:focus-visible {
   height: 54px;
   flex: 0 0 auto;
   border: 1px solid var(--line-strong);
-  border-radius: 15px;
-  box-shadow: inset 0 -10px 18px rgba(58, 61, 67, 0.08);
+  border-radius: 10px;
+  box-shadow: inset 0 -6px 12px rgba(58, 61, 67, 0.06);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0 56%, transparent 56%),
     linear-gradient(135deg, transparent 0 56%, var(--yellow) 56% 64%, var(--orange) 64% 72%, var(--red) 72% 80%, var(--green) 80% 88%, var(--blue) 88% 100%),
@@ -178,7 +178,7 @@ button:focus-visible {
   min-height: 42px;
   padding: 0 14px;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   color: var(--ink-soft);
   font-size: 1rem;
   font-weight: 600;
@@ -188,7 +188,7 @@ button:focus-visible {
 .top-nav a.active,
 .top-nav a:hover {
   border-color: rgba(37, 138, 203, 0.26);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(243, 238, 230, 0.72);
   color: var(--ink);
 }
 
@@ -237,7 +237,7 @@ button:focus-visible {
 .hero-aside,
 .sidebar,
 .viewer-nav {
-  background: linear-gradient(180deg, rgba(248, 244, 236, 0.98), rgba(241, 235, 226, 0.96));
+  background: #f8f3ec;
 }
 
 .hero-aside p,
@@ -254,11 +254,11 @@ button:focus-visible {
   display: inline-block;
   margin: 0 0 12px;
   padding: 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: var(--ink-muted);
 }
 
@@ -314,21 +314,20 @@ button:focus-visible {
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.88);
   color: var(--ink);
   font-size: 0.98rem;
   font-weight: 600;
   letter-spacing: 0.01em;
   cursor: pointer;
-  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 .button:hover {
   background: var(--paper);
   border-color: rgba(37, 138, 203, 0.32);
-  box-shadow: 0 10px 24px rgba(39, 45, 53, 0.08);
-  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(39, 45, 53, 0.05);
 }
 
 .button.primary {
@@ -385,9 +384,9 @@ button:focus-visible {
 .nav-item {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.92);
   padding: 16px;
-  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
 }
 
 .stat:hover,
@@ -397,11 +396,11 @@ button:focus-visible {
 .doc-list a:hover,
 .nav-item:hover {
   border-color: rgba(37, 138, 203, 0.24);
-  box-shadow: 0 10px 24px rgba(39, 45, 53, 0.06);
+  box-shadow: 0 2px 8px rgba(39, 45, 53, 0.04);
 }
 
 .stat {
-  background: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .stat strong {
@@ -445,9 +444,9 @@ button:focus-visible {
 }
 
 .tone-dark {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 244, 236, 0.98));
+  background: #fbf7ef;
   border-color: rgba(32, 34, 38, 0.18);
-  box-shadow: 0 18px 40px rgba(39, 45, 53, 0.09);
+  box-shadow: 0 3px 10px rgba(39, 45, 53, 0.06);
 }
 
 .tone-dark::before {
@@ -467,7 +466,7 @@ button:focus-visible {
 }
 
 .tone-cool {
-  background: linear-gradient(180deg, #fbfeff, #f1f8fc);
+  background: #f4f8fb;
   border-color: rgba(37, 138, 203, 0.18);
 }
 
@@ -476,7 +475,7 @@ button:focus-visible {
 }
 
 .tone-violet {
-  background: linear-gradient(180deg, #fafcf6, #eef6e8);
+  background: #f2f6eb;
   border-color: rgba(125, 186, 68, 0.22);
 }
 
@@ -485,7 +484,7 @@ button:focus-visible {
 }
 
 .tone-warm {
-  background: linear-gradient(180deg, #fffdf3, #fbf0cb);
+  background: #fcf4d8;
   border-color: rgba(243, 195, 51, 0.26);
 }
 
@@ -494,7 +493,7 @@ button:focus-visible {
 }
 
 .tone-signal {
-  background: linear-gradient(180deg, #fffaf7, #fde6df);
+  background: #fde8e1;
   border-color: rgba(236, 71, 54, 0.22);
 }
 
@@ -507,7 +506,7 @@ button:focus-visible {
 }
 
 .hero-preview {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 239, 231, 0.96));
+  background: #f8f3ec;
 }
 
 .hero-preview img {
@@ -650,12 +649,11 @@ button:focus-visible {
   border-color: rgba(37, 138, 203, 0.28);
   background: rgba(255, 255, 255, 0.94);
   color: var(--ink);
-  transform: translateY(-1px);
 }
 
 .content-panel {
   min-width: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(249, 246, 240, 0.98));
+  background: var(--paper);
 }
 
 .prose {
@@ -696,7 +694,7 @@ button:focus-visible {
   background: rgba(246, 241, 233, 0.92);
   padding: 0.12rem 0.3rem;
   border: 1px solid rgba(31, 34, 38, 0.08);
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .prose pre,
@@ -799,7 +797,7 @@ button:focus-visible {
   min-height: 30px;
   padding: 0 10px;
   border: 1px solid rgba(37, 138, 203, 0.24);
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.86);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.82rem;
@@ -814,7 +812,7 @@ button:focus-visible {
 }
 
 .viewer-stage {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 236, 226, 0.98));
+  background: var(--paper);
 }
 
 .source-stage {
@@ -829,7 +827,7 @@ button:focus-visible {
   padding: 14px;
   border: 1px solid rgba(37, 138, 203, 0.18);
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 244, 236, 0.96));
+  background: #fbf7ef;
 }
 
 .viewer-meta p,
@@ -864,10 +862,8 @@ button:focus-visible {
   min-height: 30rem;
   height: min(70vh, 52rem);
   border: 1px solid rgba(67, 71, 75, 0.16);
-  border-radius: calc(var(--radius-lg) - 6px);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 236, 0.98)),
-    linear-gradient(180deg, transparent 0 18px, rgba(37, 138, 203, 0.03) 18px 19px, transparent 19px 100%);
+  border-radius: var(--radius-md);
+  background: var(--paper);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
@@ -931,7 +927,7 @@ button:focus-visible {
   place-items: center;
   min-height: 320px;
   border: 1px dashed rgba(67, 71, 75, 0.24);
-  border-radius: calc(var(--radius-lg) - 6px);
+  border-radius: var(--radius-md);
   color: var(--ink-muted);
   text-align: center;
   text-transform: uppercase;
