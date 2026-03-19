@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolarH10 Diagram Viewer</title>
-  <link rel="stylesheet" href="../assets/site.css?v=20260319-polaroid-site-7" />
+  <link rel="stylesheet" href="../assets/site.css?v=20260319-polaroid-site-8" />
 </head>
 <body class="viewer-page">
   <div class="page-art" aria-hidden="true">
@@ -107,8 +107,12 @@
       let resizeObserver = null;
       let wheelHandler = null;
       let panzoomChangeHandler = null;
+      let pointerDownHandler = null;
+      let pointerUpHandler = null;
       let userAdjustedView = false;
       let programmaticChange = false;
+      let fitFramePending = false;
+      let lastViewerFullscreen = false;
 
       function updateZoomLabel(scale = 1) {
         viewerZoom.textContent = `${Math.round(scale * 100)}%`;
@@ -145,6 +149,16 @@
           activeSvg.removeEventListener('panzoomchange', panzoomChangeHandler);
         }
 
+        if (activeSurface && pointerDownHandler) {
+          activeSurface.removeEventListener('pointerdown', pointerDownHandler);
+          activeSurface.classList.remove('is-dragging');
+        }
+
+        if (pointerUpHandler) {
+          window.removeEventListener('pointerup', pointerUpHandler);
+          window.removeEventListener('pointercancel', pointerUpHandler);
+        }
+
         if (panzoom) {
           if (typeof panzoom.resetStyle === 'function') {
             panzoom.resetStyle();
@@ -157,8 +171,11 @@
         activeSvg = null;
         wheelHandler = null;
         panzoomChangeHandler = null;
+        pointerDownHandler = null;
+        pointerUpHandler = null;
         userAdjustedView = false;
         programmaticChange = false;
+        fitFramePending = false;
         updateZoomLabel(1);
         updateZoomControls();
       }
@@ -189,6 +206,20 @@
         };
       }
 
+      function requestDiagramFit() {
+        if (!activeSurface || !activeSvg || fitFramePending) {
+          return;
+        }
+
+        fitFramePending = true;
+        requestAnimationFrame(() => {
+          fitFramePending = false;
+          if (activeSurface && activeSvg) {
+            fitActiveDiagram();
+          }
+        });
+      }
+
       function attachPanzoom(surface, svg) {
         cleanupPanzoom();
 
@@ -206,7 +237,6 @@
 
         panzoom = Panzoom(svg, {
           canvas: true,
-          cursor: 'grab',
           overflow: 'hidden',
           origin: '0 0',
           pinchAndPan: true,
@@ -218,6 +248,13 @@
           step: 0.18,
           touchAction: 'none'
         });
+
+        if (typeof panzoom.setStyle === 'function') {
+          panzoom.setStyle('cursor', 'inherit');
+        }
+
+        surface.style.removeProperty('cursor');
+        svg.style.cursor = 'inherit';
 
         wheelHandler = (event) => {
           if (!panzoom || showSource) {
@@ -235,16 +272,37 @@
           }
         };
 
+        pointerDownHandler = (event) => {
+          if (!panzoom || showSource) {
+            return;
+          }
+
+          if (event.pointerType === 'mouse' && event.button !== 0) {
+            return;
+          }
+
+          surface.classList.add('is-dragging');
+        };
+
+        pointerUpHandler = () => {
+          if (activeSurface) {
+            activeSurface.classList.remove('is-dragging');
+          }
+        };
+
         surface.addEventListener('wheel', wheelHandler, { passive: false });
         svg.addEventListener('panzoomchange', panzoomChangeHandler);
+        surface.addEventListener('pointerdown', pointerDownHandler);
+        window.addEventListener('pointerup', pointerUpHandler);
+        window.addEventListener('pointercancel', pointerUpHandler);
 
         resizeObserver = new ResizeObserver(() => {
           if (!activeSurface || !activeSvg) {
             return;
           }
 
-          if (document.fullscreenElement === viewer || !userAdjustedView) {
-            requestAnimationFrame(() => fitActiveDiagram());
+          if (!userAdjustedView) {
+            requestDiagramFit();
           }
         });
         resizeObserver.observe(surface);
@@ -376,13 +434,19 @@
       });
 
       btnFit.addEventListener('click', () => {
-        fitActiveDiagram();
+        userAdjustedView = false;
+        requestDiagramFit();
       });
 
       document.addEventListener('fullscreenchange', () => {
+        const viewerFullscreen = document.fullscreenElement === viewer;
+        const viewerExited = lastViewerFullscreen && !viewerFullscreen;
+        lastViewerFullscreen = viewerFullscreen;
         syncFullscreenButton();
-        if (!showSource && activeSvg) {
-          requestAnimationFrame(() => fitActiveDiagram());
+
+        if (!showSource && activeSvg && (viewerFullscreen || viewerExited)) {
+          userAdjustedView = false;
+          requestDiagramFit();
         }
       });
 

@@ -20,20 +20,22 @@ public sealed class WaveformChart : FrameworkElement
         public bool Visible = true;
     }
 
-    private static readonly Color PaperColor = Color.FromRgb(0xF1, 0xEE, 0xE6);
-    private static readonly Color CarbonColor = Color.FromRgb(0x11, 0x13, 0x15);
-    private static readonly Color GraphiteColor = Color.FromRgb(0x4B, 0x4F, 0x52);
-    private static readonly Color GridColor = Color.FromRgb(0x8A, 0x8E, 0x91);
-    private static readonly Color HazardColor = Color.FromRgb(0xD8, 0xD6, 0x1A);
+    private static readonly Color PaperColor = Color.FromRgb(0xFF, 0xFD, 0xF9);
+    private static readonly Color SurfaceColor = Color.FromRgb(0xF6, 0xF1, 0xE9);
+    private static readonly Color CarbonColor = Color.FromRgb(0x1F, 0x22, 0x26);
+    private static readonly Color GraphiteColor = Color.FromRgb(0x5B, 0x63, 0x6F);
+    private static readonly Color GridColor = Color.FromRgb(0xD7, 0xCF, 0xC4);
+    private static readonly Color RuleColor = Color.FromRgb(0xC7, 0xC0, 0xB5);
+    private static readonly Color AccentColor = Color.FromRgb(0x25, 0x8A, 0xCB);
 
-    private static readonly Brush BackgroundBrush = CreateFrozenBrush(CarbonColor);
-    private static readonly Brush HeaderBrush = CreateFrozenBrush(GraphiteColor);
-    private static readonly Brush LabelBrush = CreateFrozenBrush(PaperColor);
-    private static readonly Brush MutedBrush = CreateFrozenBrush(GridColor);
-    private static readonly Brush TitleBrush = CreateFrozenBrush(HazardColor);
+    private static readonly Brush BackgroundBrush = CreateFrozenBrush(PaperColor);
+    private static readonly Brush HeaderBrush = CreateFrozenBrush(SurfaceColor);
+    private static readonly Brush LabelBrush = CreateFrozenBrush(CarbonColor);
+    private static readonly Brush MutedBrush = CreateFrozenBrush(GraphiteColor);
+    private static readonly Brush TitleBrush = CreateFrozenBrush(AccentColor);
     private static readonly Pen GridPen = CreateFrozenPen(GridColor, 0.8);
-    private static readonly Pen BorderPen = CreateFrozenPen(PaperColor, 1.0);
-    private static readonly Pen HeaderRulePen = CreateFrozenPen(GraphiteColor, 1.0);
+    private static readonly Pen BorderPen = CreateFrozenPen(RuleColor, 1.0);
+    private static readonly Pen HeaderRulePen = CreateFrozenPen(RuleColor, 1.0);
     private static readonly Typeface UiTypeface = new(
         new FontFamily("Bahnschrift Condensed"),
         FontStyles.Normal,
@@ -266,7 +268,7 @@ public sealed class WaveformChart : FrameworkElement
         double chartWidth,
         double chartHeight)
     {
-        var stateText = MakeText("AWAITING TELEMETRY", 12, MutedBrush, dpi, UiTypeface);
+        var stateText = MakeText("Awaiting telemetry", 12, MutedBrush, dpi, UiTypeface);
         var x = left + Math.Max((chartWidth - stateText.Width) / 2.0, 8);
         var y = top + Math.Max((chartHeight - stateText.Height) / 2.0, 8);
         dc.DrawText(stateText, new Point(x, y));

@@ -11,12 +11,12 @@ namespace PolarH10.App;
 
 public partial class MainWindow : Window
 {
-    private static readonly Color SignalRed = Color.FromRgb(0xD9, 0x2C, 0x2C);
-    private static readonly Color HazardYellow = Color.FromRgb(0xD8, 0xD6, 0x1A);
-    private static readonly Color SafetyOrange = Color.FromRgb(0xF0, 0x5A, 0x22);
-    private static readonly Color TelemetryCyan = Color.FromRgb(0x00, 0xA7, 0xA0);
-    private static readonly Color Paper = Color.FromRgb(0xF1, 0xEE, 0xE6);
-    private static readonly Color Graphite = Color.FromRgb(0x8A, 0x8E, 0x91);
+    private static readonly Color SignalRed = Color.FromRgb(0xC9, 0x4E, 0x3A);
+    private static readonly Color HazardYellow = Color.FromRgb(0x9E, 0x77, 0x14);
+    private static readonly Color SafetyOrange = Color.FromRgb(0xC8, 0x6E, 0x1C);
+    private static readonly Color TelemetryBlue = Color.FromRgb(0x1E, 0x6E, 0x9E);
+    private static readonly Color TelemetryGreen = Color.FromRgb(0x62, 0x8F, 0x37);
+    private static readonly Color Graphite = Color.FromRgb(0x5B, 0x63, 0x6F);
     private static readonly bool IsPreviewMode = string.Equals(
         Environment.GetEnvironmentVariable("POLARH10_PREVIEW"),
         "1",
@@ -83,31 +83,31 @@ public partial class MainWindow : Window
     // ── Chart init (same per-signal charts, rebound when selection changes) ──
     private void InitializeCharts()
     {
-        _hrChart = CreateSingleChart("01 HR // BPM", SignalRed, 120, out _hrSeries);
+        _hrChart = CreateSingleChart("HR", SignalRed, 120, out _hrSeries);
         HrChartHost.Child = _hrChart;
 
-        _rrChart = CreateSingleChart("02 RR // MS", HazardYellow, 120, out _rrSeries);
+        _rrChart = CreateSingleChart("RR", HazardYellow, 120, out _rrSeries);
         RrChartHost.Child = _rrChart;
 
-        _ecgChart = CreateSingleChart("03 ECG // UV", TelemetryCyan, 650, out _ecgSeries);
+        _ecgChart = CreateSingleChart("ECG", TelemetryBlue, 650, out _ecgSeries);
         EcgChartHost.Child = _ecgChart;
 
-        _accXChart = CreateSingleChart("04 ACC X // MG", SafetyOrange, 500, out _accXSeries);
+        _accXChart = CreateSingleChart("ACC X", SafetyOrange, 500, out _accXSeries);
         AccXChartHost.Child = _accXChart;
 
-        _accYChart = CreateSingleChart("05 ACC Y // MG", Paper, 500, out _accYSeries);
+        _accYChart = CreateSingleChart("ACC Y", TelemetryGreen, 500, out _accYSeries);
         AccYChartHost.Child = _accYChart;
 
-        _accZChart = CreateSingleChart("06 ACC Z // MG", Graphite, 500, out _accZSeries);
+        _accZChart = CreateSingleChart("ACC Z", Graphite, 500, out _accZSeries);
         AccZChartHost.Child = _accZChart;
 
         _overlayChart = new WaveformChart { NormalizePerSeries = true };
-        _ovHr   = _overlayChart.AddSeries("HR",    SignalRed,     300);
-        _ovRr   = _overlayChart.AddSeries("RR",    HazardYellow,  300);
-        _ovEcg  = _overlayChart.AddSeries("ECG",   TelemetryCyan, 650);
-        _ovAccX = _overlayChart.AddSeries("ACC X", SafetyOrange,  500);
-        _ovAccY = _overlayChart.AddSeries("ACC Y", Paper,         500);
-        _ovAccZ = _overlayChart.AddSeries("ACC Z", Graphite,      500);
+        _ovHr   = _overlayChart.AddSeries("HR", SignalRed, 300);
+        _ovRr   = _overlayChart.AddSeries("RR", HazardYellow, 300);
+        _ovEcg  = _overlayChart.AddSeries("ECG", TelemetryBlue, 650);
+        _ovAccX = _overlayChart.AddSeries("ACC X", SafetyOrange, 500);
+        _ovAccY = _overlayChart.AddSeries("ACC Y", TelemetryGreen, 500);
+        _ovAccZ = _overlayChart.AddSeries("ACC Z", Graphite, 500);
         OverlayChartHost.Child = _overlayChart;
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
@@ -154,6 +154,24 @@ public partial class MainWindow : Window
         return state;
     }
 
+    private static string FormatHrCount(int count) => $"HR samples {count}";
+    private static string FormatEcgCount(int count) => $"ECG frames {count}";
+    private static string FormatAccCount(int count) => $"ACC frames {count}";
+
+    private Brush ResourceBrush(string key) => (Brush)Application.Current.Resources[key];
+
+    private void SetConnectionStatus(string text, string brushKey)
+    {
+        StatusText.Text = text;
+        StatusText.Foreground = ResourceBrush(brushKey);
+    }
+
+    private void SetRecordStatus(string text, string brushKey)
+    {
+        RecordStatusText.Text = text;
+        RecordStatusText.Foreground = ResourceBrush(brushKey);
+    }
+
     // ── Wire up event handlers for a new device context ─────────
     private void WireDeviceEvents(DeviceContext ctx)
     {
@@ -164,7 +182,7 @@ public partial class MainWindow : Window
             {
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    StatusText.Text = connected ? "LINKED" : "OFFLINE";
+                    SetConnectionStatus(connected ? "Connected" : "Offline", connected ? "FocusBlueBrush" : "GraphiteBrush");
                     ConnectButton.IsEnabled = !connected;
                     DisconnectButton.IsEnabled = connected;
                 }
@@ -195,9 +213,9 @@ public partial class MainWindow : Window
                 {
                     HrValueText.Text = $"{sample.HeartRateBpm} BPM";
                     RrValueText.Text = sample.RrIntervalsMs.Length > 0
-                        ? $"RR // {string.Join(", ", sample.RrIntervalsMs.Select(r => $"{r:F0} MS"))}"
-                        : "RR // --";
-                    HrCountText.Text = $"HR // {cs.HrCount}";
+                        ? $"RR intervals {string.Join(", ", sample.RrIntervalsMs.Select(r => $"{r:F0} ms"))}"
+                        : "RR intervals --";
+                    HrCountText.Text = FormatHrCount(cs.HrCount);
 
                     _hrChart.Push(_hrSeries, sample.HeartRateBpm);
                     _overlayChart.Push(_ovHr, sample.HeartRateBpm);
@@ -220,7 +238,7 @@ public partial class MainWindow : Window
 
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    EcgCountText.Text = $"ECG FRAMES // {cs.EcgCount}";
+                    EcgCountText.Text = FormatEcgCount(cs.EcgCount);
                     foreach (var uv in frame.MicroVolts)
                     {
                         _ecgChart.Push(_ecgSeries, uv);
@@ -244,7 +262,7 @@ public partial class MainWindow : Window
 
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    AccCountText.Text = $"ACC FRAMES // {cs.AccCount}";
+                    AccCountText.Text = FormatAccCount(cs.AccCount);
                     foreach (var s in frame.Samples)
                     {
                         _accXChart.Push(_accXSeries, s.X);
@@ -278,14 +296,14 @@ public partial class MainWindow : Window
             var ctx = _coordinator.GetDevice(addr);
             var statusTag = ctx?.Status switch
             {
-                DeviceConnectionStatus.Connecting => " [ARMING]",
-                DeviceConnectionStatus.Connected => " [LINK]",
-                DeviceConnectionStatus.Streaming => " [LIVE]",
-                DeviceConnectionStatus.Error => " [FAULT]",
+                DeviceConnectionStatus.Connecting => "  Connecting",
+                DeviceConnectionStatus.Connected => "  Connected",
+                DeviceConnectionStatus.Streaming => "  Streaming",
+                DeviceConnectionStatus.Error => "  Fault",
                 _ => "",
             };
 
-            var recTag = ctx?.Recorder != null ? " [REC]" : "";
+            var recTag = ctx?.Recorder != null ? "  Recording" : "";
             var display = $"{DisplayName(addr)}{statusTag}{recTag}";
 
             var item = new ListBoxItem { Content = display, Tag = addr };
@@ -316,36 +334,47 @@ public partial class MainWindow : Window
         var isConnected = ctx?.Status is DeviceConnectionStatus.Connected or DeviceConnectionStatus.Streaming;
         ConnectButton.IsEnabled = !isConnected;
         DisconnectButton.IsEnabled = isConnected;
-        StatusText.Text = ctx?.Status switch
-        {
-            DeviceConnectionStatus.Connecting => "ARMING",
-            DeviceConnectionStatus.Connected => "LINKED",
-            DeviceConnectionStatus.Streaming => "LIVE",
-            DeviceConnectionStatus.Error => "FAULT",
-            _ => "OFFLINE",
-        };
 
         // Update counters
         if (_chartStates.TryGetValue(address, out var cs))
         {
-            HrCountText.Text = $"HR // {cs.HrCount}";
-            EcgCountText.Text = $"ECG FRAMES // {cs.EcgCount}";
-            AccCountText.Text = $"ACC FRAMES // {cs.AccCount}";
+            HrCountText.Text = FormatHrCount(cs.HrCount);
+            EcgCountText.Text = FormatEcgCount(cs.EcgCount);
+            AccCountText.Text = FormatAccCount(cs.AccCount);
         }
         else
         {
-            HrCountText.Text = "HR // 0";
-            EcgCountText.Text = "ECG FRAMES // 0";
-            AccCountText.Text = "ACC FRAMES // 0";
+            HrCountText.Text = FormatHrCount(0);
+            EcgCountText.Text = FormatEcgCount(0);
+            AccCountText.Text = FormatAccCount(0);
             HrValueText.Text = "-- BPM";
-            RrValueText.Text = "RR // --";
+            RrValueText.Text = "RR intervals --";
         }
 
         // Update recording UI
         var isRecording = ctx?.Recorder != null;
         StartRecordButton.IsEnabled = isConnected && !isRecording;
         StopRecordButton.IsEnabled = isRecording;
-        RecordStatusText.Text = isRecording ? "RECORDING ACTIVE" : "NOT RECORDING";
+        SetRecordStatus(isRecording ? "Recording active" : "Not recording", isRecording ? "SignalRedBrush" : "GraphiteBrush");
+
+        switch (ctx?.Status)
+        {
+            case DeviceConnectionStatus.Connecting:
+                SetConnectionStatus("Connecting", "SafetyOrangeBrush");
+                break;
+            case DeviceConnectionStatus.Connected:
+                SetConnectionStatus("Connected", "FocusBlueBrush");
+                break;
+            case DeviceConnectionStatus.Streaming:
+                SetConnectionStatus("Streaming", "TelemetryGreenBrush");
+                break;
+            case DeviceConnectionStatus.Error:
+                SetConnectionStatus("Fault", "SignalRedBrush");
+                break;
+            default:
+                SetConnectionStatus("Offline", "GraphiteBrush");
+                break;
+        }
     }
 
     // ── Scan ────────────────────────────────────────────────────
@@ -393,7 +422,7 @@ public partial class MainWindow : Window
         await scanner.StartScanAsync(TimeSpan.FromSeconds(8));
         await scanCompleted.Task;
 
-        ScanStatusText.Text = $"{_seenDevices.Count} device(s)";
+        ScanStatusText.Text = $"{_seenDevices.Count} devices";
         ScanButton.IsEnabled = true;
         _deviceRegistry.Save();
         RefreshDeviceList();
@@ -409,7 +438,7 @@ public partial class MainWindow : Window
         var address = _selectedAddress;
 
         ConnectButton.IsEnabled = false;
-        StatusText.Text = "ARMING";
+        SetConnectionStatus("Connecting", "SafetyOrangeBrush");
         AddLiveLog($"Connecting to {DisplayName(address)}...");
 
         try
@@ -442,7 +471,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            StatusText.Text = "FAULT";
+            SetConnectionStatus("Fault", "SignalRedBrush");
             ConnectButton.IsEnabled = true;
             AddLiveLog($"Error: {ex.Message}");
             AddDiagLog($"[{address}] Exception: {ex}");
@@ -460,7 +489,7 @@ public partial class MainWindow : Window
 
         await _coordinator.DisconnectAsync(address);
 
-        StatusText.Text = "OFFLINE";
+        SetConnectionStatus("Offline", "GraphiteBrush");
         ConnectButton.IsEnabled = true;
         DisconnectButton.IsEnabled = false;
         AddLiveLog($"Disconnected from {DisplayName(address)}");
@@ -520,13 +549,13 @@ public partial class MainWindow : Window
             _coordinator.StartRecording(_selectedAddress);
             StartRecordButton.IsEnabled = false;
             StopRecordButton.IsEnabled = true;
-            RecordStatusText.Text = "RECORDING ACTIVE";
+            SetRecordStatus("Recording active", "SignalRedBrush");
             AddLiveLog($"[{DisplayName(_selectedAddress)}] Recording started");
             RefreshDeviceList();
         }
         catch (Exception ex)
         {
-            RecordStatusText.Text = $"Record failed: {ex.Message}";
+            SetRecordStatus($"Record failed: {ex.Message}", "SignalRedBrush");
         }
     }
 
@@ -539,7 +568,7 @@ public partial class MainWindow : Window
         var address = _selectedAddress;
 
         var baseFolder = OutputFolderBox.Text.Trim();
-        RecordStatusText.Text = "Saving...";
+        SetRecordStatus("Saving...", "SafetyOrangeBrush");
 
         try
         {
@@ -549,7 +578,7 @@ public partial class MainWindow : Window
             var outputPath = Path.Combine(baseFolder, folderName);
 
             var recorder = await _coordinator.StopRecordingAsync(address, outputPath);
-            RecordStatusText.Text = $"Saved to {outputPath}  (HR={recorder.HrRrCount} ECG={recorder.EcgFrameCount} ACC={recorder.AccFrameCount})";
+            SetRecordStatus($"Saved to {outputPath}  (HR={recorder.HrRrCount} ECG={recorder.EcgFrameCount} ACC={recorder.AccFrameCount})", "TelemetryGreenBrush");
             AddLiveLog($"[{DisplayName(address)}] Session saved to {outputPath}");
 
             // Append to run manifest and write it
@@ -578,7 +607,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            RecordStatusText.Text = $"Save failed: {ex.Message}";
+            SetRecordStatus($"Save failed: {ex.Message}", "SignalRedBrush");
         }
 
         StartRecordButton.IsEnabled = true;
@@ -645,9 +674,9 @@ public partial class MainWindow : Window
 
         var previewDevices = new[]
         {
-            ("A0:9F:1D:42:11:7C", "UNIT ALPHA [LIVE]"),
-            ("A0:9F:1D:42:11:91", "UNIT BETA [LINK]"),
-            ("A0:9F:1D:42:12:04", "LAB HARNESS [OFFLINE]"),
+            ("A0:9F:1D:42:11:7C", "Unit Alpha  Streaming"),
+            ("A0:9F:1D:42:11:91", "Unit Beta  Connected"),
+            ("A0:9F:1D:42:12:04", "Lab Harness"),
         };
 
         foreach (var (address, label) in previewDevices)
@@ -662,29 +691,29 @@ public partial class MainWindow : Window
         DeviceListBox.SelectedIndex = 0;
         _selectedAddress = previewDevices[0].Item1;
 
-        ScanStatusText.Text = "3 DEVICE(S)";
-        SelectedDeviceLabel.Text = "UNIT ALPHA // TELEMETRY LINK";
-        AliasBox.Text = "ALPHA-01";
-        StatusText.Text = "LIVE";
+        ScanStatusText.Text = "3 devices";
+        SelectedDeviceLabel.Text = "Unit Alpha";
+        AliasBox.Text = "Alpha-01";
+        SetConnectionStatus("Streaming", "TelemetryGreenBrush");
         ConnectButton.IsEnabled = false;
         DisconnectButton.IsEnabled = true;
         StartRecordButton.IsEnabled = true;
         StopRecordButton.IsEnabled = false;
         OutputFolderBox.Text = @".\session\preview";
-        RecordStatusText.Text = "OUTPUT ARMED";
+        SetRecordStatus("Ready to capture", "FocusBlueBrush");
 
         HrValueText.Text = "72 BPM";
-        RrValueText.Text = "RR // 828 MS, 833 MS, 829 MS";
-        HrCountText.Text = "HR // 256";
-        EcgCountText.Text = "ECG FRAMES // 514";
-        AccCountText.Text = "ACC FRAMES // 384";
+        RrValueText.Text = "RR intervals 828 ms, 833 ms, 829 ms";
+        HrCountText.Text = FormatHrCount(256);
+        EcgCountText.Text = FormatEcgCount(514);
+        AccCountText.Text = FormatAccCount(384);
 
         foreach (var message in new[]
         {
-            "[UNIT ALPHA] Preview feed armed",
-            "[UNIT ALPHA] ECG stream locked at 130 Hz",
-            "[UNIT ALPHA] ACC stream locked at 100 Hz",
-            "[UNIT ALPHA] Recorder idle // output target armed",
+            "[Unit Alpha] Preview session armed",
+            "[Unit Alpha] ECG stream stable at 130 Hz",
+            "[Unit Alpha] ACC stream stable at 100 Hz",
+            "[Unit Alpha] Recorder idle and ready",
         })
         {
             AddLiveLog(message);

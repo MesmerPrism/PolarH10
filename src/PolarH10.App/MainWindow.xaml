@@ -9,42 +9,43 @@
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style x:Key="PanelFrameStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource SurfaceLightBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="14" />
-            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,12" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
         </Style>
 
         <Style x:Key="DarkPanelFrameStyle" TargetType="Border" BasedOn="{StaticResource PanelFrameStyle}">
-            <Setter Property="Background" Value="{StaticResource CarbonBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource GraphiteBrush}" />
+            <Setter Property="Background" Value="{StaticResource SurfaceTintBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
         </Style>
 
         <Style x:Key="SectionCodeStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="{StaticResource GridBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource GraphiteBrush}" />
         </Style>
 
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontSize" Value="22" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
         </Style>
 
         <Style x:Key="MetricLabelStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="{StaticResource GridBrush}" />
-            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource GraphiteBrush}" />
+            <Setter Property="Margin" Value="0,0,0,8" />
         </Style>
 
         <Style x:Key="ConsoleListStyle" TargetType="ListBox">
-            <Setter Property="Background" Value="{StaticResource CarbonBrush}" />
-            <Setter Property="Foreground" Value="{StaticResource AppPaperBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource GraphiteBrush}" />
+            <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
             <Setter Property="FontSize" Value="11" />
@@ -52,7 +53,7 @@
         </Style>
 
         <Style x:Key="ConsoleListItemStyle" TargetType="ListBoxItem">
-            <Setter Property="Foreground" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Padding" Value="8,4" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -64,10 +65,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource GraphiteBrush}" />
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceLightBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="#22262A" />
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceTintBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -78,32 +79,33 @@
         <Style x:Key="DeviceRailListStyle" TargetType="ListBox" BasedOn="{StaticResource ConsoleListStyle}">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
             <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
             <Setter Property="FontSize" Value="13" />
         </Style>
 
         <Style x:Key="DeviceRailListItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource ConsoleListItemStyle}">
-            <Setter Property="Foreground" Value="{StaticResource AppPaperBrush}" />
-            <Setter Property="Padding" Value="10,8" />
-            <Setter Property="Margin" Value="0,0,0,4" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,0,0,8" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
                         <Border x:Name="Chrome"
-                                Background="Transparent"
-                                BorderBrush="{StaticResource GraphiteBrush}"
-                                BorderThickness="1">
+                                Background="{StaticResource AppPaperBrush}"
+                                BorderBrush="{StaticResource PanelEdgeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
                             <ContentPresenter />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Chrome" Property="Background" Value="{StaticResource AppPaperBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource HazardYellowBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource SafetyOrangeBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -114,11 +116,27 @@
 
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
+            <RowDefinition Height="10" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.Column="0" Fill="{StaticResource FocusBlueBrush}" />
+            <Rectangle Grid.Column="1" Fill="{StaticResource TelemetryGreenBrush}" />
+            <Rectangle Grid.Column="2" Fill="{StaticResource HazardYellowBrush}" />
+            <Rectangle Grid.Column="3" Fill="{StaticResource SafetyOrangeBrush}" />
+            <Rectangle Grid.Column="4" Fill="{StaticResource SignalRedBrush}" />
+        </Grid>
+
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="312" MinWidth="240" />
                 <ColumnDefinition Width="6" />
@@ -126,37 +144,30 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Background="{StaticResource CarbonBrush}"
-                    BorderBrush="{StaticResource GraphiteBrush}"
+                    Background="{StaticResource SurfaceTintBrush}"
+                    BorderBrush="{StaticResource PanelEdgeBrush}"
                     BorderThickness="0,0,1,0">
-                <DockPanel Margin="16" LastChildFill="True">
+                <DockPanel Margin="18" LastChildFill="True">
                     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
-                        <TextBlock Text="UNIT // DEVICE INDEX"
-                                   Style="{StaticResource SectionCodeStyle}"
-                                   Foreground="{StaticResource HazardYellowBrush}" />
-                        <TextBlock Text="DEVICES"
-                                   FontSize="26"
+                        <TextBlock Text="Devices"
+                                   FontSize="28"
                                    FontWeight="Bold"
-                                   Foreground="{StaticResource AppPaperBrush}"
-                                   Margin="0,2,0,10" />
-                        <Rectangle Height="2" Fill="{StaticResource HazardYellowBrush}" Margin="0,0,0,12" />
+                                   Foreground="{StaticResource CarbonBrush}"
+                                   Margin="0,0,0,12" />
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Button x:Name="ScanButton"
-                                    Content="SCAN"
-                                    Width="82"
-                                    Background="{StaticResource HazardYellowBrush}"
-                                    Foreground="{StaticResource CarbonBrush}"
-                                    BorderBrush="{StaticResource HazardYellowBrush}"
+                                    Content="Scan"
+                                    Width="88"
                                     Click="OnScanClick" />
                             <TextBlock x:Name="ScanStatusText"
                                        Grid.Column="1"
                                        VerticalAlignment="Center"
                                        Margin="12,0,0,0"
-                                       Foreground="{StaticResource AppPaperBrush}"
+                                       Foreground="{StaticResource GraphiteBrush}"
                                        FontSize="12"
                                        Text="" />
                         </Grid>
@@ -181,10 +192,10 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0"
-                        Background="{StaticResource SurfaceLightBrush}"
-                        BorderBrush="{StaticResource CarbonBrush}"
-                        BorderThickness="0,0,0,2"
-                        Padding="18,14">
+                        Background="{StaticResource SurfaceTintBrush}"
+                        BorderBrush="{StaticResource PanelEdgeBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="20,16">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -198,14 +209,11 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
-                            <TextBlock Text="SELECTION // LINK CONTROL"
-                                       Style="{StaticResource SectionCodeStyle}"
-                                       Foreground="{StaticResource GraphiteBrush}" />
                             <TextBlock x:Name="SelectedDeviceLabel"
-                                       Text="NO DEVICE SELECTED"
-                                       FontSize="28"
+                                       Text="No device selected"
+                                       FontSize="30"
                                        FontWeight="Bold"
-                                       Margin="0,4,0,0" />
+                                       Margin="0,0,0,0" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="1"
@@ -213,33 +221,33 @@
                                     Orientation="Horizontal"
                                     VerticalAlignment="Center"
                                     Margin="0,14,0,0">
-                            <TextBlock Text="ALIAS" Style="{StaticResource MetricLabelStyle}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBlock Text="Alias" Style="{StaticResource MetricLabelStyle}" VerticalAlignment="Center" Margin="0,0,8,0" />
                             <TextBox x:Name="AliasBox" Width="180" Margin="0,0,8,0" />
                             <Button x:Name="SetAliasButton"
-                                    Content="SET"
-                                    Width="62"
-                                    Background="{StaticResource SurfaceLightBrush}"
+                                    Content="Save"
+                                    Width="68"
+                                    Background="{StaticResource AppPaperBrush}"
                                     Foreground="{StaticResource CarbonBrush}"
-                                    BorderBrush="{StaticResource CarbonBrush}"
+                                    BorderBrush="{StaticResource PanelEdgeBrush}"
                                     Click="OnSetAliasClick" />
                         </StackPanel>
 
                         <Button x:Name="ConnectButton"
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Content="CONNECT"
+                                Content="Connect"
                                 Width="96"
                                 Margin="12,14,6,0"
                                 Click="OnConnectClick" />
                         <Button x:Name="DisconnectButton"
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Content="CUT LINK"
-                                Width="96"
+                                Content="Disconnect"
+                                Width="104"
                                 Margin="0,14,8,0"
-                                Background="{StaticResource SurfaceLightBrush}"
+                                Background="{StaticResource AppPaperBrush}"
                                 Foreground="{StaticResource CarbonBrush}"
-                                BorderBrush="{StaticResource CarbonBrush}"
+                                BorderBrush="{StaticResource PanelEdgeBrush}"
                                 Click="OnDisconnectClick"
                                 IsEnabled="False" />
                         <TextBlock x:Name="StatusText"
@@ -249,13 +257,13 @@
                                    Margin="10,14,0,0"
                                    FontSize="13"
                                    FontWeight="Bold"
-                                   Foreground="{StaticResource SignalRedBrush}"
+                                   Foreground="{StaticResource GraphiteBrush}"
                                    Text="" />
                     </Grid>
                 </Border>
 
-                <TabControl x:Name="DeviceTabControl" Grid.Row="1" Margin="18,16,18,12">
-                    <TabItem Header="01 LIVE">
+                <TabControl x:Name="DeviceTabControl" Grid.Row="1" Margin="20,18,20,12">
+                    <TabItem Header="Live">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
                                 <Grid Margin="0,0,0,12">
@@ -266,34 +274,31 @@
 
                                     <Border Grid.Column="0" Style="{StaticResource DarkPanelFrameStyle}" Margin="0,0,10,0">
                                         <StackPanel>
-                                            <TextBlock Text="HEART RATE // PRIMARY FEED"
-                                                       Style="{StaticResource MetricLabelStyle}"
-                                                       Foreground="{StaticResource HazardYellowBrush}" />
+                                            <TextBlock Text="Heart rate" Style="{StaticResource MetricLabelStyle}" />
                                             <TextBlock x:Name="HrValueText"
                                                        Text="-- BPM"
                                                        FontSize="54"
                                                        FontWeight="Bold"
                                                        Foreground="{StaticResource SignalRedBrush}" />
                                             <TextBlock x:Name="RrValueText"
-                                                       Text="RR // --"
+                                                       Text="RR intervals --"
                                                        FontSize="14"
                                                        FontWeight="SemiBold"
-                                                       Foreground="{StaticResource AppPaperBrush}" />
+                                                       Foreground="{StaticResource GraphiteBrush}" />
                                         </StackPanel>
                                     </Border>
 
                                     <Border Grid.Column="1" Style="{StaticResource PanelFrameStyle}" Margin="0">
                                         <StackPanel>
-                                            <TextBlock Text="PACKET INDEX // SESSION COUNTERS"
-                                                       Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBlock x:Name="HrCountText" Text="HR // 0" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
-                                            <TextBlock x:Name="EcgCountText" Text="ECG FRAMES // 0" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
-                                            <TextBlock x:Name="AccCountText" Text="ACC FRAMES // 0" FontSize="16" FontWeight="SemiBold" />
+                                            <TextBlock Text="Session counters" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="HrCountText" Text="HR samples 0" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                                            <TextBlock x:Name="EcgCountText" Text="ECG frames 0" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                                            <TextBlock x:Name="AccCountText" Text="ACC frames 0" FontSize="16" FontWeight="SemiBold" />
                                         </StackPanel>
                                     </Border>
                                 </Grid>
 
-                                <TextBlock Text="SIGNAL WINDOWS // LIVE TELEMETRY"
+                                <TextBlock Text="Live telemetry"
                                            Style="{StaticResource SectionTitleStyle}"
                                            Margin="0,0,0,8" />
 
@@ -332,7 +337,7 @@
 
                                     <TextBlock Grid.Row="2"
                                                Grid.ColumnSpan="2"
-                                               Text="MOTION AXES // ACC VECTOR"
+                                               Text="Acceleration"
                                                Style="{StaticResource SectionTitleStyle}"
                                                Margin="0,0,0,8" />
                                 </Grid>
@@ -363,7 +368,7 @@
                                             Padding="0" />
                                 </Grid>
 
-                                <TextBlock Text="EVENT TRACE // LIVE LOG"
+                                <TextBlock Text="Live log"
                                            Style="{StaticResource SectionTitleStyle}"
                                            Margin="0,4,0,8" />
                                 <ListBox x:Name="LiveLogList"
@@ -374,7 +379,7 @@
                         </ScrollViewer>
                     </TabItem>
 
-                    <TabItem Header="02 OVERLAY">
+                    <TabItem Header="Overlay">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -396,7 +401,7 @@
                                               Foreground="{StaticResource SafetyOrangeBrush}"
                                               Checked="OnOverlayToggle" Unchecked="OnOverlayToggle" />
                                     <CheckBox x:Name="OvAccYToggle" Content="ACC Y" IsChecked="True" Margin="0,0,18,0"
-                                              Foreground="{StaticResource CarbonBrush}"
+                                              Foreground="{StaticResource TelemetryGreenBrush}"
                                               Checked="OnOverlayToggle" Unchecked="OnOverlayToggle" />
                                     <CheckBox x:Name="OvAccZToggle" Content="ACC Z" IsChecked="True"
                                               Foreground="{StaticResource GraphiteBrush}"
@@ -408,40 +413,35 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="03 RECORD">
+                    <TabItem Header="Record">
                         <StackPanel>
                             <Border Style="{StaticResource PanelFrameStyle}">
                                 <StackPanel>
-                                    <TextBlock Text="CAPTURE ROUTING // STORAGE TARGET"
-                                               Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBlock Text="Output folder" Style="{StaticResource MetricLabelStyle}" />
                                     <TextBox x:Name="OutputFolderBox" Width="360" Text="./session" />
                                 </StackPanel>
                             </Border>
 
                             <Border Style="{StaticResource PanelFrameStyle}">
                                 <StackPanel>
-                                    <TextBlock Text="CAPTURE CONTROL"
-                                               Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBlock Text="Capture control" Style="{StaticResource MetricLabelStyle}" />
                                     <StackPanel Orientation="Horizontal">
                                         <Button x:Name="StartRecordButton"
-                                                Content="START RECORD"
+                                                Content="Start recording"
                                                 Width="132"
-                                                Background="{StaticResource HazardYellowBrush}"
-                                                Foreground="{StaticResource CarbonBrush}"
-                                                BorderBrush="{StaticResource HazardYellowBrush}"
                                                 Click="OnStartRecordClick" />
                                         <Button x:Name="StopRecordButton"
-                                                Content="STOP // SAVE"
+                                                Content="Stop and save"
                                                 Width="132"
                                                 Margin="8,0,0,0"
-                                                Background="{StaticResource SurfaceLightBrush}"
+                                                Background="{StaticResource AppPaperBrush}"
                                                 Foreground="{StaticResource CarbonBrush}"
-                                                BorderBrush="{StaticResource CarbonBrush}"
+                                                BorderBrush="{StaticResource PanelEdgeBrush}"
                                                 Click="OnStopRecordClick"
                                                 IsEnabled="False" />
                                     </StackPanel>
                                     <TextBlock x:Name="RecordStatusText"
-                                               Text="NOT RECORDING"
+                                               Text="Not recording"
                                                FontSize="14"
                                                FontWeight="Bold"
                                                Foreground="{StaticResource GraphiteBrush}"
@@ -451,13 +451,13 @@
                         </StackPanel>
                     </TabItem>
 
-                    <TabItem Header="04 DIAGNOSTICS">
+                    <TabItem Header="Diagnostics">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <TextBlock Text="CONTROL FEED // PMD + LINK EVENTS"
+                            <TextBlock Text="Control log"
                                        Style="{StaticResource SectionTitleStyle}"
                                        Margin="0,0,0,10" />
                             <ListBox x:Name="DiagLogList"
@@ -470,15 +470,15 @@
             </Grid>
         </Grid>
 
-        <Border Grid.Row="1"
-                Background="{StaticResource CarbonBrush}"
-                BorderBrush="{StaticResource GraphiteBrush}"
+        <Border Grid.Row="2"
+                Background="{StaticResource SurfaceTintBrush}"
+                BorderBrush="{StaticResource PanelEdgeBrush}"
                 BorderThickness="0,1,0,0"
                 Padding="14,8">
-            <TextBlock Text="UNOFFICIAL POLAR H10 REFERENCE MONITOR // NOT AFFILIATED WITH OR ENDORSED BY POLAR"
+            <TextBlock Text="Unofficial Polar H10 reference monitor. Not affiliated with or endorsed by Polar."
                        FontSize="11"
                        FontWeight="SemiBold"
-                       Foreground="{StaticResource AppPaperBrush}" />
+                       Foreground="{StaticResource GraphiteBrush}" />
         </Border>
     </Grid>
 </Window>

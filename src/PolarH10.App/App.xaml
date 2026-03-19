@@ -3,25 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Color x:Key="AppPaperColor">#F1EEE6</Color>
-        <Color x:Key="SurfaceLightColor">#E6E1D7</Color>
-        <Color x:Key="CarbonColor">#111315</Color>
-        <Color x:Key="GraphiteColor">#4B4F52</Color>
-        <Color x:Key="GridGrayColor">#8A8E91</Color>
-        <Color x:Key="SignalRedColor">#D92C2C</Color>
-        <Color x:Key="HazardYellowColor">#D8D61A</Color>
-        <Color x:Key="SafetyOrangeColor">#F05A22</Color>
-        <Color x:Key="TelemetryCyanColor">#00A7A0</Color>
+        <Color x:Key="AppPaperColor">#FFFDF9</Color>
+        <Color x:Key="SurfaceLightColor">#F6F1E9</Color>
+        <Color x:Key="SurfaceTintColor">#FBF7EF</Color>
+        <Color x:Key="CarbonColor">#1F2226</Color>
+        <Color x:Key="GraphiteColor">#5B636F</Color>
+        <Color x:Key="GridGrayColor">#CFC8BE</Color>
+        <Color x:Key="PanelEdgeColor">#D7CFC4</Color>
+        <Color x:Key="FocusBlueColor">#258ACB</Color>
+        <Color x:Key="SignalRedColor">#C94E3A</Color>
+        <Color x:Key="HazardYellowColor">#9E7714</Color>
+        <Color x:Key="SafetyOrangeColor">#C86E1C</Color>
+        <Color x:Key="TelemetryCyanColor">#1E6E9E</Color>
+        <Color x:Key="TelemetryGreenColor">#628F37</Color>
 
         <SolidColorBrush x:Key="AppPaperBrush" Color="{StaticResource AppPaperColor}" />
         <SolidColorBrush x:Key="SurfaceLightBrush" Color="{StaticResource SurfaceLightColor}" />
+        <SolidColorBrush x:Key="SurfaceTintBrush" Color="{StaticResource SurfaceTintColor}" />
         <SolidColorBrush x:Key="CarbonBrush" Color="{StaticResource CarbonColor}" />
         <SolidColorBrush x:Key="GraphiteBrush" Color="{StaticResource GraphiteColor}" />
         <SolidColorBrush x:Key="GridBrush" Color="{StaticResource GridGrayColor}" />
+        <SolidColorBrush x:Key="PanelEdgeBrush" Color="{StaticResource PanelEdgeColor}" />
+        <SolidColorBrush x:Key="FocusBlueBrush" Color="{StaticResource FocusBlueColor}" />
         <SolidColorBrush x:Key="SignalRedBrush" Color="{StaticResource SignalRedColor}" />
         <SolidColorBrush x:Key="HazardYellowBrush" Color="{StaticResource HazardYellowColor}" />
         <SolidColorBrush x:Key="SafetyOrangeBrush" Color="{StaticResource SafetyOrangeColor}" />
         <SolidColorBrush x:Key="TelemetryCyanBrush" Color="{StaticResource TelemetryCyanColor}" />
+        <SolidColorBrush x:Key="TelemetryGreenBrush" Color="{StaticResource TelemetryGreenColor}" />
 
         <FontFamily x:Key="UiFont">Bahnschrift Condensed</FontFamily>
         <FontFamily x:Key="MonoFont">Consolas</FontFamily>
@@ -40,7 +48,7 @@
         </Style>
 
         <Style TargetType="{x:Type GridSplitter}">
-            <Setter Property="Background" Value="{StaticResource GraphiteBrush}" />
+            <Setter Property="Background" Value="{StaticResource GridBrush}" />
         </Style>
 
         <Style TargetType="{x:Type Button}">
@@ -48,7 +56,7 @@
             <Setter Property="Background" Value="{StaticResource CarbonBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="Padding" Value="12,8" />
             <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -59,6 +67,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
@@ -66,21 +75,14 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SafetyOrangeBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource SafetyOrangeBrush}" />
-                                <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource HazardYellowBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource HazardYellowBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource HazardYellowBrush}" />
-                                <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceLightBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource GridBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource GridBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -92,7 +94,7 @@
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
             <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="8,6" />
             <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
@@ -104,17 +106,18 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
                                 SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource HazardYellowBrush}" />
-                                <Setter TargetName="Chrome" Property="Background" Value="#FFF8F0" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource AppPaperBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceLightBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource GridBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource GridBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -136,9 +139,10 @@
                                     Width="14"
                                     Height="14"
                                     Margin="0,0,8,0"
-                                    BorderBrush="{StaticResource CarbonBrush}"
+                                    BorderBrush="{StaticResource GraphiteBrush}"
                                     BorderThickness="1"
-                                    Background="{StaticResource AppPaperBrush}" />
+                                    Background="{StaticResource AppPaperBrush}"
+                                    CornerRadius="4" />
                             <ContentPresenter VerticalAlignment="Center" />
                         </StackPanel>
                         <ControlTemplate.Triggers>
@@ -147,10 +151,10 @@
                                 <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource SafetyOrangeBrush}" />
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource GridBrush}" />
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource GridBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -161,27 +165,24 @@
 
         <Style TargetType="{x:Type TabControl}">
             <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
 
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Foreground" Value="{StaticResource GraphiteBrush}" />
-            <Setter Property="Background" Value="{StaticResource SurfaceLightBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0,4,0,10" />
+            <Setter Property="Margin" Value="0,0,18,0" />
             <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
-            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Border x:Name="Chrome"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Margin="0,0,6,0"
-                                SnapsToDevicePixels="True">
+                        <Grid Margin="{TemplateBinding Margin}" SnapsToDevicePixels="True">
                             <TextBlock x:Name="HeaderText"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
@@ -191,15 +192,20 @@
                                        FontWeight="{TemplateBinding FontWeight}"
                                        Foreground="{TemplateBinding Foreground}"
                                        Text="{TemplateBinding Header}" />
-                        </Border>
+                            <Border x:Name="Rule"
+                                    Height="2"
+                                    VerticalAlignment="Bottom"
+                                    Background="Transparent"
+                                    CornerRadius="1" />
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource CarbonBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
-                                <Setter Property="Foreground" Value="{StaticResource HazardYellowBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter TargetName="Rule" Property="Background" Value="{StaticResource FocusBlueBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource SafetyOrangeBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{StaticResource GridBrush}" />
