@@ -12,7 +12,7 @@ const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
-const assetVersion = '20260319-polaroid-site-8';
+const assetVersion = '20260319-polaroid-site-9';
 
 const docGroups = [
   {
@@ -179,7 +179,7 @@ function renderHomePage() {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PolarH10 Windows Telemetry</title>
-  <meta name="description" content="Windows-native Polar H10 telemetry monitor, CLI capture tooling, protocol docs, and Mermaid system maps." />
+  <meta name="description" content="Windows-native Polar H10 telemetry monitor with multi-strap parallel tracking, CLI capture tooling, protocol docs, and Mermaid system maps." />
   <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
 </head>
 <body>
@@ -193,7 +193,8 @@ function renderHomePage() {
         <p>
           PolarH10 is a Windows-native toolchain for the Polar H10 chest strap. The WPF app and CLI let you
           discover nearby straps over BLE/GATT, inspect live HR, ECG, and ACC data, run diagnostics before capture,
-          and record reusable sessions without depending on Polar&apos;s mobile SDK at runtime.
+          compare multiple active straps in parallel, and record reusable sessions without depending on Polar&apos;s
+          mobile SDK at runtime.
         </p>
         <div class="action-row">
           <a class="button primary" href="reference/app-overview.html">Open App Overview</a>
@@ -202,8 +203,8 @@ function renderHomePage() {
           <a class="button" href="diagrams/viewer.html">System Maps</a>
         </div>
         <div class="stats">
-          <div class="stat tone-cool"><strong>Live telemetry</strong><span>HR · RR · ECG · ACC in the WPF monitor.</span></div>
-          <div class="stat tone-violet"><strong>Dual surfaces</strong><span>Use the WPF app for operators and the CLI for diagnostics.</span></div>
+          <div class="stat tone-cool"><strong>Live telemetry</strong><span>HR · RR · ECG · ACC with parallel multi-strap charting in the WPF monitor.</span></div>
+          <div class="stat tone-violet"><strong>Research workflow</strong><span>Keep one selected control target while tracking multiple active straps in parallel.</span></div>
           <div class="stat tone-warm"><strong>Capture path</strong><span>CSV + JSONL session export, replay, and manifests.</span></div>
           <div class="stat tone-signal"><strong>System maps</strong><span>4 Mermaid diagrams covering repo, architecture, flow, and lifecycle.</span></div>
         </div>
@@ -214,11 +215,11 @@ function renderHomePage() {
         <ul class="note-list feature-list">
           <li>
             <strong>Device control</strong>
-            <p>Scan nearby straps, assign aliases, and switch the active unit without losing the current context.</p>
+            <p>Scan nearby straps, assign aliases, and keep a clear selected control target for connect, record, and diagnostics.</p>
           </li>
           <li>
-            <strong>Live telemetry tabs</strong>
-            <p>Inspect heart rate, respiratory timing, ECG, and ACC as immediate runtime surfaces instead of abstract metrics.</p>
+            <strong>Parallel tracking</strong>
+            <p>Use the tracked-device dropdown to follow the selected strap or pin multiple active Polar H10 units into the live charts.</p>
           </li>
           <li>
             <strong>Diagnostics + capture</strong>
@@ -245,7 +246,7 @@ function renderHomePage() {
         <div class="step-card tone-signal">
           <div class="step-no">03</div>
           <h3>Inspect live data</h3>
-          <p>Use the WPF monitor for charts and diagnostics or the CLI when you need a more direct validation surface.</p>
+          <p>Use the WPF monitor for charts and diagnostics, or pin multiple straps into the live charts when you need side-by-side comparison.</p>
         </div>
         <div class="step-card tone-warm">
           <div class="step-no">04</div>
@@ -267,7 +268,7 @@ function renderHomePage() {
         <a class="path-card tone-signal" href="reference/ui-preview.html">
           <div class="kicker">Live UI</div>
           <h3>Telemetry monitor</h3>
-          <p>Review the current WPF visual system, chart treatment, and app shell before you dive into code.</p>
+          <p>Review the current WPF visual system, tracked-device workflow, and chart treatment before you dive into code.</p>
         </a>
         <a class="path-card tone-warm" href="reference/cli.html">
           <div class="kicker">Direct control</div>
@@ -323,7 +324,7 @@ function renderHomePage() {
         <a class="path-card tone-warm" href="reference/ui-preview.html">
           <div class="kicker">Visual system</div>
           <h3>WPF UI Preview</h3>
-          <p>Review the current monitor shell, telemetry layout, and chart language in one page.</p>
+          <p>Review the current monitor shell, multi-device tracking controls, telemetry layout, and chart language in one page.</p>
         </a>
         <a class="path-card tone-violet" href="reference/cli.html">
           <div class="kicker">Command surface</div>

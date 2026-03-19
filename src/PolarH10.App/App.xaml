@@ -52,11 +52,13 @@
         </Style>
 
         <Style TargetType="{x:Type Button}">
-            <Setter Property="Foreground" Value="{StaticResource AppPaperBrush}" />
-            <Setter Property="Background" Value="{StaticResource CarbonBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="12,8" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -69,15 +71,25 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8"
                                 SnapsToDevicePixels="True">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}" />
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              RecognizesAccessKey="True"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"
+                                              TextElement.FontFamily="{TemplateBinding FontFamily}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"
+                                              TextElement.FontWeight="{TemplateBinding FontWeight}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceTintBrush}" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceLightBrush}" />
                                 <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource FocusBlueBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">

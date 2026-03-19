@@ -2,7 +2,9 @@
 
 `PolarH10.App` is the Windows operator surface in this repo. It exists to make
 the Polar H10 visible as a live telemetry source, not just as a protocol or BLE
-exercise.
+exercise. The current app shell is built around a real research workflow:
+control the selected strap on the left, then compare one or several tracked
+straps in parallel in the live telemetry surface.
 
 ![PolarH10 WPF monitor preview](assets/brutal-tdr-preview.png)
 
@@ -11,6 +13,8 @@ exercise.
 - Scan nearby Polar H10 straps and pick the one you actually want to work with.
 - Open the BLE/GATT link and confirm the runtime path is healthy before capture.
 - Inspect live HR, RR, ECG, and ACC data in one operator-facing monitor.
+- Track multiple Polar H10 units in parallel on the live charts when you need
+  direct strap-to-strap comparison.
 - Run diagnostics and inspect logs without dropping straight into debugger-only workflows.
 - Record sessions to disk so you can replay or analyze them later.
 
@@ -22,7 +26,9 @@ The left rail is the entry point for discovery and device selection. Use it to:
 
 - scan for advertisements
 - identify the correct strap by alias or address
-- switch the active device without losing the rest of the app context
+- switch the selected device without losing the rest of the app context
+- choose which device the detail panel, connect/disconnect actions, recording controls,
+  and overlay tab currently refer to
 
 ### Live tab
 
@@ -34,7 +40,21 @@ Expect to find:
 - a dominant heart-rate readout
 - supporting metrics such as RR timing
 - waveform panels for live ECG and ACC
+- a `Tracked devices` picker that follows the selected device by default
+- optional parallel tracking for multiple straps at the same time on the live charts
 - a chart treatment optimized for monitoring, not dashboard decoration
+
+### Multi-device tracking
+
+Researchers often need to compare two or more active straps without juggling
+separate windows or mental context. The tracked-device control on the Live tab
+exists for that case.
+
+- leave `Follow selected device` on when you want the charts to follow the left rail
+- turn it off when you want to pin multiple devices into the live charts
+- keep using the left rail for alias editing, connect/disconnect, recording, and overlay inspection
+- use the overlay tab for the currently selected device when you need a denser
+  single-device view of HR, RR, ECG, and ACC together
 
 ### Diagnostics
 
@@ -60,9 +80,10 @@ Once the stream is stable, the app and CLI can write:
 1. Scan for nearby straps.
 2. Select the intended device and establish the link.
 3. Confirm the live telemetry surface is populated and believable.
-4. Run diagnostics if the session looks wrong.
-5. Start capture when the stream is stable.
-6. Stop cleanly and inspect the exported files.
+4. If you are comparing subjects or strap placement, open `Tracked devices` and enable multiple straps.
+5. Run diagnostics if the session looks wrong.
+6. Start capture when the stream is stable.
+7. Stop cleanly and inspect the exported files.
 
 ## When To Use The CLI Instead
 

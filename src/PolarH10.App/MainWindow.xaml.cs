@@ -11,12 +11,24 @@ namespace PolarH10.App;
 
 public partial class MainWindow : Window
 {
+    private static readonly Color FocusBlue = Color.FromRgb(0x25, 0x8A, 0xCB);
     private static readonly Color SignalRed = Color.FromRgb(0xC9, 0x4E, 0x3A);
     private static readonly Color HazardYellow = Color.FromRgb(0x9E, 0x77, 0x14);
     private static readonly Color SafetyOrange = Color.FromRgb(0xC8, 0x6E, 0x1C);
     private static readonly Color TelemetryBlue = Color.FromRgb(0x1E, 0x6E, 0x9E);
     private static readonly Color TelemetryGreen = Color.FromRgb(0x62, 0x8F, 0x37);
     private static readonly Color Graphite = Color.FromRgb(0x5B, 0x63, 0x6F);
+    private static readonly Color Umber = Color.FromRgb(0x8D, 0x5C, 0x2E);
+    private static readonly Color Slate = Color.FromRgb(0x4F, 0x63, 0x75);
+    private static readonly Color[] DeviceTracePalette =
+    [
+        FocusBlue,
+        TelemetryGreen,
+        SignalRed,
+        SafetyOrange,
+        Slate,
+        Umber,
+    ];
     private static readonly bool IsPreviewMode = string.Equals(
         Environment.GetEnvironmentVariable("POLARH10_PREVIEW"),
         "1",
@@ -31,6 +43,9 @@ public partial class MainWindow : Window
 
     // Currently selected device address (from the left device list)
     private string? _selectedAddress;
+    private bool _trackingFollowsSelection = true;
+    private bool _updatingTrackingUi;
+    private readonly HashSet<string> _trackedAddresses = new(StringComparer.OrdinalIgnoreCase);
 
     // Per-device charting state, keyed by address
     private readonly Dictionary<string, DeviceChartState> _chartStates = new(StringComparer.OrdinalIgnoreCase);
@@ -45,7 +60,7 @@ public partial class MainWindow : Window
     private WaveformChart _accXChart = null!;
     private WaveformChart _accYChart = null!;
     private WaveformChart _accZChart = null!;
-    private int _hrSeries, _rrSeries, _ecgSeries, _accXSeries, _accYSeries, _accZSeries;
+    private readonly Dictionary<string, LiveSeriesBinding> _liveSeriesBindings = new(StringComparer.OrdinalIgnoreCase);
 
     // Overlay chart + series indices
     private WaveformChart _overlayChart = null!;
@@ -80,35 +95,20 @@ public partial class MainWindow : Window
         Loaded += OnLoaded;
     }
 
-    // ── Chart init (same per-signal charts, rebound when selection changes) ──
+    private sealed class LiveSeriesBinding
+    {
+        public required int Hr;
+        public required int Rr;
+        public required int Ecg;
+        public required int AccX;
+        public required int AccY;
+        public required int AccZ;
+    }
+
+    // ── Chart init (same per-signal charts, rebound when tracked devices change) ──
     private void InitializeCharts()
     {
-        _hrChart = CreateSingleChart("HR", SignalRed, 120, out _hrSeries);
-        HrChartHost.Child = _hrChart;
-
-        _rrChart = CreateSingleChart("RR", HazardYellow, 120, out _rrSeries);
-        RrChartHost.Child = _rrChart;
-
-        _ecgChart = CreateSingleChart("ECG", TelemetryBlue, 650, out _ecgSeries);
-        EcgChartHost.Child = _ecgChart;
-
-        _accXChart = CreateSingleChart("ACC X", SafetyOrange, 500, out _accXSeries);
-        AccXChartHost.Child = _accXChart;
-
-        _accYChart = CreateSingleChart("ACC Y", TelemetryGreen, 500, out _accYSeries);
-        AccYChartHost.Child = _accYChart;
-
-        _accZChart = CreateSingleChart("ACC Z", Graphite, 500, out _accZSeries);
-        AccZChartHost.Child = _accZChart;
-
-        _overlayChart = new WaveformChart { NormalizePerSeries = true };
-        _ovHr   = _overlayChart.AddSeries("HR", SignalRed, 300);
-        _ovRr   = _overlayChart.AddSeries("RR", HazardYellow, 300);
-        _ovEcg  = _overlayChart.AddSeries("ECG", TelemetryBlue, 650);
-        _ovAccX = _overlayChart.AddSeries("ACC X", SafetyOrange, 500);
-        _ovAccY = _overlayChart.AddSeries("ACC Y", TelemetryGreen, 500);
-        _ovAccZ = _overlayChart.AddSeries("ACC Z", Graphite, 500);
-        OverlayChartHost.Child = _overlayChart;
+        RebuildTelemetryCharts();
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
         _refreshTimer.Tick += (_, _) =>
@@ -124,11 +124,13 @@ public partial class MainWindow : Window
         _refreshTimer.Start();
     }
 
-    private static WaveformChart CreateSingleChart(string title, Color color, int capacity, out int seriesIndex)
+    private static WaveformChart CreateChart(string title, bool normalizePerSeries = false)
     {
-        var chart = new WaveformChart { Title = title };
-        seriesIndex = chart.AddSeries(title, color, capacity);
-        return chart;
+        return new WaveformChart
+        {
+            Title = title,
+            NormalizePerSeries = normalizePerSeries,
+        };
     }
 
     // ── Per-device chart data tracking ──────────────────────────
@@ -159,6 +161,251 @@ public partial class MainWindow : Window
     private static string FormatAccCount(int count) => $"ACC frames {count}";
 
     private Brush ResourceBrush(string key) => (Brush)Application.Current.Resources[key];
+
+    private IEnumerable<string> GetKnownDeviceAddresses()
+    {
+        var addresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var addr in _seenDevices.Keys)
+            addresses.Add(addr);
+        if (_coordinator is not null)
+        {
+            foreach (var ctx in _coordinator.Devices)
+                addresses.Add(ctx.BluetoothAddress);
+        }
+        foreach (var addr in _chartStates.Keys)
+            addresses.Add(addr);
+        if (!string.IsNullOrWhiteSpace(_selectedAddress))
+            addresses.Add(_selectedAddress);
+
+        return addresses.OrderBy(CompactDisplayName, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private List<string> GetTrackedChartAddresses()
+    {
+        if (_trackingFollowsSelection)
+        {
+            return string.IsNullOrWhiteSpace(_selectedAddress)
+                ? []
+                : [_selectedAddress];
+        }
+
+        return GetKnownDeviceAddresses()
+            .Where(address => _trackedAddresses.Contains(address))
+            .ToList();
+    }
+
+    private string CompactDisplayName(string address)
+    {
+        var identity = _deviceRegistry.Get(address);
+        if (!string.IsNullOrWhiteSpace(identity?.UserAlias))
+            return identity.UserAlias;
+        if (!string.IsNullOrWhiteSpace(identity?.AdvertisedName))
+            return identity.AdvertisedName;
+        if (_seenDevices.TryGetValue(address, out var seen) && !string.IsNullOrWhiteSpace(seen.Name))
+            return seen.Name;
+        return address.Length > 8 ? address[^8..] : address;
+    }
+
+    private static Color DeviceTraceColor(int index) => DeviceTracePalette[index % DeviceTracePalette.Length];
+
+    private void RebuildTelemetryCharts()
+    {
+        RebuildLiveCharts();
+        RebuildOverlayChart();
+        UpdateTrackedDevicesSummary();
+    }
+
+    private void RebuildLiveCharts()
+    {
+        _liveSeriesBindings.Clear();
+
+        _hrChart = CreateChart("HR");
+        _rrChart = CreateChart("RR");
+        _ecgChart = CreateChart("ECG");
+        _accXChart = CreateChart("ACC X");
+        _accYChart = CreateChart("ACC Y");
+        _accZChart = CreateChart("ACC Z");
+
+        var trackedAddresses = GetTrackedChartAddresses();
+        for (var index = 0; index < trackedAddresses.Count; index++)
+        {
+            var address = trackedAddresses[index];
+            var label = CompactDisplayName(address);
+            var color = DeviceTraceColor(index);
+
+            var binding = new LiveSeriesBinding
+            {
+                Hr = _hrChart.AddSeries(label, color, 120),
+                Rr = _rrChart.AddSeries(label, color, 120),
+                Ecg = _ecgChart.AddSeries(label, color, 650),
+                AccX = _accXChart.AddSeries(label, color, 500),
+                AccY = _accYChart.AddSeries(label, color, 500),
+                AccZ = _accZChart.AddSeries(label, color, 500),
+            };
+
+            _liveSeriesBindings[address] = binding;
+
+            if (_chartStates.TryGetValue(address, out var state))
+                ReplayLiveSeries(binding, state);
+        }
+
+        HrChartHost.Child = _hrChart;
+        RrChartHost.Child = _rrChart;
+        EcgChartHost.Child = _ecgChart;
+        AccXChartHost.Child = _accXChart;
+        AccYChartHost.Child = _accYChart;
+        AccZChartHost.Child = _accZChart;
+
+        _hrChart.Refresh();
+        _rrChart.Refresh();
+        _ecgChart.Refresh();
+        _accXChart.Refresh();
+        _accYChart.Refresh();
+        _accZChart.Refresh();
+    }
+
+    private void ReplayLiveSeries(LiveSeriesBinding binding, DeviceChartState state)
+    {
+        foreach (var value in state.HrValues)
+            _hrChart.Push(binding.Hr, value);
+        foreach (var value in state.RrValues)
+            _rrChart.Push(binding.Rr, value);
+        foreach (var value in state.EcgValues)
+            _ecgChart.Push(binding.Ecg, value);
+        foreach (var value in state.AccXValues)
+            _accXChart.Push(binding.AccX, value);
+        foreach (var value in state.AccYValues)
+            _accYChart.Push(binding.AccY, value);
+        foreach (var value in state.AccZValues)
+            _accZChart.Push(binding.AccZ, value);
+    }
+
+    private void RebuildOverlayChart()
+    {
+        _overlayChart = CreateChart("Overlay", normalizePerSeries: true);
+        _ovHr = _overlayChart.AddSeries("HR", SignalRed, 300);
+        _ovRr = _overlayChart.AddSeries("RR", HazardYellow, 300);
+        _ovEcg = _overlayChart.AddSeries("ECG", TelemetryBlue, 650);
+        _ovAccX = _overlayChart.AddSeries("ACC X", SafetyOrange, 500);
+        _ovAccY = _overlayChart.AddSeries("ACC Y", TelemetryGreen, 500);
+        _ovAccZ = _overlayChart.AddSeries("ACC Z", Graphite, 500);
+
+        if (!string.IsNullOrWhiteSpace(_selectedAddress) && _chartStates.TryGetValue(_selectedAddress, out var state))
+            ReplayOverlaySeries(state);
+
+        OverlayChartHost.Child = _overlayChart;
+        ApplyOverlayVisibility();
+        _overlayChart.Refresh();
+    }
+
+    private void ReplayOverlaySeries(DeviceChartState state)
+    {
+        foreach (var value in state.HrValues)
+            _overlayChart.Push(_ovHr, value);
+        foreach (var value in state.RrValues)
+            _overlayChart.Push(_ovRr, value);
+        foreach (var value in state.EcgValues)
+            _overlayChart.Push(_ovEcg, value);
+        foreach (var value in state.AccXValues)
+            _overlayChart.Push(_ovAccX, value);
+        foreach (var value in state.AccYValues)
+            _overlayChart.Push(_ovAccY, value);
+        foreach (var value in state.AccZValues)
+            _overlayChart.Push(_ovAccZ, value);
+    }
+
+    private void ApplyOverlayVisibility()
+    {
+        if (_overlayChart == null ||
+            OvHrToggle == null || OvRrToggle == null || OvEcgToggle == null ||
+            OvAccXToggle == null || OvAccYToggle == null || OvAccZToggle == null)
+            return;
+
+        _overlayChart.SetVisible(_ovHr, OvHrToggle.IsChecked == true);
+        _overlayChart.SetVisible(_ovRr, OvRrToggle.IsChecked == true);
+        _overlayChart.SetVisible(_ovEcg, OvEcgToggle.IsChecked == true);
+        _overlayChart.SetVisible(_ovAccX, OvAccXToggle.IsChecked == true);
+        _overlayChart.SetVisible(_ovAccY, OvAccYToggle.IsChecked == true);
+        _overlayChart.SetVisible(_ovAccZ, OvAccZToggle.IsChecked == true);
+    }
+
+    private void PopulateTrackedDevicesPanel()
+    {
+        if (TrackedDevicesPanel == null || FollowSelectedTrackingCheckBox == null)
+            return;
+
+        _updatingTrackingUi = true;
+        try
+        {
+            FollowSelectedTrackingCheckBox.IsChecked = _trackingFollowsSelection;
+            TrackedDevicesPanel.Children.Clear();
+
+            var addresses = GetKnownDeviceAddresses().ToList();
+            if (addresses.Count == 0)
+            {
+                TrackedDevicesPanel.Children.Add(new TextBlock
+                {
+                    Text = "No devices available yet",
+                    Foreground = ResourceBrush("GraphiteBrush"),
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                });
+                return;
+            }
+
+            foreach (var address in addresses)
+            {
+                var checkBox = new CheckBox
+                {
+                    Content = DisplayName(address),
+                    Tag = address,
+                    Margin = new Thickness(0, 0, 0, 6),
+                    IsEnabled = !_trackingFollowsSelection,
+                    IsChecked = _trackingFollowsSelection
+                        ? string.Equals(address, _selectedAddress, StringComparison.OrdinalIgnoreCase)
+                        : _trackedAddresses.Contains(address),
+                };
+                checkBox.Checked += OnTrackedDeviceCheckChanged;
+                checkBox.Unchecked += OnTrackedDeviceCheckChanged;
+                TrackedDevicesPanel.Children.Add(checkBox);
+            }
+        }
+        finally
+        {
+            _updatingTrackingUi = false;
+        }
+    }
+
+    private void UpdateTrackedDevicesSummary()
+    {
+        if (TrackedDevicesSummaryText == null)
+            return;
+
+        if (_trackingFollowsSelection)
+        {
+            TrackedDevicesSummaryText.Text = string.IsNullOrWhiteSpace(_selectedAddress)
+                ? "No device selected"
+                : $"Following {CompactDisplayName(_selectedAddress)} on the live charts";
+        }
+        else
+        {
+            var tracked = GetTrackedChartAddresses();
+            TrackedDevicesSummaryText.Text = tracked.Count switch
+            {
+                0 => "No chart targets selected",
+                1 => $"Tracking {CompactDisplayName(tracked[0])}",
+                2 => $"Tracking {CompactDisplayName(tracked[0])} and {CompactDisplayName(tracked[1])}",
+                _ => $"Tracking {CompactDisplayName(tracked[0])}, {CompactDisplayName(tracked[1])}, +{tracked.Count - 2} more",
+            };
+        }
+
+        if (OverlayTrackingSummaryText != null)
+        {
+            OverlayTrackingSummaryText.Text = string.IsNullOrWhiteSpace(_selectedAddress)
+                ? "Overlay follows the selected device"
+                : $"Overlay follows {CompactDisplayName(_selectedAddress)}";
+        }
+    }
 
     private void SetConnectionStatus(string text, string brushKey)
     {
@@ -209,6 +456,13 @@ public partial class MainWindow : Window
                 foreach (var rr in sample.RrIntervalsMs)
                     cs.RrValues.Add(rr);
 
+                if (_liveSeriesBindings.TryGetValue(address, out var binding))
+                {
+                    _hrChart.Push(binding.Hr, sample.HeartRateBpm);
+                    foreach (var rr in sample.RrIntervalsMs)
+                        _rrChart.Push(binding.Rr, rr);
+                }
+
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     HrValueText.Text = $"{sample.HeartRateBpm} BPM";
@@ -217,13 +471,9 @@ public partial class MainWindow : Window
                         : "RR intervals --";
                     HrCountText.Text = FormatHrCount(cs.HrCount);
 
-                    _hrChart.Push(_hrSeries, sample.HeartRateBpm);
                     _overlayChart.Push(_ovHr, sample.HeartRateBpm);
                     foreach (var rr in sample.RrIntervalsMs)
-                    {
-                        _rrChart.Push(_rrSeries, rr);
                         _overlayChart.Push(_ovRr, rr);
-                    }
                 }
             });
 
@@ -236,12 +486,17 @@ public partial class MainWindow : Window
                 foreach (var uv in frame.MicroVolts)
                     cs.EcgValues.Add(uv);
 
+                if (_liveSeriesBindings.TryGetValue(address, out var binding))
+                {
+                    foreach (var uv in frame.MicroVolts)
+                        _ecgChart.Push(binding.Ecg, uv);
+                }
+
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     EcgCountText.Text = FormatEcgCount(cs.EcgCount);
                     foreach (var uv in frame.MicroVolts)
                     {
-                        _ecgChart.Push(_ecgSeries, uv);
                         _overlayChart.Push(_ovEcg, uv);
                     }
                 }
@@ -260,14 +515,21 @@ public partial class MainWindow : Window
                     cs.AccZValues.Add(s.Z);
                 }
 
+                if (_liveSeriesBindings.TryGetValue(address, out var binding))
+                {
+                    foreach (var s in frame.Samples)
+                    {
+                        _accXChart.Push(binding.AccX, s.X);
+                        _accYChart.Push(binding.AccY, s.Y);
+                        _accZChart.Push(binding.AccZ, s.Z);
+                    }
+                }
+
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     AccCountText.Text = FormatAccCount(cs.AccCount);
                     foreach (var s in frame.Samples)
                     {
-                        _accXChart.Push(_accXSeries, s.X);
-                        _accYChart.Push(_accYSeries, s.Y);
-                        _accZChart.Push(_accZSeries, s.Z);
                         _overlayChart.Push(_ovAccX, s.X);
                         _overlayChart.Push(_ovAccY, s.Y);
                         _overlayChart.Push(_ovAccZ, s.Z);
@@ -290,8 +552,9 @@ public partial class MainWindow : Window
         var allAddresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var addr in _seenDevices.Keys) allAddresses.Add(addr);
         foreach (var ctx in _coordinator.Devices) allAddresses.Add(ctx.BluetoothAddress);
+        foreach (var addr in _chartStates.Keys) allAddresses.Add(addr);
 
-        foreach (var addr in allAddresses)
+        foreach (var addr in allAddresses.OrderBy(CompactDisplayName, StringComparer.OrdinalIgnoreCase))
         {
             var ctx = _coordinator.GetDevice(addr);
             var statusTag = ctx?.Status switch
@@ -306,12 +569,15 @@ public partial class MainWindow : Window
             var recTag = ctx?.Recorder != null ? "  Recording" : "";
             var display = $"{DisplayName(addr)}{statusTag}{recTag}";
 
-            var item = new ListBoxItem { Content = display, Tag = addr };
+            var item = CreateDeviceListItem(display, addr);
             DeviceListBox.Items.Add(item);
 
             if (addr.Equals(prevSelected, StringComparison.OrdinalIgnoreCase))
                 item.IsSelected = true;
         }
+
+        PopulateTrackedDevicesPanel();
+        UpdateTrackedDevicesSummary();
     }
 
     private void OnDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -319,6 +585,13 @@ public partial class MainWindow : Window
         if (DeviceListBox.SelectedItem is ListBoxItem item && item.Tag is string addr)
         {
             _selectedAddress = addr;
+            if (_trackingFollowsSelection)
+            {
+                _trackedAddresses.Clear();
+                _trackedAddresses.Add(addr);
+            }
+            RebuildTelemetryCharts();
+            PopulateTrackedDevicesPanel();
             UpdateDetailPanel(addr);
         }
     }
@@ -341,6 +614,12 @@ public partial class MainWindow : Window
             HrCountText.Text = FormatHrCount(cs.HrCount);
             EcgCountText.Text = FormatEcgCount(cs.EcgCount);
             AccCountText.Text = FormatAccCount(cs.AccCount);
+            HrValueText.Text = cs.HrValues.Count > 0
+                ? $"{cs.HrValues[^1]:F0} BPM"
+                : "-- BPM";
+            RrValueText.Text = cs.RrValues.Count > 0
+                ? $"RR intervals {string.Join(", ", cs.RrValues.TakeLast(Math.Min(3, cs.RrValues.Count)).Select(value => $"{value:F0} ms"))}"
+                : "RR intervals --";
         }
         else
         {
@@ -511,23 +790,56 @@ public partial class MainWindow : Window
 
         SelectedDeviceLabel.Text = DisplayName(_selectedAddress);
         RefreshDeviceList();
+        RebuildTelemetryCharts();
         AddLiveLog($"Alias for {_selectedAddress} set to: {(string.IsNullOrEmpty(alias) ? "(cleared)" : alias)}");
     }
 
     // ── Overlay toggles ────────────────────────────────────────
     private void OnOverlayToggle(object sender, RoutedEventArgs e)
     {
-        if (_overlayChart == null ||
-            OvHrToggle == null || OvRrToggle == null || OvEcgToggle == null ||
-            OvAccXToggle == null || OvAccYToggle == null || OvAccZToggle == null)
+        ApplyOverlayVisibility();
+    }
+
+    private void OnTrackedDevicesButtonClick(object sender, RoutedEventArgs e)
+    {
+        PopulateTrackedDevicesPanel();
+        TrackedDevicesPopup.IsOpen = !TrackedDevicesPopup.IsOpen;
+    }
+
+    private void OnFollowSelectedTrackingChanged(object sender, RoutedEventArgs e)
+    {
+        if (_updatingTrackingUi || FollowSelectedTrackingCheckBox == null ||
+            HrChartHost == null || RrChartHost == null || EcgChartHost == null ||
+            AccXChartHost == null || AccYChartHost == null || AccZChartHost == null)
             return;
 
-        _overlayChart.SetVisible(_ovHr,   OvHrToggle.IsChecked == true);
-        _overlayChart.SetVisible(_ovRr,   OvRrToggle.IsChecked == true);
-        _overlayChart.SetVisible(_ovEcg,  OvEcgToggle.IsChecked == true);
-        _overlayChart.SetVisible(_ovAccX, OvAccXToggle.IsChecked == true);
-        _overlayChart.SetVisible(_ovAccY, OvAccYToggle.IsChecked == true);
-        _overlayChart.SetVisible(_ovAccZ, OvAccZToggle.IsChecked == true);
+        _trackingFollowsSelection = FollowSelectedTrackingCheckBox.IsChecked == true;
+        _trackedAddresses.Clear();
+
+        if (!string.IsNullOrWhiteSpace(_selectedAddress))
+            _trackedAddresses.Add(_selectedAddress);
+
+        RebuildTelemetryCharts();
+        PopulateTrackedDevicesPanel();
+    }
+
+    private void OnTrackedDeviceCheckChanged(object sender, RoutedEventArgs e)
+    {
+        if (_updatingTrackingUi || sender is not CheckBox checkBox || checkBox.Tag is not string address)
+            return;
+
+        _trackingFollowsSelection = false;
+        if (checkBox.IsChecked == true)
+            _trackedAddresses.Add(address);
+        else
+            _trackedAddresses.Remove(address);
+
+        if (_trackedAddresses.Count == 0)
+            _trackedAddresses.Add(address);
+
+        RebuildLiveCharts();
+        UpdateTrackedDevicesSummary();
+        PopulateTrackedDevicesPanel();
     }
 
     // ── Recording ───────────────────────────────────────────────
@@ -646,7 +958,14 @@ public partial class MainWindow : Window
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        if (!IsPreviewMode || _previewPrepared)
+        if (!IsPreviewMode)
+        {
+            PopulateTrackedDevicesPanel();
+            UpdateTrackedDevicesSummary();
+            return;
+        }
+
+        if (_previewPrepared)
             return;
 
         _previewPrepared = true;
@@ -671,25 +990,31 @@ public partial class MainWindow : Window
         DeviceListBox.Items.Clear();
         LiveLogList.Items.Clear();
         DiagLogList.Items.Clear();
+        _seenDevices.Clear();
+        _chartStates.Clear();
+        _trackedAddresses.Clear();
 
         var previewDevices = new[]
         {
-            ("A0:9F:1D:42:11:7C", "Unit Alpha  Streaming"),
-            ("A0:9F:1D:42:11:91", "Unit Beta  Connected"),
-            ("A0:9F:1D:42:12:04", "Lab Harness"),
+            ("A0:9F:1D:42:11:7C", "Unit Alpha", "Streaming"),
+            ("A0:9F:1D:42:11:91", "Unit Beta", "Connected"),
+            ("A0:9F:1D:42:12:04", "Lab Harness", ""),
         };
 
-        foreach (var (address, label) in previewDevices)
+        foreach (var (address, name, status) in previewDevices)
         {
-            DeviceListBox.Items.Add(new ListBoxItem
-            {
-                Content = label,
-                Tag = address,
-            });
+            _seenDevices[address] = (name, -40);
+            _deviceRegistry.RecordSeen(address, name);
+            var label = string.IsNullOrWhiteSpace(status) ? name : $"{name}  {status}";
+            DeviceListBox.Items.Add(CreateDeviceListItem(label, address));
         }
+        _deviceRegistry.SetAlias(previewDevices[0].Item1, "Alpha-01");
 
         DeviceListBox.SelectedIndex = 0;
         _selectedAddress = previewDevices[0].Item1;
+        _trackingFollowsSelection = false;
+        _trackedAddresses.Add(previewDevices[0].Item1);
+        _trackedAddresses.Add(previewDevices[1].Item1);
 
         ScanStatusText.Text = "3 devices";
         SelectedDeviceLabel.Text = "Unit Alpha";
@@ -732,49 +1057,55 @@ public partial class MainWindow : Window
 
         LiveLogList.UpdateLayout();
         DiagLogList.UpdateLayout();
-        PopulatePreviewCharts();
+        PopulatePreviewCharts(previewDevices[0].Item1, offset: 0.0, connectedScale: 1.0);
+        PopulatePreviewCharts(previewDevices[1].Item1, offset: 0.9, connectedScale: 0.82);
+        PopulatePreviewCharts(previewDevices[2].Item1, offset: 1.6, connectedScale: 0.58);
+        RebuildTelemetryCharts();
+        PopulateTrackedDevicesPanel();
+        UpdateDetailPanel(_selectedAddress);
     }
 
-    private void PopulatePreviewCharts()
+    private ListBoxItem CreateDeviceListItem(string display, string address)
     {
+        return new ListBoxItem
+        {
+            Content = display,
+            Tag = address,
+            Style = (Style)FindResource("DeviceRailListItemStyle"),
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+        };
+    }
+
+    private void PopulatePreviewCharts(string address, double offset, double connectedScale)
+    {
+        var state = GetOrCreateChartState(address);
         const int sampleCount = 240;
 
         for (var i = 0; i < sampleCount; i++)
         {
-            var t = i / 11.0;
-            var hr = 72 + Math.Sin(i / 18.0) * 2.2 + Math.Cos(i / 31.0) * 1.1;
-            var rr = 828 + Math.Sin(i / 13.0) * 14 + Math.Cos(i / 29.0) * 9;
+            var t = i / 11.0 + offset;
+            var hr = 72 + Math.Sin(i / 18.0 + offset) * 2.2 * connectedScale + Math.Cos(i / 31.0 + offset) * 1.1;
+            var rr = 828 + Math.Sin(i / 13.0 + offset) * 14 * connectedScale + Math.Cos(i / 29.0 + offset) * 9;
             var ecg =
-                Math.Sin(t) * 210 +
+                Math.Sin(t) * 210 * connectedScale +
                 Math.Sin(t * 2.4) * 34 +
                 Math.Sin(t * 6.8) * 12 +
-                (i % 32 == 0 ? 280 : 0);
-            var accX = Math.Sin(i / 9.0) * 180 + Math.Cos(i / 17.0) * 40;
-            var accY = Math.Cos(i / 11.0) * 150 + Math.Sin(i / 21.0) * 45;
-            var accZ = Math.Sin(i / 7.0) * 120 + Math.Cos(i / 19.0) * 55;
+                (i % 32 == 0 ? 280 * connectedScale : 0);
+            var accX = Math.Sin(i / 9.0 + offset) * 180 * connectedScale + Math.Cos(i / 17.0 + offset) * 40;
+            var accY = Math.Cos(i / 11.0 + offset) * 150 * connectedScale + Math.Sin(i / 21.0 + offset) * 45;
+            var accZ = Math.Sin(i / 7.0 + offset) * 120 * connectedScale + Math.Cos(i / 19.0 + offset) * 55;
 
-            _hrChart.Push(_hrSeries, hr);
-            _rrChart.Push(_rrSeries, rr);
-            _ecgChart.Push(_ecgSeries, ecg);
-            _accXChart.Push(_accXSeries, accX);
-            _accYChart.Push(_accYSeries, accY);
-            _accZChart.Push(_accZSeries, accZ);
-
-            _overlayChart.Push(_ovHr, hr);
-            _overlayChart.Push(_ovRr, rr);
-            _overlayChart.Push(_ovEcg, ecg);
-            _overlayChart.Push(_ovAccX, accX);
-            _overlayChart.Push(_ovAccY, accY);
-            _overlayChart.Push(_ovAccZ, accZ);
+            state.HrValues.Add((float)hr);
+            state.RrValues.Add((float)rr);
+            state.EcgValues.Add((float)ecg);
+            state.AccXValues.Add((float)accX);
+            state.AccYValues.Add((float)accY);
+            state.AccZValues.Add((float)accZ);
         }
 
-        _hrChart.Refresh();
-        _rrChart.Refresh();
-        _ecgChart.Refresh();
-        _accXChart.Refresh();
-        _accYChart.Refresh();
-        _accZChart.Refresh();
-        _overlayChart.Refresh();
+        state.HrCount = sampleCount;
+        state.EcgCount = sampleCount;
+        state.AccCount = sampleCount;
     }
 
     private void SavePreviewCapture(string outputPath)

@@ -126,7 +126,7 @@ public sealed class WaveformChart : FrameworkElement
         {
             DrawGrid(dc, left, top, chartWidth, chartHeight);
             DrawEmptyState(dc, dpi, left, top, chartWidth, chartHeight);
-            DrawHeader(dc, dpi);
+            DrawHeaderLegend(dc, dpi, width);
             dc.DrawRectangle(null, BorderPen, new Rect(left, top, chartWidth, chartHeight));
             return;
         }
@@ -181,25 +181,7 @@ public sealed class WaveformChart : FrameworkElement
             DrawSeries(dc, s, left, top, chartWidth, chartHeight, yMin, yRange);
         }
 
-        double legendX = left + 4;
-        foreach (var s in _series)
-        {
-            if (!s.Visible)
-                continue;
-
-            double currentValue = s.Count > 0
-                ? s.Ring[(s.Head - 1 + s.Ring.Length) % s.Ring.Length]
-                : 0;
-            var text = MakeText($"{s.Name} {currentValue:F0}", 10, s.Pen.Brush, dpi, UiTypeface);
-            dc.DrawText(text, new Point(legendX, 3));
-            legendX += text.Width + 18;
-        }
-
-        if (!string.IsNullOrEmpty(Title))
-        {
-            var titleText = MakeText(Title, 11, TitleBrush, dpi, TitleTypeface);
-            dc.DrawText(titleText, new Point(10, 3));
-        }
+        DrawHeaderLegend(dc, dpi, ActualWidth);
     }
 
     private void DrawStandardChart(
@@ -254,10 +236,7 @@ public sealed class WaveformChart : FrameworkElement
             DrawSeries(dc, s, left, top, chartWidth, chartHeight, yMin, yRange);
         }
 
-        if (!string.IsNullOrEmpty(Title))
-        {
-            DrawHeader(dc, dpi);
-        }
+        DrawHeaderLegend(dc, dpi, ActualWidth);
     }
 
     private void DrawEmptyState(
@@ -274,13 +253,29 @@ public sealed class WaveformChart : FrameworkElement
         dc.DrawText(stateText, new Point(x, y));
     }
 
-    private void DrawHeader(DrawingContext dc, double dpi)
+    private void DrawHeaderLegend(DrawingContext dc, double dpi, double width)
     {
-        if (string.IsNullOrEmpty(Title))
-            return;
+        double x = 10;
 
-        var titleText = MakeText(Title, 11, TitleBrush, dpi, TitleTypeface);
-        dc.DrawText(titleText, new Point(10, 3));
+        if (!string.IsNullOrEmpty(Title))
+        {
+            var titleText = MakeText(Title, 11, TitleBrush, dpi, TitleTypeface);
+            dc.DrawText(titleText, new Point(x, 3));
+            x += titleText.Width + 18;
+        }
+
+        foreach (var s in _series)
+        {
+            if (!s.Visible || s.Count == 0)
+                continue;
+
+            var text = MakeText(s.Name, 10, s.Pen.Brush, dpi, UiTypeface);
+            if (x + text.Width > width - 12)
+                break;
+
+            dc.DrawText(text, new Point(x, 3));
+            x += text.Width + 18;
+        }
     }
 
     private static void DrawGrid(DrawingContext dc, double left, double top, double chartWidth, double chartHeight)

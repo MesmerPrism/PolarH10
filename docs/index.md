@@ -3,9 +3,10 @@
 > **Unofficial** Windows-first Polar H10 telemetry toolkit.
 > Not affiliated with or endorsed by Polar Electro Oy.
 
-Start with the app surfaces and operator flow. Move into protocol detail and
-Mermaid system maps once you need implementation boundaries, data flow, and BLE
-internals.
+Start with the app surfaces and operator flow. The WPF app now supports
+parallel multi-strap telemetry tracking for research comparisons, then move into
+protocol detail and Mermaid system maps once you need implementation
+boundaries, data flow, and BLE internals.
 
 ## Read This First
 

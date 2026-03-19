@@ -35,10 +35,18 @@ dotnet run --project src/PolarH10.App
 ```
 
 The GUI provides:
-1. **Connect** tab — scan and connect to your H10
-2. **Live** tab — real-time HR, ECG packet counts, ACC packet counts
-3. **Record** tab — save sessions to CSV
-4. **Diagnostics** tab — raw PMD control messages for debugging
+1. **Device rail** — scan nearby straps, assign aliases, and choose the current control target
+2. **Live** tab — real-time HR, RR, ECG, and ACC with a tracked-device dropdown for parallel charting
+3. **Overlay** tab — dense single-device view for the currently selected strap
+4. **Record** tab — save sessions to CSV
+5. **Diagnostics** tab — raw PMD control messages for debugging
+
+If you are working with more than one strap:
+
+1. scan until both Polar H10 units appear in the device rail
+2. connect each device from the left-hand control flow
+3. open `Tracked devices` on the Live tab
+4. leave `Follow selected device` enabled for normal one-device work, or disable it and tick multiple straps for parallel research tracking
 
 ## Package identity for Bluetooth
 
