@@ -69,11 +69,11 @@ flowchart LR
     TL3 --> D3
 
     classDef hub fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
-    classDef source fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
-    classDef tests fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
-    classDef docs fill:#F7F1BA,stroke:#D8D61A,color:#111315,stroke-width:1.5px;
-    classDef tooling fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
-    classDef sample fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    classDef source fill:#F6F1E7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef tests fill:#E7E0D6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
+    classDef docs fill:#E9E4C8,stroke:#8A8250,color:#111315,stroke-width:1.5px;
+    classDef tooling fill:#EADDD5,stroke:#8B6656,color:#111315,stroke-width:1.5px;
+    classDef sample fill:#E0E8E4,stroke:#607C78,color:#111315,stroke-width:1.5px;
     class R hub;
     class P1,P2,P3,P4,P5 source;
     class T1,T2,T3 tests;
@@ -150,14 +150,16 @@ flowchart LR
     SE --> G1
     G1 --> G2
 
-    classDef core fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
-    classDef contracts fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
-    classDef windows fill:#111315,stroke:#8A8E91,color:#F1EEE6,stroke-width:1.5px;
-    classDef record fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
-    classDef surface fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
+    classDef core fill:#F6F1E7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef contracts fill:#E7E0D6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
+    classDef windows fill:#E3DED6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
+    classDef active fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
+    classDef record fill:#EADDD5,stroke:#8B6656,color:#111315,stroke-width:1.5px;
+    classDef surface fill:#E0E8E4,stroke:#607C78,color:#111315,stroke-width:1.5px;
     class EC,AC,HR,PMD,CP,GID core;
     class IS,IC,IG contracts;
-    class WS,WC,WG,SE,CO windows;
+    class WS,WC,WG windows;
+    class SE,CO active;
     class RE,SD,MA,DR record;
     class C1,G1,G2 surface;
     linkStyle default stroke:#4B4F52,stroke-width:1.6px;
@@ -218,10 +220,10 @@ flowchart LR
     CTRL --> LOG
 
     classDef hardware fill:#111315,stroke:#D8D61A,color:#F1EEE6,stroke-width:2px;
-    classDef link fill:#E6E1D7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
-    classDef decode fill:#F1EEE6,stroke:#111315,color:#111315,stroke-width:1.5px;
-    classDef session fill:#DCECEB,stroke:#00A7A0,color:#111315,stroke-width:1.5px;
-    classDef output fill:#F6DDD2,stroke:#F05A22,color:#111315,stroke-width:1.5px;
+    classDef link fill:#E7E0D6,stroke:#5B6266,color:#111315,stroke-width:1.5px;
+    classDef decode fill:#F6F1E7,stroke:#4B4F52,color:#111315,stroke-width:1.5px;
+    classDef session fill:#E0E8E4,stroke:#607C78,color:#111315,stroke-width:1.5px;
+    classDef output fill:#EADDD5,stroke:#8B6656,color:#111315,stroke-width:1.5px;
     class H10 hardware;
     class ADV,HRS,PMD,CTRL,DATA link;
     class DHR,DECG,DACC decode;

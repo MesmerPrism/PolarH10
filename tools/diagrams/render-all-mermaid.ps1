@@ -57,7 +57,7 @@ foreach ($entry in $manifest.diagrams) {
 
     Write-Host "  $($entry.id): $($entry.source) -> $(Split-Path $out -Leaf)" -NoNewline
 
-    $mmdcArgs = @('-i', $src, '-o', $out, '-b', 'transparent')
+    $mmdcArgs = @('-i', $src, '-o', $out, '-b', '#E6E1D7')
     if (Test-Path $configPath) {
         $mmdcArgs += @('-c', $configPath)
     }

@@ -515,11 +515,11 @@ a:hover {
   overflow: auto;
   border: 1px solid var(--graphite);
   border-radius: 0;
-  background: var(--carbon);
   color: var(--paper);
 }
 
 .prose pre {
+  background: var(--carbon);
   padding: 18px;
 }
 
@@ -589,6 +589,14 @@ a:hover {
   padding: 14px;
 }
 
+.viewer-stage {
+  background: var(--paper-2);
+}
+
+.source-stage {
+  background: var(--carbon);
+}
+
 .viewer-meta {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 0.65fr));
@@ -642,6 +650,10 @@ a:hover {
   margin: 0;
   padding: 18px;
   border: 0;
+  background: var(--paper-2);
+}
+
+.source-stage:fullscreen {
   background: var(--carbon);
 }
 
