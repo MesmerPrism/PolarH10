@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolarH10 Diagram Viewer // Unofficial Open-Source Reference</title>
-  <link rel="stylesheet" href="../assets/site.css?v=20260319-polaroid-site-11" />
+  <link rel="stylesheet" href="../assets/site.css?v=20260319-polaroid-site-12" />
 </head>
 <body class="viewer-page">
   <div class="page-art" aria-hidden="true">
@@ -230,9 +230,11 @@
         }
 
         const rect = activeSurface.getBoundingClientRect();
+        const viewportCenterX = window.innerWidth / 2;
+        const viewportCenterY = window.innerHeight / 2;
         return {
-          clientX: rect.left + rect.width / 2,
-          clientY: rect.top + rect.height / 2
+          clientX: Math.min(Math.max(viewportCenterX, rect.left), rect.right),
+          clientY: Math.min(Math.max(viewportCenterY, rect.top), rect.bottom)
         };
       }
 
