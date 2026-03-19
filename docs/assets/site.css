@@ -132,17 +132,11 @@ button:focus-visible {
 }
 
 .brand-mark {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   flex: 0 0 auto;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  box-shadow: inset 0 -6px 12px rgba(58, 61, 67, 0.06);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0 56%, transparent 56%),
-    linear-gradient(135deg, transparent 0 56%, var(--yellow) 56% 64%, var(--orange) 64% 72%, var(--red) 72% 80%, var(--green) 80% 88%, var(--blue) 88% 100%),
-    radial-gradient(circle at 26% 50%, #faf7f0 0 9px, #b7b2ab 9px 12px, transparent 13px),
-    linear-gradient(180deg, #ffffff, #e9e3da);
+  display: block;
+  background: url('polarh10-stripe-mark.png') center / contain no-repeat;
 }
 
 .brand-copy {

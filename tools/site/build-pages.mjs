@@ -12,7 +12,7 @@ const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
-const assetVersion = '20260319-polaroid-site-9';
+const assetVersion = '20260319-polaroid-site-10';
 
 const docGroups = [
   {
@@ -146,8 +146,8 @@ function renderPage({ title, bodyClass, navKey, pageTitle, pageIntro, sidebar, c
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(title)} | PolarH10</title>
-  <meta name="description" content="PolarH10 reference docs and architecture diagrams." />
+  <title>${escapeHtml(title)} | PolarH10 Unofficial Open-Source Reference</title>
+  <meta name="description" content="Unofficial open-source PolarH10 reference docs and architecture diagrams. Not endorsed by or affiliated with Polar Electro Oy." />
   <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
 </head>
 <body class="${bodyClass}">
@@ -159,7 +159,7 @@ function renderPage({ title, bodyClass, navKey, pageTitle, pageIntro, sidebar, c
         ${sidebar}
       </aside>
       <main class="panel content-panel">
-        <div class="eyebrow">PolarH10 Reference</div>
+        <div class="eyebrow">Unofficial Open-Source Reference</div>
         <h1 class="page-title">${escapeHtml(pageTitle)}</h1>
         ${pageIntro ? `<p class="page-intro">${escapeHtml(pageIntro)}</p>` : ''}
         ${content}
@@ -178,8 +178,8 @@ function renderHomePage() {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PolarH10 Windows Telemetry</title>
-  <meta name="description" content="Windows-native Polar H10 telemetry monitor with multi-strap parallel tracking, CLI capture tooling, protocol docs, and Mermaid system maps." />
+  <title>PolarH10 Unofficial Open-Source Telemetry Toolkit</title>
+  <meta name="description" content="Unofficial open-source PolarH10 telemetry monitor with multi-strap parallel tracking, CLI capture tooling, protocol docs, and Mermaid system maps. Not endorsed by or affiliated with Polar Electro Oy." />
   <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
 </head>
 <body>
@@ -188,7 +188,7 @@ function renderHomePage() {
     ${renderHeader(topNav, 'index.html')}
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
-        <div class="eyebrow">Windows Telemetry Monitor + Capture Stack</div>
+        <div class="eyebrow">Unofficial Open-Source Research Toolkit</div>
         <h1>Scan.<br />Link.<br />Stream.<br />Record.</h1>
         <p>
           PolarH10 is a Windows-native toolchain for the Polar H10 chest strap. The WPF app and CLI let you
@@ -347,8 +347,8 @@ function render404Page() {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>404 - Page Not Found | PolarH10</title>
-  <meta name="description" content="This page could not be found." />
+  <title>404 | PolarH10 Unofficial Open-Source Reference</title>
+  <meta name="description" content="This unofficial PolarH10 reference page could not be found." />
   <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
 </head>
 <body>
@@ -403,14 +403,14 @@ function renderHeader(topNav, homeHref) {
   return `<header class="site-header">
     <a class="brand" href="${homeHref}">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-copy"><small>Windows Telemetry Toolkit</small><strong>PolarH10</strong></span>
+      <span class="brand-copy"><small>Unofficial Open-Source Toolkit</small><strong>PolarH10</strong></span>
     </a>
     <nav class="top-nav" aria-label="Primary">${topNav}</nav>
   </header>`;
 }
 
 function renderFooter() {
-  return `<footer class="footer">PolarH10 WPF monitor, CLI capture tooling, protocol docs, and Mermaid system maps. Unofficial reference build; not affiliated with Polar Electro Oy.</footer>`;
+  return `<footer class="footer">PolarH10 WPF monitor, CLI capture tooling, protocol docs, and Mermaid system maps. Unofficial open-source reference build; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
 }
 
 function renderArt() {
