@@ -242,9 +242,23 @@
         }
 
         const currentScale = panzoom.getScale();
+        const currentPan = panzoom.getPan();
+        const rect = activeSurface?.getBoundingClientRect();
+        if (!rect) {
+          return;
+        }
+
+        const viewportX = point.clientX - rect.left;
+        const viewportY = point.clientY - rect.top;
+        const focalX = viewportX / currentScale - currentPan.x;
+        const focalY = viewportY / currentScale - currentPan.y;
         const targetScale = currentScale * Math.exp(direction * getZoomStep() / divisor);
         userAdjustedView = true;
-        panzoom.zoomToPoint(targetScale, point, { animate: false });
+        const zoomResult = panzoom.zoom(targetScale, { animate: false, force: true });
+        const appliedScale = zoomResult?.scale ?? panzoom.getScale();
+        const targetPanX = viewportX / appliedScale - focalX;
+        const targetPanY = viewportY / appliedScale - focalY;
+        panzoom.pan(targetPanX, targetPanY, { animate: false, force: true });
       }
 
       function panByScroll(deltaX, deltaY) {
