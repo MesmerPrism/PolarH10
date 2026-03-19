@@ -3,6 +3,7 @@
   "themeVariables": {
     "fontSize": "14px",
     "fontFamily": "IBM Plex Sans Condensed, Bahnschrift Condensed, Helvetica, Arial, sans-serif",
+    "background": "#E6E1D7",
     "primaryColor": "#F1EEE6",
     "primaryTextColor": "#111315",
     "primaryBorderColor": "#111315",
@@ -12,7 +13,7 @@
     "tertiaryColor": "#111315",
     "tertiaryTextColor": "#F1EEE6",
     "tertiaryBorderColor": "#8A8E91",
-    "mainBkg": "#F1EEE6",
+    "mainBkg": "#E6E1D7",
     "nodeBorder": "#111315",
     "clusterBkg": "#ECE7DD",
     "clusterBorder": "#4B4F52",

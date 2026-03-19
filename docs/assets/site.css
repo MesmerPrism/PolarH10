@@ -631,7 +631,7 @@ a:hover {
   height: auto;
   padding: 18px;
   border: 1px solid var(--line);
-  background: var(--paper);
+  background: var(--paper-2);
 }
 
 .viewer-stage:fullscreen,
