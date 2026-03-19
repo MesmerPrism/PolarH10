@@ -12,7 +12,7 @@ const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
-const assetVersion = '20260319-polaroid-site-10';
+const assetVersion = '20260319-polaroid-site-11';
 
 const docGroups = [
   {
