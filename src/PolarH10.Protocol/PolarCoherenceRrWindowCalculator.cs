@@ -18,8 +18,6 @@ internal sealed class PolarCoherenceRrWindowCalculator
     private const double TotalBandLowerBound = 0.0033;
     private const double TotalBandUpperBound = 0.4;
 
-    private const float LowestValidIbiMs = 400f;
-    private const float HighestValidIbiMs = 1800f;
     private const int StabilizationDatapoints = 5;
 
     private struct SamplePoint
@@ -54,7 +52,7 @@ internal sealed class PolarCoherenceRrWindowCalculator
     public float LastPaperCoherenceRatio { get; private set; }
     public float LastComputedCoherence01 { get; private set; }
 
-    public static bool IsValidIbi(float ibiMs) => ibiMs >= LowestValidIbiMs && ibiMs <= HighestValidIbiMs;
+    public static bool IsValidIbi(float ibiMs) => PolarRrIntervalValidator.IsValid(ibiMs);
 
     public void Reset()
     {

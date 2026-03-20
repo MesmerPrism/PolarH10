@@ -373,7 +373,7 @@
                                 </Grid>
 
                                 <Border Style="{StaticResource PanelFrameStyle}">
-                                    <TextBlock Text="Detailed module views now live in the Raw, Breathing, Coherence, and Dynamics tabs."
+                                    <TextBlock Text="Detailed module views now live in the Raw, Breathing, HRV, Coherence, and Dynamics tabs."
                                                FontSize="13"
                                                FontWeight="SemiBold"
                                                Foreground="{StaticResource GraphiteBrush}"
@@ -881,6 +881,8 @@
                     </TabItem>
 
                     <TabItem x:Name="CoherenceTab" Header="Coherence" />
+
+                    <TabItem x:Name="HrvTab" Header="HRV" />
 
                     <TabItem x:Name="DynamicsTab" Header="Dynamics" />
 

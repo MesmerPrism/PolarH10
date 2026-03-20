@@ -8,11 +8,12 @@ internal enum TelemetryMetric
     Breathing = 3,
     Coherence = 4,
     CoherenceConfidence = 5,
-    AccX = 6,
-    AccY = 7,
-    AccZ = 8,
-    BreathIntervalEntropy = 9,
-    BreathAmplitudeEntropy = 10,
+    HrvRmssd = 6,
+    AccX = 7,
+    AccY = 8,
+    AccZ = 9,
+    BreathIntervalEntropy = 10,
+    BreathAmplitudeEntropy = 11,
 }
 
 internal readonly record struct TelemetryMetricOption(TelemetryMetric Metric, string Label);

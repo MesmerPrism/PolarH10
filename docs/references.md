@@ -1,7 +1,7 @@
 ---
 title: References
 description: Primary protocol sources, Bluetooth specification pointers, and notes about how this repo derives its documentation.
-summary: These references anchor the protocol docs and explain which public sources informed the implementation.
+summary: These references anchor the protocol docs and derived telemetry pages, including coherence, short-term HRV, and breathing-dynamics documentation.
 nav_label: References
 nav_group: Internals
 nav_order: 90
@@ -43,6 +43,24 @@ nav_order: 90
    RR-derived coherence workflow: search the dominant peak in `0.04-0.26 Hz`,
    integrate a `0.030 Hz` peak window, and compare it against total power in
    `0.0033-0.4 Hz`.
+
+## Short-Term HRV Source
+
+1. **Shaffer, F.; Ginsberg, J. P.** "An Overview of Heart Rate Variability
+   Metrics and Norms." *Front. Public Health* 5:258, 2017.
+   <https://doi.org/10.3389/fpubh.2017.00258>
+
+   This paper is the short-term HRV reference for the app's HRV tab. The tab
+   defaults to a `300 s` RR window, uses `RMSSD` as the headline value, and
+   keeps `SDNN`, `pNN50`, `SD1`, `mean NN`, `mean HR`, and `lnRMSSD` visible as
+   supporting telemetry.
+
+   Implementation reference used during this update:
+   `C:\Users\tillh\Downloads\fpubh-05-00258.pdf`
+
+   The repository intentionally treats these values as short-term RR-derived
+   telemetry, not as a substitute for `24 h` norms or full clinical artifact
+   correction.
 
 ## Breathing Dynamics Sources
 

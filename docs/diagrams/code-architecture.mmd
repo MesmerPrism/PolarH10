@@ -7,6 +7,7 @@ flowchart LR
         AC["PolarAccDecoder<br/>mG + compressed deltas"]
         HR["PolarHrRrDecoder<br/>HR / RR parsing"]
         CH["PolarCoherenceTracker<br/>RR spectral solve"]
+        HV["PolarHrvTracker<br/>short-term RMSSD + SDNN"]
         BR["PolarBreathingTracker<br/>ACC breathing calibration"]
         BD["PolarBreathingDynamicsTracker<br/>interval + amplitude entropy"]
         PMD["PolarPmdCommandBuilder<br/>settings · start · stop"]
@@ -38,7 +39,7 @@ flowchart LR
     subgraph Surfaces["OPERATOR SURFACES"]
         C1["CLI<br/>scan · doctor · record · replay"]
         G1["WPF shell<br/>selection · tabs · diagnostics"]
-        G2["Derived windows<br/>coherence · breathing · dynamics"]
+        G2["Derived windows<br/>coherence · HRV · breathing · dynamics"]
         G3["WaveformChart<br/>live telemetry rendering"]
     end
 
@@ -55,6 +56,7 @@ flowchart LR
     WG --> SE
     SE --> MD
     SE --> CH
+    SE --> HV
     SE --> BR
     BR --> BD
     SE --> RE
@@ -68,6 +70,8 @@ flowchart LR
     SE --> G1
     CH --> G1
     CH --> G2
+    HV --> G1
+    HV --> G2
     BR --> G1
     BR --> G2
     BD --> G1
@@ -86,7 +90,7 @@ flowchart LR
     classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
     classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef surface fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
-    class EC,AC,HR,CH,BR,BD,PMD,CP,GID core;
+    class EC,AC,HR,CH,HV,BR,BD,PMD,CP,GID core;
     class IS,IC,IG contracts;
     class WS,WC,WG windows;
     class SE,MD active;

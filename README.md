@@ -4,13 +4,13 @@
 > Not affiliated with or endorsed by Polar Electro.
 
 Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect
-live HR, ECG, and ACC data, review RR-derived coherence and breathing-dynamics
-entropy, compare multiple active straps, and record reusable sessions from a
-WPF app or CLI.
+live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and
+breathing-dynamics entropy, compare multiple active straps, and record reusable
+sessions from a WPF app or CLI.
 
 ## What It Gives You
 
-- **WPF operator surface** for scan, connect, live telemetry, RR-derived coherence review, breathing calibration, breathing-dynamics entropy review, diagnostics, and recording
+- **WPF operator surface** for scan, connect, live telemetry, RR-derived coherence review, short-term HRV review, breathing calibration, breathing-dynamics entropy review, diagnostics, and recording
 - **CLI capture path** for `scan`, `monitor`, `doctor`, `record`, `replay`, `sessions`, and protocol output
 - **Protocol layer** with C# decoders for ECG, accelerometer, and heart rate / RR intervals
 - **Windows BLE transport** with WinRT scanner, connection, and GATT support
@@ -56,13 +56,17 @@ dotnet run --project src/PolarH10.App
 ```
 
 Use the app when you want the fastest operator workflow: scan nearby straps,
-connect, inspect live telemetry, review RR-derived coherence, calibrate
-breathing, review breathing-dynamics entropy, compare multiple straps, and
-record sessions from the desktop surface.
+connect, inspect live telemetry, review RR-derived coherence and short-term
+HRV, calibrate breathing, review breathing-dynamics entropy, compare multiple
+straps, and record sessions from the desktop surface.
 
 The coherence workflow follows the fixed spectral method described in McCraty et
 al., *The Coherent Heart* (2006), while also preserving the normalized
 AstralKarateDojo-compatible score used for the app's headline and chart surfaces.
+
+The HRV workflow follows the short-term time-domain guidance summarized by
+Shaffer and Ginsberg, *An Overview of Heart Rate Variability Metrics and Norms*
+(2017), using RMSSD as the headline value from a rolling accepted RR window.
 
 Read next:
 
@@ -70,6 +74,7 @@ Read next:
 - [Getting Started on Windows](docs/getting-started.md)
 - [First Recording](docs/first-recording.md)
 - [Coherence Workflow](docs/coherence-workflow.md)
+- [HRV Workflow](docs/hrv-workflow.md)
 - [Breathing Workflow](docs/breathing-workflow.md)
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
 
@@ -126,7 +131,7 @@ control-point commands, frame layouts, or code architecture.
 1. Scan for the intended strap and note the Bluetooth address.
 2. Connect once and confirm HR plus ACC are actually moving.
 3. Inspect live ECG / ACC / RR in the app or CLI before committing to a long capture.
-4. If you need derived metrics, open the coherence or breathing-dynamics windows only after the relevant warmup conditions are met.
+4. If you need derived metrics, open the coherence, HRV, or breathing-dynamics tabs only after the relevant warmup conditions are met.
 5. Record a short session and verify `session.json`, CSV sensor files, and `protocol.jsonl`.
 6. Replay or inspect the saved session without hardware attached.
 
@@ -138,6 +143,7 @@ control-point commands, frame layouts, or code architecture.
 - [CLI Reference](docs/cli.md)
 - [First Recording](docs/first-recording.md)
 - [Coherence Workflow](docs/coherence-workflow.md)
+- [HRV Workflow](docs/hrv-workflow.md)
 - [Breathing Workflow](docs/breathing-workflow.md)
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
 - [Output Formats](docs/output-formats.md)
@@ -187,22 +193,22 @@ flowchart LR
     R["POLARH10<br/>WINDOWS H10 WORKSPACE"]
 
     subgraph Source["src/ // runtime code"]
-        P1["Protocol<br/>decoders · coherence · breathing"]
+        P1["Protocol<br/>decoders · coherence · HRV · breathing"]
         P2["Transport.Abstractions<br/>BLE contracts"]
         P3["Transport.Windows<br/>scanner · GATT · session"]
         P4["Cli<br/>diagnostics · capture · replay"]
-        P5["App<br/>shell · coherence · dynamics"]
+        P5["App<br/>shell · coherence · HRV · dynamics"]
     end
 
     subgraph Tests["tests/ // verification"]
-        T1["Protocol.Tests<br/>decoders · coherence · entropy"]
+        T1["Protocol.Tests<br/>decoders · coherence · HRV · entropy"]
         T2["Playback.Tests<br/>session compatibility"]
         T3["Transport.Windows.Tests<br/>smoke coverage"]
     end
 
     subgraph Docs["docs/ // published reference"]
         D1["protocol/<br/>GATT · PMD · ECG · ACC · HR"]
-        D2["getting-started.md<br/>first-recording · coherence · entropy guides"]
+        D2["getting-started.md<br/>first-recording · coherence · HRV · entropy guides"]
         D3["diagrams/<br/>mmd sources · svg output"]
     end
 
@@ -260,6 +266,7 @@ flowchart LR
         AC["PolarAccDecoder<br/>mG + compressed deltas"]
         HR["PolarHrRrDecoder<br/>HR / RR parsing"]
         CH["PolarCoherenceTracker<br/>RR spectral solve"]
+        HV["PolarHrvTracker<br/>short-term RMSSD + SDNN"]
         BR["PolarBreathingTracker<br/>ACC breathing calibration"]
         BD["PolarBreathingDynamicsTracker<br/>interval + amplitude entropy"]
         PMD["PolarPmdCommandBuilder<br/>settings · start · stop"]
@@ -291,7 +298,7 @@ flowchart LR
     subgraph Surfaces["OPERATOR SURFACES"]
         C1["CLI<br/>scan · doctor · record · replay"]
         G1["WPF shell<br/>selection · tabs · diagnostics"]
-        G2["Derived windows<br/>coherence · breathing · dynamics"]
+        G2["Derived windows<br/>coherence · HRV · breathing · dynamics"]
         G3["WaveformChart<br/>live telemetry rendering"]
     end
 
@@ -308,6 +315,7 @@ flowchart LR
     WG --> SE
     SE --> MD
     SE --> CH
+    SE --> HV
     SE --> BR
     BR --> BD
     SE --> RE
@@ -321,6 +329,8 @@ flowchart LR
     SE --> G1
     CH --> G1
     CH --> G2
+    HV --> G1
+    HV --> G2
     BR --> G1
     BR --> G2
     BD --> G1
@@ -339,7 +349,7 @@ flowchart LR
     classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
     classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef surface fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
-    class EC,AC,HR,CH,BR,BD,PMD,CP,GID core;
+    class EC,AC,HR,CH,HV,BR,BD,PMD,CP,GID core;
     class IS,IC,IG contracts;
     class WS,WC,WG windows;
     class SE,MD active;
@@ -433,6 +443,11 @@ flowchart LR
 - McCraty, R., Atkinson, M., Tomasino, D., and Bradley, R.T., *The Coherent Heart:
   Heart-Brain Interactions, Psychophysiological Coherence, and the Emergence of
   System-Wide Order*, Institute of HeartMath, 2006.
+- Shaffer, F., and Ginsberg, J.P., "An Overview of Heart Rate Variability Metrics
+  and Norms," *Frontiers in Public Health*, vol. 5, 2017.
+  [DOI: 10.3389/fpubh.2017.00258](https://doi.org/10.3389/fpubh.2017.00258)
+  Implementation reference PDF used for this update:
+  `C:\Users\tillh\Downloads\fpubh-05-00258.pdf`
 - Goheen, D. P. et al., "It's About Time: Breathing Dynamics Modulate Emotion and
   Cognition," *Psychophysiology*, 2025.
   [DOI: 10.1111/psyp.70149](https://doi.org/10.1111/psyp.70149)

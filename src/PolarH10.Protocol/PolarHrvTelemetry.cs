@@ -1,0 +1,26 @@
+namespace PolarH10.Protocol;
+
+public readonly record struct PolarHrvTelemetry(
+    bool IsTransportConnected,
+    bool HasReceivedAnyRrSample,
+    bool HasMetricsSample,
+    PolarHrvTrackingState TrackingState,
+    bool HasTracking,
+    float CurrentRmssdMs,
+    float LnRmssd,
+    float SdnnMs,
+    float Pnn50Percent,
+    float Sd1Ms,
+    float MeanNnMs,
+    float MeanHeartRateBpm,
+    float CurrentHeartbeatBpm,
+    float CurrentHeartbeatIbiMs,
+    int RrSampleCount,
+    int AcceptedWindowSampleCount,
+    int MinimumSampleRequirement,
+    float SampleRequirementProgress01,
+    float WindowCoverage01,
+    float LastRrSampleAgeSeconds,
+    float LastMetricsAgeSeconds,
+    PolarHrvSettings Settings,
+    DateTimeOffset? LastRrReceivedAtUtc);

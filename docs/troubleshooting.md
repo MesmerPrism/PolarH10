@@ -46,13 +46,15 @@ or transport investigation.
 - If the chart moves but inhale and exhale are reversed, use `Flip inhale/exhale` instead of recalibrating.
 - If the status never becomes calibrated, rerun the full [Breathing Workflow](breathing-workflow.md) without touching the strap during the calibration window.
 
-## Coherence Or Entropy Values Stay Unavailable
+## Coherence, HRV, Or Entropy Values Stay Unavailable
 
 - Coherence depends on accepted RR intervals, not just a heart-rate number. If RR is not clean yet, the coherence window can stay unavailable.
+- The HRV tab also depends on accepted RR intervals and, by default, a nearly full five-minute short-term RR window. A live heart-rate number alone is not enough.
 - A low-confidence or warming-up coherence state is expected until the RR window has enough stable coverage.
+- If the HRV tab stays on `Warming up`, keep the session running longer before treating it as a failure.
 - Breathing-dynamics entropy depends on successful breathing calibration plus enough accepted breaths after calibration.
 - If the breathing-dynamics plots stay flat at zero during warmup, that is expected until entropy becomes available.
-- Use [Coherence Workflow](coherence-workflow.md) and [Breathing Dynamics Workflow](breathing-dynamics-workflow.md) for the operator-side readiness checks.
+- Use [Coherence Workflow](coherence-workflow.md), [HRV Workflow](hrv-workflow.md), and [Breathing Dynamics Workflow](breathing-dynamics-workflow.md) for the operator-side readiness checks.
 
 ## Windows Blocks The Normal App Launch
 

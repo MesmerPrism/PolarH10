@@ -10,6 +10,7 @@
         "../index.md",
         "../app-overview.md",
         "../coherence-workflow.md",
+        "../hrv-workflow.md",
         "../breathing-dynamics-workflow.md",
         "../cli.md",
         "../protocol/overview.md"
@@ -25,6 +26,7 @@
         "../first-recording.md",
         "../getting-started.md",
         "../coherence-workflow.md",
+        "../hrv-workflow.md",
         "../breathing-dynamics-workflow.md",
         "../output-formats.md",
         "../troubleshooting.md"
@@ -40,6 +42,7 @@
         "../index.md",
         "../app-overview.md",
         "../coherence-workflow.md",
+        "../hrv-workflow.md",
         "../breathing-dynamics-workflow.md"
       ]
     },
@@ -53,6 +56,7 @@
         "../app-overview.md",
         "../protocol/overview.md",
         "../coherence-workflow.md",
+        "../hrv-workflow.md",
         "../breathing-workflow.md",
         "../breathing-dynamics-workflow.md"
       ]

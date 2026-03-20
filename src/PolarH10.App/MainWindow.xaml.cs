@@ -74,6 +74,7 @@ public partial class MainWindow : Window
     private readonly ChartAxisOptions _accZChartAxisOptions = new() { ManualYAxisSymmetric = true };
     private readonly ChartAxisOptions _breathingChartAxisOptions = new();
     private readonly ChartAxisOptions _coherenceChartAxisOptions = new() { AdaptiveYAxis = false, ManualYAxisMaxText = "1" };
+    private readonly ChartAxisOptions _hrvChartAxisOptions = new();
     private readonly ChartAxisOptions _breathingDynamicsChartAxisOptions = new() { AdaptiveYAxis = false, ManualYAxisMaxText = "2" };
 
     // Overlay chart + series indices
@@ -114,6 +115,7 @@ public partial class MainWindow : Window
                 _chartStates.Remove(ctx.BluetoothAddress);
                 RemoveBreathingState(ctx.BluetoothAddress);
                 RemoveCoherenceState(ctx.BluetoothAddress);
+                RemoveHrvState(ctx.BluetoothAddress);
                 RemoveBreathingDynamicsState(ctx.BluetoothAddress);
                 RefreshDeviceList();
             });
@@ -125,6 +127,7 @@ public partial class MainWindow : Window
     {
         EnsureRawTelemetryWindow();
         EnsureCoherenceWindow();
+        EnsureHrvWindow();
         EnsureBreathingDynamicsWindow();
     }
 
@@ -293,6 +296,7 @@ public partial class MainWindow : Window
         RebuildTelemetryCharts();
         InitializeBreathingChart();
         InitializeCoherenceChart();
+        InitializeHrvChart();
         InitializeBreathingDynamicsChart();
         InitializeTelemetrySummarySlots();
 
@@ -312,6 +316,8 @@ public partial class MainWindow : Window
             _breathingChart.Refresh();
             RefreshCoherenceTrackers();
             _coherenceChart.Refresh();
+            RefreshHrvTrackers();
+            _hrvChart.Refresh();
             RefreshBreathingDynamicsTrackers();
             _breathingDynamicsChart.Refresh();
         };
@@ -453,6 +459,7 @@ public partial class MainWindow : Window
         public readonly List<float> BreathingValues = [];
         public readonly List<float> CoherenceValues = [];
         public readonly List<float> CoherenceConfidenceValues = [];
+        public readonly List<float> HrvRmssdValues = [];
         public readonly List<float> BreathIntervalEntropyValues = [];
         public readonly List<float> BreathAmplitudeEntropyValues = [];
         public readonly List<float> AccXValues = [];
@@ -530,6 +537,7 @@ public partial class MainWindow : Window
         UpdateTrackedDevicesSummary();
         UpdateRawTelemetryWindow();
         UpdateCoherencePanel(_selectedAddress);
+        UpdateHrvPanel(_selectedAddress);
         UpdateBreathingDynamicsPanel(_selectedAddress);
     }
 
@@ -747,6 +755,7 @@ public partial class MainWindow : Window
             {
                 var breathingState = GetOrCreateBreathingState(address);
                 var coherenceState = GetOrCreateCoherenceState(address);
+                var hrvState = GetOrCreateHrvState(address);
                 var breathingDynamicsState = GetOrCreateBreathingDynamicsState(address);
                 if (breathingState.UsesExternalTelemetry && breathingState.HasTelemetry)
                 {
@@ -763,8 +772,10 @@ public partial class MainWindow : Window
                     CaptureBreathingTelemetry(address, breathingState, pushChartValue: false);
                 }
                 coherenceState.Tracker.SetTransportConnected(connected);
+                hrvState.Tracker.SetTransportConnected(connected);
                 breathingDynamicsState.Tracker.SetTransportConnected(connected);
                 CaptureCoherenceTelemetry(address, coherenceState, pushChartValue: false);
+                CaptureHrvTelemetry(address, hrvState, pushChartValue: false);
                 CaptureBreathingDynamicsTelemetry(address, breathingDynamicsState, pushChartValue: false);
 
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
@@ -791,6 +802,7 @@ public partial class MainWindow : Window
             {
                 var cs = GetOrCreateChartState(address);
                 var coherenceState = GetOrCreateCoherenceState(address);
+                var hrvState = GetOrCreateHrvState(address);
                 cs.HrCount++;
 
                 AppendRolling(cs.HrValues, sample.HeartRateBpm, maxCount: 120);
@@ -823,6 +835,8 @@ public partial class MainWindow : Window
 
                 coherenceState.Tracker.SubmitHrRrSample(sample);
                 CaptureCoherenceTelemetry(address, coherenceState, pushChartValue: true);
+                hrvState.Tracker.SubmitHrRrSample(sample);
+                CaptureHrvTelemetry(address, hrvState, pushChartValue: true);
             });
 
         ctx.Session.EcgFrameReceived += frame =>
@@ -969,6 +983,7 @@ public partial class MainWindow : Window
         UpdateTrackedDevicesSummary();
         UpdateBreathingPanel(selectedAddress);
         UpdateCoherencePanel(selectedAddress);
+        UpdateHrvPanel(selectedAddress);
         UpdateBreathingDynamicsPanel(selectedAddress);
         UpdateRawTelemetryWindow();
     }
@@ -989,6 +1004,7 @@ public partial class MainWindow : Window
             EnsureBreathingEditorLoaded(addr);
             UpdateRawTelemetryWindow();
             UpdateCoherencePanel(addr);
+            UpdateHrvPanel(addr);
             UpdateBreathingDynamicsPanel(addr);
         }
     }
@@ -1029,6 +1045,7 @@ public partial class MainWindow : Window
 
         UpdateBreathingPanel(address);
         UpdateCoherencePanel(address);
+        UpdateHrvPanel(address);
         UpdateBreathingDynamicsPanel(address);
         UpdateRawTelemetryWindow();
 
@@ -1401,6 +1418,7 @@ public partial class MainWindow : Window
         _seenDevices.Clear();
         _chartStates.Clear();
         ClearBreathingStates();
+        ClearHrvStates();
         ClearBreathingDynamicsStates();
         _trackedAddresses.Clear();
 
@@ -1472,6 +1490,7 @@ public partial class MainWindow : Window
         PopulatePreviewCharts(previewDevices[2].Item1, offset: 1.6, connectedScale: 0.58);
         SeedPreviewBreathingState(previewDevices);
         SeedPreviewCoherenceState(previewDevices);
+        SeedPreviewHrvState(previewDevices);
         SeedPreviewBreathingDynamicsState(previewDevices);
         RebuildTelemetryCharts();
         PopulateTrackedDevicesPanel();

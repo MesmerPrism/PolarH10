@@ -10,9 +10,9 @@ nav_order: 10
 # PolarH10 App + Protocol Reference
 
 Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect
-live HR, ECG, and ACC data, review RR-derived coherence and breathing-dynamics
-entropy, compare multiple active straps, and record reusable sessions from a
-WPF app or CLI.
+live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and
+breathing-dynamics entropy, compare multiple active straps, and record reusable
+sessions from a WPF app or CLI.
 
 ## Quick Start
 
@@ -37,7 +37,7 @@ dotnet run --project src/PolarH10.Cli -- scan
 ## What This Project Is
 
 - A direct BLE/GATT workflow for the Polar H10 on Windows.
-- A practical WPF app for scanning, connecting, inspecting live telemetry, reviewing coherence and breathing-dynamics windows, and recording sessions.
+- A practical WPF app for scanning, connecting, inspecting live telemetry, reviewing coherence, HRV, and breathing-dynamics tabs, and recording sessions.
 - A CLI for scripted scan, doctor, monitor, record, replay, and session review work.
 - A protocol and transport reference once you need PMD, GATT, or decoder internals.
 
@@ -55,6 +55,7 @@ dotnet run --project src/PolarH10.Cli -- scan
 - [Getting Started on Windows](getting-started.md)
 - [First Recording](first-recording.md)
 - [Coherence Workflow](coherence-workflow.md)
+- [HRV Workflow](hrv-workflow.md)
 - [Breathing Workflow](breathing-workflow.md)
 - [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
 

@@ -34,10 +34,11 @@ session folder on disk.
    - ACC counters move
    - ECG or ACC charts start updating on the Live tab
 5. If you want RR-derived coherence, open [Coherence Workflow](coherence-workflow.md) only after HR and RR are already live.
-6. If you need breathing output or breathing-dynamics entropy, open [Breathing Workflow](breathing-workflow.md) first and [Breathing Dynamics Workflow](breathing-dynamics-workflow.md) only after calibration is complete.
-7. Open the Record tab, choose the output folder, and start the capture.
-8. Let the session run long enough to confirm real data is arriving, then stop cleanly.
-9. Open the saved folder and verify that `session.json`, `hr_rr.csv`, `ecg.csv`, `acc.csv`, and `protocol.jsonl` exist.
+6. If you want short-term HRV, open [HRV Workflow](hrv-workflow.md) only after HR and RR are already live and let the RR window run long enough for the first solve.
+7. If you need breathing output or breathing-dynamics entropy, open [Breathing Workflow](breathing-workflow.md) first and [Breathing Dynamics Workflow](breathing-dynamics-workflow.md) only after calibration is complete.
+8. Open the Record tab, choose the output folder, and start the capture.
+9. Let the session run long enough to confirm real data is arriving, then stop cleanly.
+10. Open the saved folder and verify that `session.json`, `hr_rr.csv`, `ecg.csv`, `acc.csv`, and `protocol.jsonl` exist.
 
 ## CLI Path
 
@@ -72,7 +73,7 @@ session folder on disk.
 - `hr_rr.csv` contains heart-rate rows.
 - `ecg.csv` and `acc.csv` contain timestamped sensor samples.
 - `protocol.jsonl` contains PMD and CCCD traffic that matches a clean start and stop sequence.
-- If you open the coherence or breathing-dynamics windows, their values should move off `--` only after the relevant warmup and stabilization phases.
+- If you open the coherence, HRV, or breathing-dynamics tabs, their values should move off `--` only after the relevant warmup and stabilization phases.
 
 ## If The First Attempt Fails
 

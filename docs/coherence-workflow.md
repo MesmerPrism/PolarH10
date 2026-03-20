@@ -90,6 +90,7 @@ The following coherence constants are intentionally not user-tunable in the app:
 
 - [Getting Started on Windows](getting-started.md)
 - [App Overview](app-overview.md)
+- [HRV Workflow](hrv-workflow.md)
 - [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
 - [Troubleshooting](troubleshooting.md)
 - [References](references.md)

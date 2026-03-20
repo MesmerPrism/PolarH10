@@ -20,7 +20,7 @@ const siteConfig = {
   siteName: 'PolarH10',
   homeTitle: 'PolarH10 Unofficial Open-Source Telemetry Toolkit',
   referenceTitle: 'PolarH10 Unofficial Open-Source Reference',
-  sharedPromise: 'Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect live HR, ECG, and ACC data, review RR-derived coherence and breathing-dynamics entropy, compare multiple active straps, and record reusable sessions from a WPF app or CLI.',
+  sharedPromise: 'Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and breathing-dynamics entropy, compare multiple active straps, and record reusable sessions from a WPF app or CLI.',
   defaultDescription: 'Unofficial open-source PolarH10 docs, onboarding guides, protocol reference, and Mermaid system diagrams. Not endorsed by or affiliated with Polar Electro Oy.',
   socialImage: 'assets/brutal-tdr-preview.png',
   favicon: 'assets/polarh10-stripe-mark.png',
@@ -240,7 +240,7 @@ ${renderHead({
         <ul class="note-list feature-list">
           <li>
             <strong>WPF operator flow</strong>
-            <p>Scan nearby straps, connect one or more devices, inspect live telemetry, review coherence or breathing-dynamics entropy when ready, and capture a reusable session from the desktop app.</p>
+            <p>Scan nearby straps, connect one or more devices, inspect live telemetry, review coherence, short-term HRV, or breathing-dynamics entropy when ready, and capture a reusable session from the desktop app.</p>
           </li>
           <li>
             <strong>CLI diagnostics</strong>
@@ -272,7 +272,7 @@ ${renderHead({
         <div class="step-card tone-signal">
           <div class="step-no">03</div>
           <h3>Inspect the live stream</h3>
-          <p>Check HR, ECG, and ACC in the app or terminal, open coherence once RR is stable, and open breathing dynamics only after breathing calibration is already live.</p>
+          <p>Check HR, ECG, and ACC in the app or terminal, open coherence or HRV once RR is stable, and open breathing dynamics only after breathing calibration is already live.</p>
         </div>
         <div class="step-card tone-warm">
           <div class="step-no">04</div>
@@ -296,6 +296,10 @@ ${renderHead({
         <a class="path-card tone-cool" href="reference/coherence-workflow.html">
           <h3>Coherence Workflow</h3>
           <p>Use the RR-derived coherence window, understand the warmup phase, and read confidence instead of trusting a raw number too early.</p>
+        </a>
+        <a class="path-card tone-cool" href="reference/hrv-workflow.html">
+          <h3>HRV Workflow</h3>
+          <p>Use the short-term HRV tab, let the RR window fill, and read RMSSD with SDNN and pNN50 instead of assuming a five-minute solve is instant.</p>
         </a>
         <a class="path-card tone-violet" href="reference/breathing-dynamics-workflow.html">
           <h3>Breathing Dynamics Workflow</h3>
@@ -327,7 +331,7 @@ ${renderHead({
         <a class="preview-card tone-cool" href="diagrams/viewer.html#choose-your-path">
           <div class="meta">Onboarding</div>
           <h3>Choose your path</h3>
-          <p>Pick the WPF, CLI, or protocol route based on whether you need raw telemetry only or the new derived coherence and entropy views.</p>
+          <p>Pick the WPF, CLI, or protocol route based on whether you need raw telemetry only or the derived coherence, HRV, and entropy views.</p>
           <img src="diagrams/choose-your-path.svg" alt="Choose your path diagram" />
         </a>
         <a class="preview-card tone-warm" href="diagrams/viewer.html#first-session-flow">

@@ -1,7 +1,7 @@
 ---
 title: App Overview
 description: Learn what the WPF operator surface is for before you read protocol internals or lower-level transport code.
-summary: The app is the fastest way to see what the repo actually does in practice: scan, connect, inspect live data, review derived coherence and breathing metrics, and capture sessions.
+summary: The app is the fastest way to see what the repo actually does in practice: scan, connect, inspect live data, review derived coherence, HRV, and breathing metrics, and capture sessions.
 nav_label: App Overview
 nav_group: Start Here
 nav_order: 20
@@ -24,7 +24,7 @@ straps in parallel in the live telemetry surface.
 - Inspect live HR, RR, ECG, and ACC data in one operator-facing monitor.
 - Track multiple Polar H10 units in parallel on the live charts when you need
   direct strap-to-strap comparison.
-- Open dedicated coherence and breathing-dynamics windows when the summary plots
+- Open dedicated coherence, HRV, and breathing-dynamics tabs when the summary plots
   are not enough.
 - Run diagnostics and inspect logs without dropping straight into debugger-only workflows.
 - Record sessions to disk so you can replay or analyze them later.
@@ -53,7 +53,7 @@ Expect to find:
 - waveform panels for live ECG and ACC
 - a `Tracked devices` picker that follows the selected device by default
 - optional parallel tracking for multiple straps at the same time on the live charts
-- view shortcuts for raw telemetry, coherence, and breathing dynamics
+- view shortcuts for raw telemetry, coherence, HRV, and breathing dynamics
 - a chart treatment optimized for monitoring, not dashboard decoration
 
 ### Multi-device tracking
@@ -89,6 +89,16 @@ The coherence window is the RR-derived feature view for resonance-style review.
 - confidence, stabilization, and RR coverage tell you whether the current number is trustworthy yet
 - peak frequency plus peak/total band-power fields stay visible without cluttering the Live tab
 - reset, defaults, and tuning controls give you direct control over the RR window behavior
+
+### HRV
+
+The HRV tab is the short-term RR-derived feature view for time-domain HRV review.
+
+- the headline value is `RMSSD`, derived from the rolling accepted RR window
+- supporting `SDNN`, `pNN50`, `SD1`, `mean NN`, `mean HR`, and `lnRMSSD` stay visible without overloading the Live tab
+- the default window follows the five-minute short-term reference discussed by Shaffer and Ginsberg (2017)
+- readiness, stale state, and window fill are operator-visible so the page shows when the first solve is actually ready
+- reset, defaults, and tuning flows follow the same pattern as the coherence tab
 
 ### Breathing dynamics
 
@@ -129,12 +139,13 @@ Once the stream is stable, the app and CLI can write:
 3. Confirm the live telemetry surface is populated and believable.
 4. If you are comparing subjects or strap placement, open `Tracked devices` and enable multiple straps.
 5. Open `Breathing` when you need calibrated breath-volume tracking from ACC.
-6. Open `Coherence window` when you need RR-derived coherence and confidence instead of raw RR only.
-7. Open `Dynamics window` when you need breath interval/amplitude entropy and
+6. Open `Coherence` when you need RR-derived coherence and confidence instead of raw RR only.
+7. Open `HRV` when you need short-term RMSSD plus supporting time-domain HRV telemetry from the rolling RR window.
+8. Open `Dynamics window` when you need breath interval/amplitude entropy and
    the full breathing feature bundle.
-8. Run diagnostics if the session looks wrong.
-9. Start capture when the stream is stable.
-10. Stop cleanly and inspect the exported files.
+9. Run diagnostics if the session looks wrong.
+10. Start capture when the stream is stable.
+11. Stop cleanly and inspect the exported files.
 
 ## When To Use The CLI Instead
 
@@ -150,6 +161,7 @@ Use the CLI when you need:
 - [Getting Started](getting-started.md)
 - [Breathing Workflow](breathing-workflow.md)
 - [Coherence Workflow](coherence-workflow.md)
+- [HRV Workflow](hrv-workflow.md)
 - [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
 - [References](references.md)
 - [WPF UI Preview](ui-preview.md)

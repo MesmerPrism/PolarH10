@@ -46,7 +46,7 @@ dotnet run --project src/PolarH10.App
 The GUI provides:
 1. **Device rail** — scan nearby straps, assign aliases, and choose the current control target
 2. **Live** tab — real-time HR, RR, ECG, and ACC with a tracked-device dropdown for parallel charting
-3. **Live tab views** — raw telemetry, coherence, and breathing-dynamics windows for focused review
+3. **Live tab views** — raw telemetry plus coherence, HRV, and breathing-dynamics tabs for focused review
 4. **Overlay** tab — dense single-device view for the currently selected strap
 5. **Breathing** tab — ACC breathing calibration, live state, telemetry, and tuning
 6. **Record** tab — save sessions to CSV
@@ -84,6 +84,19 @@ Use the `Coherence window` from the Live tab once HR and RR are already updating
 6. optionally switch a shared telemetry plot to `Coherence` or `Coherence confidence`
 
 For the full operator checklist, see [Coherence Workflow](coherence-workflow.md).
+
+## Manual HRV test
+
+Use the `HRV` tab once heart rate and RR intervals are already updating.
+
+1. connect the intended H10 and confirm heart rate plus RR intervals are moving
+2. open `HRV`
+3. confirm RMSSD stays unavailable during the early RR warmup
+4. keep the session running until the short-term RR window fills
+5. verify the RMSSD headline, SDNN, and pNN50 values start updating for the selected device
+6. optionally switch a shared telemetry plot to `HRV (RMSSD)`
+
+For the full operator checklist, see [HRV Workflow](hrv-workflow.md).
 
 ## Manual breathing-dynamics test
 
