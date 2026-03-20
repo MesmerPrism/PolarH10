@@ -61,7 +61,15 @@ or transport investigation.
 On this machine, Windows application-control policy can block the normal
 multi-file .NET app launch path.
 
-Use the single-file publish workaround:
+Use the canonical workspace build first:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
+.\out\workspace-app\PolarH10.App.exe
+```
+
+If Windows still blocks that multi-file workspace build, use the single-file
+publish workaround:
 
 ```powershell
 dotnet publish src/PolarH10.App/PolarH10.App.csproj `

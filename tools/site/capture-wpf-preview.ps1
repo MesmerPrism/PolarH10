@@ -12,13 +12,17 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
-$projectPath = Join-Path $repoRoot 'src\PolarH10.App\PolarH10.App.csproj'
-$targetFramework = 'net8.0-windows10.0.19041.0'
-$exePath = Join-Path $repoRoot "src\PolarH10.App\bin\$Configuration\$targetFramework\PolarH10.App.exe"
+$buildScriptPath = Join-Path $repoRoot 'tools\app\Build-Workspace-App.ps1'
+$workspaceOutputPath = 'out\workspace-app'
+$exePath = Join-Path $repoRoot "$workspaceOutputPath\PolarH10.App.exe"
 $resolvedOutputPath = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $OutputPath))
 
-Write-Host "Building PolarH10.App ($Configuration)..." -ForegroundColor Cyan
-dotnet build $projectPath -c $Configuration | Out-Host
+if (-not (Test-Path $buildScriptPath)) {
+    throw "Workspace build script not found at $buildScriptPath"
+}
+
+Write-Host "Building PolarH10.App workspace build ($Configuration)..." -ForegroundColor Cyan
+& $buildScriptPath -Configuration $Configuration -OutputRelativePath $workspaceOutputPath | Out-Host
 
 if (-not (Test-Path $exePath)) {
     throw "Built executable not found at $exePath"

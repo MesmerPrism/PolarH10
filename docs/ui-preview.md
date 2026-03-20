@@ -29,7 +29,7 @@ multi-strap telemetry review.
 
 ## Notes
 
-- The screenshot is generated from the current local build of `PolarH10.App` using the scripted preview mode in `tools/site/capture-wpf-preview.ps1`.
+- The screenshot is generated from the canonical workspace build at `out\workspace-app\PolarH10.App.exe` using the scripted preview mode in `tools/site/capture-wpf-preview.ps1`.
 - This preview focuses on the main shell, device rail, tracked-device workflow, telemetry panels, and chart language; the dedicated coherence, HRV, and breathing-dynamics tabs follow the same visual system.
 - The preview image intentionally shows two tracked straps in parallel because that comparison view is now a first-class feature.
 - Runtime data states will populate once a device is connected.

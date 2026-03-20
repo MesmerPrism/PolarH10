@@ -52,6 +52,7 @@ $RECYCLE.BIN/
 ## Node (diagram toolchain)
 node_modules/
 /site/
+/out/
 
 ## Local captures and third-party reference files
 session/

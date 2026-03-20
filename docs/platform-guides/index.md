@@ -75,8 +75,15 @@ The Windows transport uses:
 
 - Local `dotnet test` and normal multi-file local .NET runs can still be
   blocked by Windows application-control policy on this machine.
+- The canonical repo-local operator build is:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
+.\out\workspace-app\PolarH10.App.exe
+```
+
 - For manual operator validation, a practical workaround is a single-file
-  publish:
+  publish if Windows still blocks that multi-file workspace build:
 
 ```powershell
 dotnet publish src/PolarH10.App/PolarH10.App.csproj `

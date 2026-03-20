@@ -67,10 +67,17 @@ runtime.
 - If `Last failure` mentions travel or sample-count limits, rerun calibration
   while breathing more clearly through the full window.
 
-## Single-File Manual Run
+## Desktop App Run Paths
 
-On this machine, Windows application-control policy can block normal multi-file
-.NET app launches. A stable manual-run path is to publish a single-file build:
+The canonical repo-local desktop build is:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
+.\out\workspace-app\PolarH10.App.exe
+```
+
+If Windows application-control policy blocks that normal multi-file workspace
+launch, publish a single-file fallback instead:
 
 ```powershell
 dotnet publish src/PolarH10.App/PolarH10.App.csproj `

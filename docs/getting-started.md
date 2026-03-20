@@ -98,6 +98,20 @@ Use the `HRV` tab once heart rate and RR intervals are already updating.
 
 For the full operator checklist, see [HRV Workflow](hrv-workflow.md).
 
+## Canonical workspace desktop build
+
+If you want a stable repo-local executable instead of `dotnet run`, build the
+workspace app into the canonical output that sibling tooling also uses:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
+.\out\workspace-app\PolarH10.App.exe
+```
+
+`SyntheticBio` and the WPF preview capture script both target this
+`out\workspace-app\PolarH10.App.exe` path so they cannot drift to an older
+`src\PolarH10.App\bin\...` executable.
+
 ## Manual breathing-dynamics test
 
 Use the `Dynamics window` from the Live tab after breathing calibration is complete.
@@ -113,8 +127,8 @@ For the full operator checklist, see [Breathing Dynamics Workflow](breathing-dyn
 
 ## Manual single-file app run
 
-If Windows application-control policy blocks the normal multi-file app launch on
-this machine, publish a single-file build for manual testing:
+If Windows application-control policy blocks the normal multi-file workspace
+build on this machine, publish a single-file build for manual testing:
 
 ```powershell
 dotnet publish src/PolarH10.App/PolarH10.App.csproj `

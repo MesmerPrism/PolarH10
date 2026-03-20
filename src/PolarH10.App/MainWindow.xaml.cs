@@ -172,7 +172,7 @@ public partial class MainWindow : Window
             string bannerText = $"Scratch validation build detected: {fullProcessPath}.";
 
             bannerText += string.IsNullOrWhiteSpace(recommendedPath)
-                ? " Launch the normal app from the main build output under src\\PolarH10.App\\bin or out\\app-single."
+                ? " Launch the canonical workspace build under out\\workspace-app or the single-file publish under out\\app-single."
                 : $" Launch the normal app from {recommendedPath}.";
 
             return new LaunchStamp
@@ -188,26 +188,12 @@ public partial class MainWindow : Window
             "PolarH10",
             "app-single",
             "PolarH10.App.exe");
-        if (string.Equals(fullProcessPath, canonicalPublishedPath, StringComparison.OrdinalIgnoreCase))
-        {
-            return new LaunchStamp
-            {
-                TitleSuffix = "[current build]",
-                FooterText = "Current launcher",
-            };
-        }
-
         string? currentDirectory = Path.GetDirectoryName(fullProcessPath);
         string? repo = FindRepoRoot(currentDirectory);
         if (!string.IsNullOrWhiteSpace(repo))
         {
-            string workspaceDebugPath = Path.Combine(repo, "src", "PolarH10.App", "bin", "Debug", "net8.0-windows10.0.19041.0", "PolarH10.App.exe");
-            string workspaceReleasePath = Path.Combine(repo, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "win-x64", "PolarH10.App.exe");
-            string workspaceFlatReleasePath = Path.Combine(repo, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "PolarH10.App.exe");
-
-            if (string.Equals(fullProcessPath, workspaceDebugPath, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(fullProcessPath, workspaceReleasePath, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(fullProcessPath, workspaceFlatReleasePath, StringComparison.OrdinalIgnoreCase))
+            string workspaceBuildPath = GetCanonicalWorkspaceBuildPath(repo);
+            if (string.Equals(fullProcessPath, workspaceBuildPath, StringComparison.OrdinalIgnoreCase))
             {
                 return new LaunchStamp
                 {
@@ -215,6 +201,35 @@ public partial class MainWindow : Window
                     FooterText = "Workspace build",
                 };
             }
+
+            string repoSingleFilePath = Path.Combine(repo, "out", "app-single", "PolarH10.App.exe");
+            if (string.Equals(fullProcessPath, repoSingleFilePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return new LaunchStamp
+                {
+                    TitleSuffix = "[single-file build]",
+                    FooterText = "Single-file published build",
+                };
+            }
+
+            if (IsDirectSourceTreeBuild(fullProcessPath, repo))
+            {
+                return new LaunchStamp
+                {
+                    TitleSuffix = "[direct bin build]",
+                    FooterText = "Direct bin build",
+                    BannerText = $"Direct src\\bin launch detected: {fullProcessPath}. Use the canonical workspace build at {workspaceBuildPath} so companion tools and docs resolve the same app version.",
+                };
+            }
+        }
+
+        if (string.Equals(fullProcessPath, canonicalPublishedPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return new LaunchStamp
+            {
+                TitleSuffix = "[single-file build]",
+                FooterText = "Single-file published build",
+            };
         }
 
         return new LaunchStamp
@@ -245,6 +260,7 @@ public partial class MainWindow : Window
 
         string[] candidates =
         [
+            GetCanonicalWorkspaceBuildPath(repoRoot),
             Path.Combine(repoRoot, "out", "app-single", "PolarH10.App.exe"),
             Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "win-x64", "PolarH10.App.exe"),
             Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Debug", "net8.0-windows10.0.19041.0", "PolarH10.App.exe"),
@@ -257,6 +273,27 @@ public partial class MainWindow : Window
         }
 
         return null;
+    }
+
+    private static string GetCanonicalWorkspaceBuildPath(string repoRoot)
+        => Path.Combine(repoRoot, "out", "workspace-app", "PolarH10.App.exe");
+
+    private static bool IsDirectSourceTreeBuild(string fullProcessPath, string repoRoot)
+    {
+        string[] candidates =
+        [
+            Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Debug", "net8.0-windows10.0.19041.0", "PolarH10.App.exe"),
+            Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "PolarH10.App.exe"),
+            Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "win-x64", "PolarH10.App.exe"),
+        ];
+
+        foreach (string candidate in candidates)
+        {
+            if (string.Equals(fullProcessPath, candidate, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     private void ApplyLaunchStamp()

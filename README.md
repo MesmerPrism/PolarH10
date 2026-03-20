@@ -78,8 +78,17 @@ Read next:
 - [Breathing Workflow](docs/breathing-workflow.md)
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
 
-If Windows application-control policy blocks the normal multi-file app launch on
-this machine, publish a single-file build:
+If you want the canonical repo-local desktop build that the Pages preview
+pipeline and sibling `SyntheticBio` launcher both use, build it into
+`out/workspace-app`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
+.\out\workspace-app\PolarH10.App.exe
+```
+
+If Windows application-control policy blocks that normal multi-file workspace
+build on this machine, publish a single-file fallback instead:
 
 ```powershell
 dotnet publish src/PolarH10.App/PolarH10.App.csproj `

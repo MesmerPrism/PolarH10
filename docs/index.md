@@ -28,6 +28,14 @@ dotnet build PolarH10.sln
 dotnet run --project src/PolarH10.App
 ```
 
+If you want the stable repo-local desktop executable that sibling launchers and
+preview tooling use, build:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
+.\out\workspace-app\PolarH10.App.exe
+```
+
 If you want the terminal path first instead of the desktop app, run:
 
 ```powershell
