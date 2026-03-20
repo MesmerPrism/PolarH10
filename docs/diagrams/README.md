@@ -21,6 +21,7 @@ Mermaid JS CDN even without pre-rendered SVGs.
 
 | Category      | Diagrams                                   |
 | ------------- | ------------------------------------------ |
+| Onboarding    | choose-your-path · first-session-flow |
 | Architecture  | repo-structure · code-architecture · data-flow |
 | Runtime       | session-lifecycle |
 

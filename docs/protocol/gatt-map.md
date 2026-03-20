@@ -1,3 +1,12 @@
+---
+title: GATT Service & Characteristic Map
+description: UUID and measurement-type reference for the standard Heart Rate Service and Polar PMD service.
+summary: Use this page when you need the service, characteristic, CCCD, and measurement identifiers in one place.
+nav_label: GATT Map
+nav_group: Internals
+nav_order: 20
+---
+
 # GATT Service & Characteristic Map
 
 ## Heart Rate Service

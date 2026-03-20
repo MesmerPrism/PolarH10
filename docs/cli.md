@@ -1,3 +1,12 @@
+---
+title: CLI Reference
+description: Use the command-line path for scanning, doctor-style validation, recording, replay, and protocol output.
+summary: The CLI is the direct path when you want a scriptable session flow, rawer diagnostics, or replay without the WPF app.
+nav_label: CLI Guide
+nav_group: Start Here
+nav_order: 40
+---
+
 # CLI Reference
 
 ## Commands

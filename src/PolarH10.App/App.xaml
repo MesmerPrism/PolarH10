@@ -138,6 +138,17 @@
             </Setter>
         </Style>
 
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="MinHeight" Value="34" />
+        </Style>
+
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
             <Setter Property="FontFamily" Value="{StaticResource UiFont}" />

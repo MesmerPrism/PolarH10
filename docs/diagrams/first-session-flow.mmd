@@ -1,0 +1,13 @@
+flowchart LR
+    S["Wear the strap + wet electrodes"]
+    S --> A["Scan and find the intended H10"]
+    A --> B["Connect and validate the link"]
+    B --> C["Confirm HR + ACC are moving"]
+    C --> D["Inspect live ECG / ACC / RR"]
+    D --> E["Optional: coherence or breathing dynamics"]
+    E --> F["Record a short session"]
+    F --> G["Check session.json + CSV + protocol.jsonl"]
+    G --> H["Replay or review without hardware"]
+
+    B -. if Windows blocks access .-> I["Use doctor / platform guide"]
+    C -. if breathing is needed .-> J["Run breathing calibration"]

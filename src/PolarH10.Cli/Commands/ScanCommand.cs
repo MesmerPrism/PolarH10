@@ -1,5 +1,5 @@
 using System.CommandLine;
-using PolarH10.Transport.Windows;
+using PolarH10.Cli;
 
 namespace PolarH10.Cli.Commands;
 
@@ -17,47 +17,59 @@ internal static class ScanCommand
             () => false,
             "Output results as JSON");
 
+        var transportOption = CliTransportOptions.CreateTransportOption();
+        var syntheticPipeOption = CliTransportOptions.CreateSyntheticPipeOption();
+
         var cmd = new Command("scan", "Discover nearby Polar H10 devices")
         {
             durationOption,
             jsonOption,
+            transportOption,
+            syntheticPipeOption,
         };
 
-        cmd.SetHandler(async (int duration, bool json) =>
+        cmd.SetHandler(async (int duration, bool json, string transport, string syntheticPipe) =>
         {
-            var factory = new WindowsBleAdapterFactory();
-            using var scanner = (WindowsBleScanner)factory.CreateScanner();
+            var factory = CliTransportOptions.CreateFactory(transport, syntheticPipe);
+            var scanner = factory.CreateScanner();
             var found = new List<(string Address, string Name, int Rssi)>();
 
-            scanner.DeviceFound += device =>
+            try
             {
-                if (string.IsNullOrEmpty(device.Name) ||
-                    device.Name.IndexOf("Polar", StringComparison.OrdinalIgnoreCase) < 0)
-                    return;
+                scanner.DeviceFound += device =>
+                {
+                    if (string.IsNullOrEmpty(device.Name) ||
+                        device.Name.IndexOf("Polar", StringComparison.OrdinalIgnoreCase) < 0)
+                        return;
 
-                found.Add((device.Address, device.Name, device.Rssi));
+                    found.Add((device.Address, device.Name, device.Rssi));
+
+                    if (!json)
+                        Console.WriteLine($"  {device.Name,-30} {device.Address}  RSSI={device.Rssi} dBm");
+                };
 
                 if (!json)
-                    Console.WriteLine($"  {device.Name,-30} {device.Address}  RSSI={device.Rssi} dBm");
-            };
+                    Console.WriteLine($"Scanning for {duration}s...\n");
 
-            if (!json)
-                Console.WriteLine($"Scanning for {duration}s...\n");
+                await scanner.StartScanAsync(TimeSpan.FromSeconds(duration));
 
-            await scanner.StartScanAsync(TimeSpan.FromSeconds(duration));
-            await Task.Delay(TimeSpan.FromSeconds(duration));
-
-            if (json)
-            {
-                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(
-                    found.Select(d => new { d.Address, d.Name, d.Rssi }),
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                if (json)
+                {
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(
+                        found.Select(d => new { d.Address, d.Name, d.Rssi }),
+                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+                }
+                else
+                {
+                    Console.WriteLine($"\n{found.Count} Polar device(s) found.");
+                }
             }
-            else
+            finally
             {
-                Console.WriteLine($"\n{found.Count} Polar device(s) found.");
+                if (scanner is IDisposable disposable)
+                    disposable.Dispose();
             }
-        }, durationOption, jsonOption);
+        }, durationOption, jsonOption, transportOption, syntheticPipeOption);
 
         return cmd;
     }

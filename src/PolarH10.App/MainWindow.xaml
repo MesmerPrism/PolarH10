@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
         Title="Polar H10 // Telemetry Unit"
+        Icon="Assets/polarh10-stripe-mark.ico"
         Width="1360"
         Height="940"
         MinWidth="1160"
@@ -121,6 +122,7 @@
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -140,7 +142,21 @@
             <Rectangle Grid.Column="4" Fill="{StaticResource SignalRedBrush}" />
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Border x:Name="LaunchNoticeBanner"
+                Grid.Row="1"
+                Visibility="Collapsed"
+                Background="{StaticResource SurfaceTintBrush}"
+                BorderBrush="{StaticResource SignalRedBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,10">
+            <TextBlock x:Name="LaunchNoticeTextBlock"
+                       FontSize="12"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource SignalRedBrush}"
+                       TextWrapping="Wrap" />
+        </Border>
+
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="312" MinWidth="240" />
                 <ColumnDefinition Width="6" />
@@ -267,7 +283,7 @@
                 </Border>
 
                 <TabControl x:Name="DeviceTabControl" Grid.Row="1" Margin="20,18,20,12">
-                    <TabItem Header="Live">
+                    <TabItem x:Name="OverviewTab" Header="Overview">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
                                 <Grid Margin="0,0,0,12">
@@ -356,9 +372,16 @@
                                     </primitives:Popup>
                                 </Grid>
 
+                                <Border Style="{StaticResource PanelFrameStyle}">
+                                    <TextBlock Text="Detailed module views now live in the Raw, Breathing, Coherence, and Dynamics tabs."
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource GraphiteBrush}"
+                                               TextWrapping="Wrap" />
+                                </Border>
+
                                 <Grid Margin="0,0,0,10">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
@@ -367,59 +390,120 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Border x:Name="HrChartHost"
-                                            Grid.Row="0"
+                                    <Border Grid.Row="0"
                                             Grid.Column="0"
                                             Style="{StaticResource PanelFrameStyle}"
-                                            Height="120"
-                                            Padding="0"
-                                            Margin="0,0,10,10" />
-                                    <Border x:Name="RrChartHost"
-                                            Grid.Row="0"
+                                            Margin="0,0,10,10">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Plot A" Style="{StaticResource MetricLabelStyle}" Margin="0,0,12,0" />
+                                                <ComboBox x:Name="TelemetryPlot1MetricBox"
+                                                          Grid.Column="1"
+                                                          Width="188"
+                                                          SelectionChanged="OnTelemetryPlotMetricChanged" />
+                                            </Grid>
+
+                                            <Border x:Name="TelemetryPlot1ChartHost"
+                                                    Grid.Row="1"
+                                                    Height="186"
+                                                    Padding="0" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Row="0"
                                             Grid.Column="1"
                                             Style="{StaticResource PanelFrameStyle}"
-                                            Height="120"
-                                            Padding="0"
-                                            Margin="0,0,0,10" />
-                                    <Border x:Name="EcgChartHost"
-                                            Grid.Row="1"
-                                            Grid.ColumnSpan="2"
-                                            Style="{StaticResource PanelFrameStyle}"
-                                            Height="188"
-                                            Padding="0"
-                                            Margin="0,0,0,10" />
+                                            Margin="0,0,0,10">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Row="2"
-                                               Grid.ColumnSpan="2"
-                                               Text="Acceleration"
-                                               Style="{StaticResource SectionTitleStyle}"
-                                               Margin="0,0,0,8" />
-                                </Grid>
+                                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Plot B" Style="{StaticResource MetricLabelStyle}" Margin="0,0,12,0" />
+                                                <ComboBox x:Name="TelemetryPlot2MetricBox"
+                                                          Grid.Column="1"
+                                                          Width="188"
+                                                          SelectionChanged="OnTelemetryPlotMetricChanged" />
+                                            </Grid>
 
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                                            <Border x:Name="TelemetryPlot2ChartHost"
+                                                    Grid.Row="1"
+                                                    Height="186"
+                                                    Padding="0" />
+                                        </Grid>
+                                    </Border>
 
-                                    <Border x:Name="AccXChartHost"
+                                    <Border Grid.Row="1"
                                             Grid.Column="0"
                                             Style="{StaticResource PanelFrameStyle}"
-                                            Height="118"
-                                            Padding="0"
-                                            Margin="0,0,10,0" />
-                                    <Border x:Name="AccYChartHost"
+                                            Margin="0,0,10,0">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Plot C" Style="{StaticResource MetricLabelStyle}" Margin="0,0,12,0" />
+                                                <ComboBox x:Name="TelemetryPlot3MetricBox"
+                                                          Grid.Column="1"
+                                                          Width="188"
+                                                          SelectionChanged="OnTelemetryPlotMetricChanged" />
+                                            </Grid>
+
+                                            <Border x:Name="TelemetryPlot3ChartHost"
+                                                    Grid.Row="1"
+                                                    Height="186"
+                                                    Padding="0" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Row="1"
                                             Grid.Column="1"
-                                            Style="{StaticResource PanelFrameStyle}"
-                                            Height="118"
-                                            Padding="0"
-                                            Margin="0,0,10,0" />
-                                    <Border x:Name="AccZChartHost"
-                                            Grid.Column="2"
-                                            Style="{StaticResource PanelFrameStyle}"
-                                            Height="118"
-                                            Padding="0" />
+                                            Style="{StaticResource PanelFrameStyle}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Plot D" Style="{StaticResource MetricLabelStyle}" Margin="0,0,12,0" />
+                                                <ComboBox x:Name="TelemetryPlot4MetricBox"
+                                                          Grid.Column="1"
+                                                          Width="188"
+                                                          SelectionChanged="OnTelemetryPlotMetricChanged" />
+                                            </Grid>
+
+                                            <Border x:Name="TelemetryPlot4ChartHost"
+                                                    Grid.Row="1"
+                                                    Height="186"
+                                                    Padding="0" />
+                                        </Grid>
+                                    </Border>
                                 </Grid>
 
                                 <TextBlock Text="Live log"
@@ -432,6 +516,8 @@
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
+
+                    <TabItem x:Name="RawTab" Header="Raw" />
 
                     <TabItem Header="Overlay">
                         <Grid>
@@ -513,6 +599,291 @@
                         </StackPanel>
                     </TabItem>
 
+                    <TabItem x:Name="BreathingTab" Header="Breathing">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.15*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" Style="{StaticResource DarkPanelFrameStyle}" Margin="0,0,10,0">
+                                        <StackPanel>
+                                            <TextBlock Text="Breathing volume" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingVolumeValueText"
+                                                       Text="--"
+                                                       FontSize="54"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource FocusBlueBrush}" />
+                                            <TextBlock x:Name="BreathingStateValueText"
+                                                       Text="Bad tracking"
+                                                       FontSize="18"
+                                                       FontWeight="Bold"
+                                                       Margin="0,4,0,0" />
+                                            <TextBlock x:Name="BreathingTrackingValueText"
+                                                       Text="Awaiting device selection"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource GraphiteBrush}"
+                                                       Margin="0,8,0,0" />
+                                            <TextBlock x:Name="BreathingCalibrationValueText"
+                                                       Text="No tracker"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource GraphiteBrush}"
+                                                       Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Style="{StaticResource PanelFrameStyle}">
+                                        <StackPanel>
+                                            <TextBlock Text="Control" Style="{StaticResource MetricLabelStyle}" />
+                                            <WrapPanel>
+                                                <Button x:Name="BreathingStartCalibrationButton"
+                                                        Content="Start calibration"
+                                                        Width="128"
+                                                        Margin="0,0,8,8"
+                                                        Click="OnBreathingStartCalibrationClick" />
+                                                <Button x:Name="BreathingCancelCalibrationButton"
+                                                        Content="Cancel"
+                                                        Width="92"
+                                                        Margin="0,0,8,8"
+                                                        Background="{StaticResource AppPaperBrush}"
+                                                        Foreground="{StaticResource CarbonBrush}"
+                                                        BorderBrush="{StaticResource PanelEdgeBrush}"
+                                                        Click="OnBreathingCancelCalibrationClick" />
+                                                <Button x:Name="BreathingResetTrackerButton"
+                                                        Content="Reset tracker"
+                                                        Width="112"
+                                                        Margin="0,0,8,8"
+                                                        Background="{StaticResource AppPaperBrush}"
+                                                        Foreground="{StaticResource CarbonBrush}"
+                                                        BorderBrush="{StaticResource PanelEdgeBrush}"
+                                                        Click="OnBreathingResetTrackerClick" />
+                                                <Button x:Name="BreathingFlipMappingButton"
+                                                        Content="Flip inhale/exhale"
+                                                        Width="136"
+                                                        Margin="0,0,8,8"
+                                                        Background="{StaticResource AppPaperBrush}"
+                                                        Foreground="{StaticResource CarbonBrush}"
+                                                        BorderBrush="{StaticResource PanelEdgeBrush}"
+                                                        Click="OnBreathingFlipMappingClick" />
+                                                <Button x:Name="BreathingApplyTuningButton"
+                                                        Content="Apply tuning"
+                                                        Width="112"
+                                                        Margin="0,0,8,8"
+                                                        Click="OnBreathingApplyTuningClick" />
+                                                <Button x:Name="BreathingRestoreDefaultsButton"
+                                                        Content="Restore defaults"
+                                                        Width="128"
+                                                        Margin="0,0,0,8"
+                                                        Background="{StaticResource AppPaperBrush}"
+                                                        Foreground="{StaticResource CarbonBrush}"
+                                                        BorderBrush="{StaticResource PanelEdgeBrush}"
+                                                        Click="OnBreathingRestoreDefaultsClick" />
+                                            </WrapPanel>
+                                            <TextBlock x:Name="BreathingStatusText"
+                                                       Text="No device selected"
+                                                       FontSize="14"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource GraphiteBrush}"
+                                                       Margin="0,8,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <TextBlock Text="Breathing telemetry"
+                                           Style="{StaticResource SectionTitleStyle}"
+                                           Margin="0,0,0,8" />
+
+                                <Border x:Name="BreathingChartHost"
+                                        Style="{StaticResource PanelFrameStyle}"
+                                        Height="206"
+                                        Padding="0"
+                                        Margin="0,0,0,10" />
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" Style="{StaticResource PanelFrameStyle}" Margin="0,0,10,0">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Sample rate" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetrySampleRateText" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                                            <TextBlock Grid.Row="1" Text="Useful signal" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryUsefulSignalText" Grid.Row="1" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                                            <TextBlock Grid.Row="2" Text="Axis range" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryAxisRangeText" Grid.Row="2" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                                            <TextBlock Grid.Row="3" Text="Last sample" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryLastSampleText" Grid.Row="3" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                                            <TextBlock Grid.Row="4" Text="Base mode" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryBaseModeText" Grid.Row="4" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                                            <TextBlock Grid.Row="5" Text="Tracking" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryTrackingText" Grid.Row="5" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Style="{StaticResource PanelFrameStyle}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Bounds" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryBoundsText" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                                            <TextBlock Grid.Row="1" Text="XZ bounds" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryXzBoundsText" Grid.Row="1" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                                            <TextBlock Grid.Row="2" Text="Axis" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryAxisText" Grid.Row="2" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                                            <TextBlock Grid.Row="3" Text="Center" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryCenterText" Grid.Row="3" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                                            <TextBlock Grid.Row="4" Text="Volumes" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryVolumesText" Grid.Row="4" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                                            <TextBlock Grid.Row="5" Text="Last failure" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBlock x:Name="BreathingTelemetryFailureText" Grid.Row="5" Grid.Column="1" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <TextBlock Text="Tuning"
+                                           Style="{StaticResource SectionTitleStyle}"
+                                           Margin="0,0,0,8" />
+
+                                <Border Style="{StaticResource PanelFrameStyle}">
+                                    <StackPanel>
+                                        <WrapPanel Margin="0,0,0,12">
+                                            <CheckBox x:Name="BreathingAutoCalibrateCheckBox"
+                                                      Content="Auto-calibrate"
+                                                      Margin="0,0,18,8" />
+                                            <CheckBox x:Name="BreathingAdaptiveBoundsCheckBox"
+                                                      Content="Adaptive bounds"
+                                                      Margin="0,0,18,8" />
+                                            <CheckBox x:Name="BreathingUseXzBaseCheckBox"
+                                                      Content="Use X/Z base"
+                                                      Margin="0,0,18,8" />
+                                            <CheckBox x:Name="BreathingInvertVolumeCheckBox"
+                                                      Content="Invert output"
+                                                      Margin="0,0,0,8" />
+                                        </WrapPanel>
+
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="118" />
+                                                <ColumnDefinition Width="24" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="118" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Calibration seconds" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingCalibrationDurationBox" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Column="3" Text="Min calibration samples" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingMinCalibrationSamplesBox" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="1" Text="Min travel (g)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingMinCalibrationTravelBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="1" Grid.Column="3" Text="Useful window (s)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingUsefulWindowBox" Grid.Row="1" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="2" Text="Min useful samples" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingMinUsefulSamplesBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="2" Grid.Column="3" Text="Min useful rate (Hz)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingMinUsefulSampleRateBox" Grid.Row="2" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="3" Text="Min axis range (g)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingMinUsefulAxisRangeBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="3" Grid.Column="3" Text="Sample EMA" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingSampleEmaBox" Grid.Row="3" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="4" Text="Projection EMA" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingProjectionEmaBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="4" Grid.Column="3" Text="Lower quantile" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingBoundsLowerQuantileBox" Grid.Row="4" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="5" Text="Upper quantile" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingBoundsUpperQuantileBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="5" Grid.Column="3" Text="Bounds edge ease" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingBoundsEdgeEaseBox" Grid.Row="5" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="6" Text="Adaptive window (s)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingAdaptiveWindowBox" Grid.Row="6" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="6" Grid.Column="3" Text="Adaptive update (s)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingAdaptiveUpdateIntervalBox" Grid.Row="6" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="7" Text="Adaptive lerp speed" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingAdaptiveLerpSpeedBox" Grid.Row="7" Grid.Column="1" Margin="0,0,0,8" />
+                                            <TextBlock Grid.Row="7" Grid.Column="3" Text="Adaptive contract" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingAdaptiveContractBox" Grid.Row="7" Grid.Column="4" Margin="0,0,0,8" />
+
+                                            <TextBlock Grid.Row="8" Text="Stale timeout (s)" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingStaleTimeoutBox" Grid.Row="8" Grid.Column="1" />
+                                            <TextBlock Grid.Row="8" Grid.Column="3" Text="State delta threshold" Style="{StaticResource MetricLabelStyle}" />
+                                            <TextBox x:Name="BreathingStateDeltaThresholdBox" Grid.Row="8" Grid.Column="4" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Breathing log"
+                                           Style="{StaticResource SectionTitleStyle}"
+                                           Margin="0,4,0,8" />
+                                <ListBox x:Name="BreathingLogList"
+                                         Height="132"
+                                         Style="{StaticResource ConsoleListStyle}"
+                                         ItemContainerStyle="{StaticResource ConsoleListItemStyle}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem x:Name="CoherenceTab" Header="Coherence" />
+
+                    <TabItem x:Name="DynamicsTab" Header="Dynamics" />
+
                     <TabItem Header="Diagnostics">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -532,15 +903,28 @@
             </Grid>
         </Grid>
 
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 Background="{StaticResource SurfaceTintBrush}"
                 BorderBrush="{StaticResource PanelEdgeBrush}"
                 BorderThickness="0,1,0,0"
                 Padding="14,8">
-            <TextBlock Text="Unofficial Polar H10 reference monitor. Not affiliated with or endorsed by Polar."
-                       FontSize="11"
-                       FontWeight="SemiBold"
-                       Foreground="{StaticResource GraphiteBrush}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Unofficial Polar H10 reference monitor. Not affiliated with or endorsed by Polar."
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource GraphiteBrush}" />
+                <TextBlock x:Name="BuildStampTextBlock"
+                           Grid.Column="1"
+                           Margin="16,0,0,0"
+                           FontSize="11"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource FocusBlueBrush}"
+                           Visibility="Collapsed" />
+            </Grid>
         </Border>
     </Grid>
 </Window>

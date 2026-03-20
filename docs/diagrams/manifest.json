@@ -1,32 +1,83 @@
 {
   "diagrams": [
     {
+      "id": "choose-your-path",
+      "title": "Choose Your Path",
+      "source": "choose-your-path.mmd",
+      "category": "onboarding",
+      "description": "Decision map for the WPF app, CLI, and protocol-first reader paths",
+      "relatedDocs": [
+        "../index.md",
+        "../app-overview.md",
+        "../coherence-workflow.md",
+        "../breathing-dynamics-workflow.md",
+        "../cli.md",
+        "../protocol/overview.md"
+      ]
+    },
+    {
+      "id": "first-session-flow",
+      "title": "First Session Flow",
+      "source": "first-session-flow.mmd",
+      "category": "onboarding",
+      "description": "From scan and connection check to a saved session and replay",
+      "relatedDocs": [
+        "../first-recording.md",
+        "../getting-started.md",
+        "../coherence-workflow.md",
+        "../breathing-dynamics-workflow.md",
+        "../output-formats.md",
+        "../troubleshooting.md"
+      ]
+    },
+    {
       "id": "repo-structure",
       "title": "Repository Structure",
       "source": "repo-structure.mmd",
       "category": "architecture",
-      "description": "Top-level organisation of the PolarH10 workspace"
+      "description": "Top-level organisation of the PolarH10 workspace",
+      "relatedDocs": [
+        "../index.md",
+        "../app-overview.md",
+        "../coherence-workflow.md",
+        "../breathing-dynamics-workflow.md"
+      ]
     },
     {
       "id": "code-architecture",
       "title": "Code Architecture",
       "source": "code-architecture.mmd",
       "category": "architecture",
-      "description": "Layered subsystem design: protocol, transport, session, consumers"
+      "description": "Layered subsystem design: protocol, transport, session, consumers",
+      "relatedDocs": [
+        "../app-overview.md",
+        "../protocol/overview.md",
+        "../coherence-workflow.md",
+        "../breathing-workflow.md",
+        "../breathing-dynamics-workflow.md"
+      ]
     },
     {
       "id": "data-flow",
       "title": "Data Flow",
       "source": "data-flow.mmd",
       "category": "architecture",
-      "description": "Signal path from Polar H10 hardware through decoders to disk and UI"
+      "description": "Signal path from Polar H10 hardware through decoders to disk and UI",
+      "relatedDocs": [
+        "../output-formats.md",
+        "../protocol/overview.md"
+      ]
     },
     {
       "id": "session-lifecycle",
       "title": "Session Lifecycle",
       "source": "session-lifecycle.mmd",
       "category": "runtime",
-      "description": "Operator-facing lifecycle from scan and link setup to streaming, recording, and shutdown"
+      "description": "Operator-facing lifecycle from scan and link setup to streaming, recording, and shutdown",
+      "relatedDocs": [
+        "../first-recording.md",
+        "../troubleshooting.md"
+      ]
     }
   ]
 }

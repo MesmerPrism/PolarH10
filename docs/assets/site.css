@@ -143,7 +143,7 @@ button:focus-visible {
   min-width: 0;
 }
 
-.brand-copy small {
+.brand-copy span {
   display: block;
   margin-bottom: 4px;
   font-size: 11px;
@@ -230,6 +230,10 @@ button:focus-visible {
   padding: 24px;
 }
 
+.sidebar section + section {
+  margin-top: 18px;
+}
+
 .hero-aside,
 .sidebar,
 .viewer-nav {
@@ -244,6 +248,7 @@ button:focus-visible {
 }
 
 .eyebrow,
+.page-marker,
 .category-label,
 .kicker,
 .meta {
@@ -539,6 +544,7 @@ button:focus-visible {
 
 .section-heading,
 .sidebar h2,
+.category-heading,
 .viewer-nav h2,
 .viewer-main h2,
 .content-panel h1,
@@ -552,9 +558,15 @@ button:focus-visible {
 }
 
 .section-heading,
+.category-heading,
 .viewer-main h2,
 .prose h2 {
   font-size: 2rem;
+}
+
+.category-heading {
+  margin-bottom: 12px;
+  font-size: 1.05rem;
 }
 
 .path-card h3,
@@ -650,6 +662,65 @@ button:focus-visible {
 .content-panel {
   min-width: 0;
   background: var(--paper);
+}
+
+.search-panel {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search-panel p {
+  margin: 0 0 12px;
+}
+
+#pagefind-search {
+  min-width: 0;
+}
+
+.pagefind-ui__search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font: inherit;
+}
+
+.pagefind-ui__search-input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.pagefind-ui__drawer {
+  margin-top: 10px;
+}
+
+.pagefind-ui__result {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pagefind-ui__result-link,
+.pagefind-ui__result-title {
+  color: var(--ink);
+}
+
+.pagefind-ui__result-excerpt,
+.pagefind-ui__message {
+  color: var(--ink-muted);
+}
+
+.pagefind-ui__button {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
 }
 
 .prose {
@@ -824,6 +895,19 @@ button:focus-visible {
   border: 1px solid rgba(37, 138, 203, 0.18);
   border-radius: var(--radius-md);
   background: #fbf7ef;
+}
+
+.viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.viewer-related-note {
+  margin: -2px 0 14px;
+  color: var(--ink-muted);
+  font-size: 0.94rem;
 }
 
 .viewer-meta p,
@@ -1103,7 +1187,7 @@ button:focus-visible {
     height: 48px;
   }
 
-  .brand-copy small {
+  .brand-copy span {
     margin-bottom: 3px;
     font-size: 10px;
     letter-spacing: 0.1em;

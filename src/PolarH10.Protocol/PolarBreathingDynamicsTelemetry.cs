@@ -1,0 +1,26 @@
+namespace PolarH10.Protocol;
+
+public readonly record struct PolarBreathingDynamicsTelemetry(
+    bool IsTransportConnected,
+    bool HasReceivedAnyWaveformSample,
+    bool IsBreathingCalibrated,
+    bool HasBreathingTracking,
+    PolarBreathingDynamicsTrackingState TrackingState,
+    bool HasTracking,
+    bool HasAcceptedAnyBreath,
+    bool IntervalHasBasicStats,
+    bool AmplitudeHasBasicStats,
+    bool IntervalHasEntropyMetrics,
+    bool AmplitudeHasEntropyMetrics,
+    int AcceptedExtremumCount,
+    int IntervalBreathCount,
+    int AmplitudeBreathCount,
+    float StabilizationProgress01,
+    float Confidence01,
+    float LastWaveformSampleAgeSeconds,
+    float LastBreathAgeSeconds,
+    PolarBreathingFeatureSet Interval,
+    PolarBreathingFeatureSet Amplitude,
+    PolarBreathingDynamicsSettings Settings,
+    DateTimeOffset? LastWaveformReceivedAtUtc,
+    DateTimeOffset? LastBreathDetectedAtUtc);

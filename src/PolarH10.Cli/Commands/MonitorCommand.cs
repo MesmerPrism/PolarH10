@@ -1,4 +1,5 @@
 using System.CommandLine;
+using PolarH10.Cli;
 using PolarH10.Protocol;
 using PolarH10.Transport.Windows;
 
@@ -22,16 +23,21 @@ internal static class MonitorCommand
             () => false,
             "Show detailed protocol messages");
 
+        var transportOption = CliTransportOptions.CreateTransportOption();
+        var syntheticPipeOption = CliTransportOptions.CreateSyntheticPipeOption();
+
         var cmd = new Command("monitor", "Live terminal dashboard for a connected Polar H10")
         {
             deviceOption,
             channelsOption,
             verboseOption,
+            transportOption,
+            syntheticPipeOption,
         };
 
-        cmd.SetHandler(async (string device, string channels, bool verbose) =>
+        cmd.SetHandler(async (string device, string channels, bool verbose, string transport, string syntheticPipe) =>
         {
-            var factory = new WindowsBleAdapterFactory();
+            var factory = CliTransportOptions.CreateFactory(transport, syntheticPipe);
             var session = new PolarH10Session(factory);
 
             var cts = new CancellationTokenSource();
@@ -52,13 +58,19 @@ internal static class MonitorCommand
             if (wantEcg)
             {
                 session.EcgFrameReceived += f => Console.WriteLine($"ECG: {f.MicroVolts.Length} samples  ts={f.SensorTimestampNs}");
-                await session.StartEcgAsync(ct: cts.Token);
+                if (session.IsPmdReady)
+                    await session.StartEcgAsync(ct: cts.Token);
+                else
+                    Console.WriteLine("ECG requested, but PMD is not available on the selected transport.");
             }
 
             if (wantAcc)
             {
                 session.AccFrameReceived += f => Console.WriteLine($"ACC: {f.Samples.Length} samples  ts={f.SensorTimestampNs}");
-                await session.StartAccAsync(ct: cts.Token);
+                if (session.IsPmdReady)
+                    await session.StartAccAsync(ct: cts.Token);
+                else
+                    Console.WriteLine("ACC requested, but PMD is not available on the selected transport.");
             }
 
             if (verbose)
@@ -69,7 +81,7 @@ internal static class MonitorCommand
 
             Console.WriteLine("\nDisconnecting...");
             await session.DisposeAsync();
-        }, deviceOption, channelsOption, verboseOption);
+        }, deviceOption, channelsOption, verboseOption, transportOption, syntheticPipeOption);
 
         return cmd;
     }

@@ -9,7 +9,10 @@
     "diagram:serve": "browser-sync start --server docs --files \"docs/diagrams/*.svg,docs/diagrams/*.html\" --startPath \"diagrams/viewer.html\"",
     "diagram:dev": "concurrently \"npm:diagram:watch\" \"npm:diagram:serve\"",
     "ui:preview:capture": "node ./tools/diagrams/invoke-powershell.mjs ../site/capture-wpf-preview.ps1",
-    "pages:build": "node ./tools/site/build-pages.mjs",
+    "pages:build:site": "node ./tools/site/build-pages.mjs",
+    "pages:validate": "node ./tools/site/validate-pages.mjs",
+    "pages:index": "pagefind --site site",
+    "pages:build": "npm run pages:build:site && npm run pages:validate && npm run pages:index",
     "pages:watch": "chokidar \"docs/**/*.md\" \"docs/assets/*\" \"docs/diagrams/*\" -c \"npm run diagram:render:all && npm run pages:build\"",
     "pages:serve": "browser-sync start --server site --files \"site/**/*\" --startPath \"index.html\"",
     "pages:dev": "concurrently \"npm:pages:watch\" \"npm:pages:serve\""
@@ -19,6 +22,7 @@
     "browser-sync": "^3.0.0",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^9.0.0",
-    "marked": "^15.0.7"
+    "marked": "^15.0.7",
+    "pagefind": "^1.3.0"
   }
 }

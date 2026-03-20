@@ -49,6 +49,13 @@ public sealed class WaveformChart : FrameworkElement
 
     private readonly List<SeriesState> _series = [];
     private bool _dirty;
+    private bool _normalizePerSeries;
+    private bool _adaptiveYAxis = true;
+    private double? _manualYAxisMax;
+    private bool _manualYAxisSymmetric;
+    private bool _hasFrozenYAxisRange;
+    private double _frozenYAxisMin;
+    private double _frozenYAxisMax;
 
     /// <summary>Chart title drawn in the top-left corner.</summary>
     public string Title { get; set; } = "";
@@ -57,7 +64,71 @@ public sealed class WaveformChart : FrameworkElement
     /// When true, each series is normalized independently to fill the chart height.
     /// Useful for overlaying signals with different scales.
     /// </summary>
-    public bool NormalizePerSeries { get; set; }
+    public bool NormalizePerSeries
+    {
+        get => _normalizePerSeries;
+        set
+        {
+            if (_normalizePerSeries == value)
+                return;
+
+            _normalizePerSeries = value;
+            _hasFrozenYAxisRange = false;
+            _dirty = true;
+        }
+    }
+
+    /// <summary>
+    /// When true, the standard chart range is recalculated continuously from visible data.
+    /// When false, the chart keeps the current range until a manual max is supplied.
+    /// </summary>
+    public bool AdaptiveYAxis
+    {
+        get => _adaptiveYAxis;
+        set
+        {
+            if (_adaptiveYAxis == value)
+                return;
+
+            _adaptiveYAxis = value;
+            if (value)
+                _hasFrozenYAxisRange = false;
+            _dirty = true;
+        }
+    }
+
+    /// <summary>
+    /// Optional fixed Y-axis maximum used when adaptive scaling is disabled.
+    /// </summary>
+    public double? ManualYAxisMax
+    {
+        get => _manualYAxisMax;
+        set
+        {
+            if (_manualYAxisMax == value)
+                return;
+
+            _manualYAxisMax = value;
+            _dirty = true;
+        }
+    }
+
+    /// <summary>
+    /// When true, manual Y-axis ranges are centered on zero as [-max, +max].
+    /// Otherwise, manual ranges use [0, max].
+    /// </summary>
+    public bool ManualYAxisSymmetric
+    {
+        get => _manualYAxisSymmetric;
+        set
+        {
+            if (_manualYAxisSymmetric == value)
+                return;
+
+            _manualYAxisSymmetric = value;
+            _dirty = true;
+        }
+    }
 
     public int AddSeries(string name, Color color, int capacity = 500, double thickness = 1.2)
     {
@@ -192,8 +263,77 @@ public sealed class WaveformChart : FrameworkElement
         double chartWidth,
         double chartHeight)
     {
-        double yMin = double.MaxValue;
-        double yMax = double.MinValue;
+        GetDisplayYAxisRange(out double yMin, out double yMax);
+        double yRange = yMax - yMin;
+
+        DrawGrid(dc, left, top, chartWidth, chartHeight);
+
+        for (int i = 0; i <= 4; i++)
+        {
+            double y = top + chartHeight * i / 4.0;
+            double value = yMax - (yMax - yMin) * i / 4.0;
+            var label = MakeText(value.ToString("G4"), 9, MutedBrush, dpi, UiTypeface);
+            dc.DrawText(label, new Point(left - label.Width - 6, y - label.Height / 2));
+        }
+
+        foreach (var s in _series)
+        {
+            if (!s.Visible || s.Count < 2)
+                continue;
+
+            DrawSeries(dc, s, left, top, chartWidth, chartHeight, yMin, yRange);
+        }
+
+        DrawHeaderLegend(dc, dpi, ActualWidth);
+    }
+
+    private void GetDisplayYAxisRange(out double yMin, out double yMax)
+    {
+        if (TryGetManualYAxisRange(out yMin, out yMax))
+            return;
+
+        if (AdaptiveYAxis || !_hasFrozenYAxisRange)
+        {
+            ComputeAdaptiveYAxisRange(out yMin, out yMax);
+            _frozenYAxisMin = yMin;
+            _frozenYAxisMax = yMax;
+            _hasFrozenYAxisRange = true;
+            return;
+        }
+
+        yMin = _frozenYAxisMin;
+        yMax = _frozenYAxisMax;
+        if (yMin >= yMax)
+            ComputeAdaptiveYAxisRange(out yMin, out yMax);
+    }
+
+    private bool TryGetManualYAxisRange(out double yMin, out double yMax)
+    {
+        if (ManualYAxisMax is not double max || max <= 0)
+        {
+            yMin = 0;
+            yMax = 0;
+            return false;
+        }
+
+        if (ManualYAxisSymmetric)
+        {
+            yMin = -max;
+            yMax = max;
+        }
+        else
+        {
+            yMin = 0;
+            yMax = max;
+        }
+
+        return true;
+    }
+
+    private void ComputeAdaptiveYAxisRange(out double yMin, out double yMax)
+    {
+        yMin = double.MaxValue;
+        yMax = double.MinValue;
 
         foreach (var s in _series)
         {
@@ -216,27 +356,6 @@ public sealed class WaveformChart : FrameworkElement
         double pad = (yMax - yMin) * 0.05;
         yMin -= pad;
         yMax += pad;
-        double yRange = yMax - yMin;
-
-        DrawGrid(dc, left, top, chartWidth, chartHeight);
-
-        for (int i = 0; i <= 4; i++)
-        {
-            double y = top + chartHeight * i / 4.0;
-            double value = yMax - (yMax - yMin) * i / 4.0;
-            var label = MakeText(value.ToString("G4"), 9, MutedBrush, dpi, UiTypeface);
-            dc.DrawText(label, new Point(left - label.Width - 6, y - label.Height / 2));
-        }
-
-        foreach (var s in _series)
-        {
-            if (!s.Visible || s.Count < 2)
-                continue;
-
-            DrawSeries(dc, s, left, top, chartWidth, chartHeight, yMin, yRange);
-        }
-
-        DrawHeaderLegend(dc, dpi, ActualWidth);
     }
 
     private void DrawEmptyState(

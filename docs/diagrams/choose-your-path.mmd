@@ -1,0 +1,21 @@
+flowchart TD
+    U["You have a Polar H10 and want data on Windows"]
+
+    U --> A["Use the WPF app"]
+    U --> B["Use the CLI"]
+    U --> C["Study protocol or integrate code"]
+
+    A --> A1["Scan nearby straps"]
+    A --> A2["Inspect live HR / ECG / ACC"]
+    A --> A3["Watch RR-derived coherence / confidence"]
+    A --> A4["Review interval + amplitude entropy"]
+    A --> A5["Calibrate breathing when ACC is stable"]
+    A --> A6["Track multiple active straps"]
+
+    B --> B1["Run scan and doctor"]
+    B --> B2["Record to CSV + JSONL"]
+    B --> B3["Replay saved sessions without hardware"]
+
+    C --> C1["Read GATT and PMD overview"]
+    C --> C2["Check frame formats"]
+    C --> C3["Use architecture and data-flow diagrams"]

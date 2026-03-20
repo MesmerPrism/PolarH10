@@ -1,3 +1,12 @@
+---
+title: Heart Rate Measurement Format
+description: Standard Bluetooth SIG heart-rate and RR-interval payload decoding as used by the Polar H10.
+summary: Use this page when you need the `0x2A37` payload structure, flags, and RR conversion details.
+nav_label: HR Measurement
+nav_group: Internals
+nav_order: 60
+---
+
 # Heart Rate Measurement Format
 
 Heart rate data uses the standard Bluetooth SIG Heart Rate Measurement characteristic

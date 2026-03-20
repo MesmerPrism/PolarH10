@@ -1,3 +1,12 @@
+---
+title: References
+description: Primary protocol sources, Bluetooth specification pointers, and notes about how this repo derives its documentation.
+summary: These references anchor the protocol docs and explain which public sources informed the implementation.
+nav_label: References
+nav_group: Internals
+nav_order: 90
+---
+
 # References
 
 ## Primary Sources
@@ -25,6 +34,66 @@
    This paper evaluates the Polar H10 and Verity Sense in terms of data quality and
    measurement reliability, providing independent validation of ECG and accelerometer
    data characteristics.
+
+4. **McCraty, R.; Atkinson, M.; Tomasino, D.; Bradley, R.T.** *The Coherent Heart:
+   Heart-Brain Interactions, Psychophysiological Coherence, and the Emergence of
+   System-Wide Order.* Institute of HeartMath, Publication No. 06-022, 2006.
+
+   This monograph provides the spectral coherence ratio used by the app's
+   RR-derived coherence workflow: search the dominant peak in `0.04-0.26 Hz`,
+   integrate a `0.030 Hz` peak window, and compare it against total power in
+   `0.0033-0.4 Hz`.
+
+## Breathing Dynamics Sources
+
+1. **Goheen, D. P.; et al.** "It's About Time: Breathing Dynamics Modulate Emotion
+   and Cognition." *Psychophysiology* 2025.
+   <https://doi.org/10.1111/psyp.70149>
+
+   This paper defines the breathing-dynamics feature family used by the app's
+   breathing-dynamics window: breath interval and breath amplitude series plus
+   mean, standard deviation, coefficient of variation, autocorrelation window,
+   PSD slope, Lempel-Ziv complexity, sample entropy, and multiscale entropy.
+
+2. **CANALLAB / breathing_wm**
+   <https://github.com/CANALLAB/breathing_wm>
+
+   The paper links this repository as the companion analysis code for the
+   published workflow. It is included here as method provenance only; this repo
+   does not embed that code directly.
+
+3. **NeuroKit2 implementation references**
+   - sample entropy:
+     <https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/complexity/entropy_sample.html>
+   - multiscale entropy:
+     <https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/complexity/entropy_multiscale.html>
+   - PSD slope:
+     <https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/complexity/fractal_psdslope.html>
+   - autocorrelation:
+     <https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/signal/signal_autocor.html>
+   - Lempel-Ziv complexity:
+     <https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/complexity/complexity_lempelziv.html>
+
+   Goheen et al. explicitly state that these feature families were computed with
+   NeuroKit2. Where the paper leaves entropy hyperparameters unspecified, this
+   repository documents explicit defaults and keeps them close to that
+   implementation path.
+
+## Breathing Dynamics Provenance Note
+
+The breathing-dynamics runtime in this repository is an adaptation, not a claim
+of numeric identity with the paper's respiration-belt pipeline. Goheen et al.
+derive their breath interval and amplitude series from a preprocessed belt
+signal; this app derives the same feature family from the calibrated ACC-based
+breathing waveform already available in `PolarBreathingTracker`.
+
+The app's default entropy settings are explicit and operator-visible:
+
+- SampEn: `m=2`, `delay=1`, `r=0.2 * SD`
+- MSE: `m=3`, `delay=1`, `r=0.2 * SD`, scales `1..5`, summary=`AUC`
+
+Those defaults are intended to stay aligned with the NeuroKit2 path cited by
+the paper while making the runtime behavior reproducible inside this repository.
 
 ## Bluetooth SIG Specifications
 

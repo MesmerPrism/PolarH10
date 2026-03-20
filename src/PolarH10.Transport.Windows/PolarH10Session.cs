@@ -18,6 +18,7 @@ public sealed class PolarH10Session : IAsyncDisposable
     private IGattCharacteristicHandle? _hrChar;
     private IGattCharacteristicHandle? _pmdCtrl;
     private IGattCharacteristicHandle? _pmdData;
+    private ISyntheticBreathingTelemetrySource? _syntheticBreathingSource;
 
     public bool IsConnected => _connection?.IsConnected ?? false;
     public bool IsPmdReady { get; private set; }
@@ -26,6 +27,7 @@ public sealed class PolarH10Session : IAsyncDisposable
     public event Action<PolarEcgFrame>? EcgFrameReceived;
     public event Action<PolarAccFrame>? AccFrameReceived;
     public event Action<PmdControlPointResponse>? PmdCtrlResponse;
+    public event Action<PolarBreathingTelemetry>? BreathingTelemetryReceived;
     public event Action<bool>? ConnectionChanged;
 
     public PolarH10Session(IBleAdapterFactory factory)
@@ -40,6 +42,11 @@ public sealed class PolarH10Session : IAsyncDisposable
     {
         _connection = _factory.CreateConnection(deviceAddress);
         _connection.ConnectionStateChanged += e => ConnectionChanged?.Invoke(e.IsConnected);
+        if (_connection is ISyntheticBreathingTelemetrySource syntheticBreathingSource)
+        {
+            _syntheticBreathingSource = syntheticBreathingSource;
+            _syntheticBreathingSource.BreathingTelemetryReceived += OnSyntheticBreathingTelemetry;
+        }
 
         await _connection.ConnectAsync(ct);
 
@@ -132,6 +139,12 @@ public sealed class PolarH10Session : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        if (_syntheticBreathingSource is not null)
+        {
+            _syntheticBreathingSource.BreathingTelemetryReceived -= OnSyntheticBreathingTelemetry;
+            _syntheticBreathingSource = null;
+        }
+
         if (_connection != null)
             await _connection.DisposeAsync();
     }
@@ -178,5 +191,10 @@ public sealed class PolarH10Session : IAsyncDisposable
                 catch { /* malformed frame */ }
                 break;
         }
+    }
+
+    private void OnSyntheticBreathingTelemetry(PolarBreathingTelemetry telemetry)
+    {
+        BreathingTelemetryReceived?.Invoke(telemetry);
     }
 }

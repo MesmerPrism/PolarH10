@@ -1,3 +1,12 @@
+---
+title: Accelerometer Data Format
+description: Uncompressed and compressed accelerometer frame layout, units, and delta-decoding notes for PMD output.
+summary: This is the accelerometer frame reference for X/Y/Z sample encoding and compressed delta blocks.
+nav_label: ACC Format
+nav_group: Internals
+nav_order: 50
+---
+
 # Accelerometer Data Format
 
 Accelerometer data arrives on the PMD Data characteristic as notification payloads.

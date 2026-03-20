@@ -1,3 +1,12 @@
+---
+title: App Overview
+description: Learn what the WPF operator surface is for before you read protocol internals or lower-level transport code.
+summary: The app is the fastest way to see what the repo actually does in practice: scan, connect, inspect live data, review derived coherence and breathing metrics, and capture sessions.
+nav_label: App Overview
+nav_group: Start Here
+nav_order: 20
+---
+
 # App Overview
 
 `PolarH10.App` is the Windows operator surface in this repo. It exists to make
@@ -15,6 +24,8 @@ straps in parallel in the live telemetry surface.
 - Inspect live HR, RR, ECG, and ACC data in one operator-facing monitor.
 - Track multiple Polar H10 units in parallel on the live charts when you need
   direct strap-to-strap comparison.
+- Open dedicated coherence and breathing-dynamics windows when the summary plots
+  are not enough.
 - Run diagnostics and inspect logs without dropping straight into debugger-only workflows.
 - Record sessions to disk so you can replay or analyze them later.
 
@@ -42,6 +53,7 @@ Expect to find:
 - waveform panels for live ECG and ACC
 - a `Tracked devices` picker that follows the selected device by default
 - optional parallel tracking for multiple straps at the same time on the live charts
+- view shortcuts for raw telemetry, coherence, and breathing dynamics
 - a chart treatment optimized for monitoring, not dashboard decoration
 
 ### Multi-device tracking
@@ -55,6 +67,41 @@ exists for that case.
 - keep using the left rail for alias editing, connect/disconnect, recording, and overlay inspection
 - use the overlay tab for the currently selected device when you need a denser
   single-device view of HR, RR, ECG, and ACC together
+
+### Breathing
+
+The Breathing tab is the app-side operator surface for the Polar ACC breathing
+approximation.
+
+- calibrate directly from the app instead of relying on a hidden runtime state
+- inspect live output volume and inhale/exhale state while ACC is streaming
+- flip the inhale/exhale mapping when strap orientation makes the default
+  direction feel reversed
+- tune thresholds, windows, and adaptive-bounds behavior from the same page
+- inspect tracker telemetry before deciding whether a calibration or tuning
+  change is actually needed
+
+### Coherence
+
+The coherence window is the RR-derived feature view for resonance-style review.
+
+- the headline value is a smoothed 0..1 coherence score derived from accepted RR intervals
+- confidence, stabilization, and RR coverage tell you whether the current number is trustworthy yet
+- peak frequency plus peak/total band-power fields stay visible without cluttering the Live tab
+- reset, defaults, and tuning controls give you direct control over the RR window behavior
+
+### Breathing dynamics
+
+The breathing-dynamics window extends the breathing tracker into a research-facing
+feature view derived from the calibrated base waveform.
+
+- interval and amplitude breath series are extracted from alternating extrema
+- interval entropy and amplitude entropy are surfaced as the headline operator values
+- the dedicated window keeps CV, ACW50, PSD slope, LZC, sample entropy, and
+  multiscale entropy visible without bloating the Live tab selector list
+- the window includes direct method references back to the Goheen paper, the
+  paper-code repository, and the NeuroKit2 entropy sources that informed the defaults
+- reset, defaults, and tuning flows follow the same pattern as the coherence window
 
 ### Diagnostics
 
@@ -81,9 +128,13 @@ Once the stream is stable, the app and CLI can write:
 2. Select the intended device and establish the link.
 3. Confirm the live telemetry surface is populated and believable.
 4. If you are comparing subjects or strap placement, open `Tracked devices` and enable multiple straps.
-5. Run diagnostics if the session looks wrong.
-6. Start capture when the stream is stable.
-7. Stop cleanly and inspect the exported files.
+5. Open `Breathing` when you need calibrated breath-volume tracking from ACC.
+6. Open `Coherence window` when you need RR-derived coherence and confidence instead of raw RR only.
+7. Open `Dynamics window` when you need breath interval/amplitude entropy and
+   the full breathing feature bundle.
+8. Run diagnostics if the session looks wrong.
+9. Start capture when the stream is stable.
+10. Stop cleanly and inspect the exported files.
 
 ## When To Use The CLI Instead
 
@@ -97,7 +148,11 @@ Use the CLI when you need:
 ## Related Pages
 
 - [Getting Started](getting-started.md)
+- [Breathing Workflow](breathing-workflow.md)
+- [Coherence Workflow](coherence-workflow.md)
+- [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
+- [References](references.md)
 - [WPF UI Preview](ui-preview.md)
 - [CLI Reference](cli.md)
 - [Protocol Overview](protocol/overview.md)
-- [Diagram Viewer](../diagrams/viewer.html)
+- [Diagram Viewer](diagrams/viewer.html)

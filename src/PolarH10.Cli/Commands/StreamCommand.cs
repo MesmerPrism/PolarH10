@@ -1,4 +1,5 @@
 using System.CommandLine;
+using PolarH10.Cli;
 using PolarH10.Protocol;
 using PolarH10.Transport.Windows;
 
@@ -22,25 +23,28 @@ internal static class StreamCommand
             () => false,
             "Include raw hex payload in output");
 
+        var transportOption = CliTransportOptions.CreateTransportOption();
+        var syntheticPipeOption = CliTransportOptions.CreateSyntheticPipeOption();
+
         var ecgCmd = new Command("ecg", "Stream ECG data to stdout")
         {
-            deviceOption, jsonOption, rawHexOption,
+            deviceOption, jsonOption, rawHexOption, transportOption, syntheticPipeOption,
         };
 
-        ecgCmd.SetHandler(async (string device, bool json, bool rawHex) =>
+        ecgCmd.SetHandler(async (string device, bool json, bool rawHex, string transport, string syntheticPipe) =>
         {
-            await StreamMeasurement(device, "ecg", json, rawHex);
-        }, deviceOption, jsonOption, rawHexOption);
+            await StreamMeasurement(device, "ecg", json, rawHex, transport, syntheticPipe);
+        }, deviceOption, jsonOption, rawHexOption, transportOption, syntheticPipeOption);
 
         var accCmd = new Command("acc", "Stream ACC data to stdout")
         {
-            deviceOption, jsonOption, rawHexOption,
+            deviceOption, jsonOption, rawHexOption, transportOption, syntheticPipeOption,
         };
 
-        accCmd.SetHandler(async (string device, bool json, bool rawHex) =>
+        accCmd.SetHandler(async (string device, bool json, bool rawHex, string transport, string syntheticPipe) =>
         {
-            await StreamMeasurement(device, "acc", json, rawHex);
-        }, deviceOption, jsonOption, rawHexOption);
+            await StreamMeasurement(device, "acc", json, rawHex, transport, syntheticPipe);
+        }, deviceOption, jsonOption, rawHexOption, transportOption, syntheticPipeOption);
 
         var cmd = new Command("stream", "Stream a single measurement channel to stdout")
         {
@@ -51,15 +55,21 @@ internal static class StreamCommand
         return cmd;
     }
 
-    private static async Task StreamMeasurement(string device, string channel, bool json, bool rawHex)
+    private static async Task StreamMeasurement(string device, string channel, bool json, bool rawHex, string transport, string syntheticPipe)
     {
-        var factory = new WindowsBleAdapterFactory();
+        var factory = CliTransportOptions.CreateFactory(transport, syntheticPipe);
         var session = new PolarH10Session(factory);
 
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
 
         await session.ConnectAsync(device, cts.Token);
+        if (!session.IsPmdReady)
+        {
+            Console.Error.WriteLine($"PMD is not available on the selected transport; cannot stream {channel}.");
+            await session.DisposeAsync();
+            return;
+        }
 
         if (channel == "ecg")
         {

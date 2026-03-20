@@ -11,176 +11,213 @@ const siteRoot = path.join(repoRoot, 'site');
 const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
 const diagramsSource = path.join(docsRoot, 'diagrams');
-const repoUrl = 'https://github.com/MesmerPrism/PolarH10';
-const assetVersion = '20260319-polaroid-site-12';
+const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
+const assetVersion = '20260320-pages-13';
 
-const docGroups = [
+const siteConfig = {
+  repoUrl: 'https://github.com/MesmerPrism/PolarH10',
+  baseUrl: 'https://mesmerprism.github.io/PolarH10/',
+  siteName: 'PolarH10',
+  homeTitle: 'PolarH10 Unofficial Open-Source Telemetry Toolkit',
+  referenceTitle: 'PolarH10 Unofficial Open-Source Reference',
+  sharedPromise: 'Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect live HR, ECG, and ACC data, review RR-derived coherence and breathing-dynamics entropy, compare multiple active straps, and record reusable sessions from a WPF app or CLI.',
+  defaultDescription: 'Unofficial open-source PolarH10 docs, onboarding guides, protocol reference, and Mermaid system diagrams. Not endorsed by or affiliated with Polar Electro Oy.',
+  socialImage: 'assets/brutal-tdr-preview.png',
+  favicon: 'assets/polarh10-stripe-mark.png',
+  themeColor: '#f3eee6',
+  navGroups: ['Start Here', 'Task Guides', 'Troubleshooting', 'Internals'],
+  diagramViewerLabel: 'Diagram Viewer',
+  diagramViewerDescription: 'Browse onboarding, runtime, and architecture Mermaid diagrams.'
+};
+
+const specialNavItems = [
   {
-    title: 'Start Here',
-    items: [
-      { file: 'index.md', label: 'Documentation Home', description: 'App-first entry point into the reference set.' },
-      { file: 'app-overview.md', label: 'App Overview', description: 'What the WPF monitor and CLI are for in practice.' },
-      { file: 'ui-preview.md', label: 'WPF UI Preview', description: 'Current operator-facing visual language and layout.' },
-      { file: 'getting-started.md', label: 'Getting Started', description: 'Build, run, and verify the toolchain.' },
-      { file: 'cli.md', label: 'CLI Reference', description: 'Scan, doctor, record, replay, and stream flows.' },
-      { href: '../diagrams/viewer.html', label: 'Diagram Viewer', description: 'Architecture, data path, and runtime maps.' }
-    ]
-  },
-  {
-    title: 'Protocol',
-    items: [
-      { file: 'protocol/overview.md', label: 'Protocol Overview', description: 'Services, characteristics, and data streams.' },
-      { file: 'protocol/gatt-map.md', label: 'GATT Map', description: 'Polar service and characteristic layout.' },
-      { file: 'protocol/pmd-commands.md', label: 'PMD Commands', description: 'Control point request and response flow.' },
-      { file: 'protocol/ecg-format.md', label: 'ECG Format', description: 'Frame structure and unit decoding.' },
-      { file: 'protocol/acc-format.md', label: 'ACC Format', description: 'Accelerometer compression and scaling.' },
-      { file: 'protocol/hr-measurement.md', label: 'HR Measurement', description: 'Heart rate and RR parsing.' }
-    ]
-  },
-  {
-    title: 'Support',
-    items: [
-      { file: 'platform-guides/index.md', label: 'Platform Guides', description: 'Windows-specific BLE and runtime notes.' },
-      { file: 'references.md', label: 'References', description: 'Source material and research links.' }
-    ]
+    group: 'Internals',
+    order: 999,
+    label: siteConfig.diagramViewerLabel,
+    description: siteConfig.diagramViewerDescription,
+    target: 'diagrams/viewer.html'
   }
 ];
 
-await fs.rm(siteRoot, { recursive: true, force: true });
-await fs.mkdir(siteRoot, { recursive: true });
-await fs.mkdir(referenceRoot, { recursive: true });
-await copyDir(assetsSource, path.join(siteRoot, 'assets'));
-await copyDir(diagramsSource, path.join(siteRoot, 'diagrams'));
-await fs.writeFile(path.join(siteRoot, '.nojekyll'), '', 'utf8');
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
 
-const markdownFiles = await collectMarkdownFiles(docsRoot);
-for (const filePath of markdownFiles) {
-  const rel = path.relative(docsRoot, filePath).replace(/\\/g, '/');
-  const outPath = path.join(referenceRoot, rel.replace(/\.md$/i, '.html'));
-  await fs.mkdir(path.dirname(outPath), { recursive: true });
-  const markdown = await fs.readFile(filePath, 'utf8');
-  const title = extractTitle(markdown) ?? rel.replace(/\.md$/i, '');
-  const html = renderMarkdown(markdown, rel);
-  const currentOutDir = path.dirname(path.relative(siteRoot, outPath)).replace(/\\/g, '/');
-  await fs.writeFile(outPath, renderPage({
-    title,
-    bodyClass: 'doc-page',
-    navKey: 'reference',
-    pageTitle: title,
-    pageIntro: rel === 'index.md'
-      ? 'Start with the app surfaces and operator flow, then drill into protocol, diagnostics, and Mermaid system maps when you need internals.'
-      : null,
-    sidebar: renderSidebar(rel),
-    content: `<article class="prose">${html}</article>`,
-    currentDir: currentOutDir
-  }), 'utf8');
+async function main() {
+  const docs = await loadDocs();
+  const diagramManifest = await loadDiagramManifest();
+
+  await fs.rm(siteRoot, { recursive: true, force: true });
+  await fs.mkdir(referenceRoot, { recursive: true });
+  await copyDir(assetsSource, path.join(siteRoot, 'assets'));
+  await copyDir(diagramsSource, path.join(siteRoot, 'diagrams'));
+  await fs.writeFile(path.join(siteRoot, '.nojekyll'), '', 'utf8');
+  await fs.writeFile(
+    path.join(siteRoot, 'diagrams', 'manifest.json'),
+    JSON.stringify(transformDiagramManifestForSite(diagramManifest), null, 2),
+    'utf8'
+  );
+  await finalizeDiagramViewerPage();
+
+  for (const doc of docs) {
+    const html = renderMarkdown(doc.renderBody, doc.sourceRel);
+    const outPath = path.join(siteRoot, doc.outRel);
+    await fs.mkdir(path.dirname(outPath), { recursive: true });
+    await fs.writeFile(outPath, renderDocPage(doc, docs), 'utf8');
+  }
+
+  await fs.writeFile(path.join(siteRoot, 'index.html'), renderHomePage(), 'utf8');
+  await fs.writeFile(path.join(siteRoot, '404.html'), render404Page(), 'utf8');
+  await fs.writeFile(path.join(siteRoot, 'site.webmanifest'), JSON.stringify(renderWebManifest(), null, 2), 'utf8');
+  await fs.writeFile(path.join(siteRoot, 'sitemap.xml'), renderSitemap(docs), 'utf8');
+  await fs.writeFile(path.join(siteRoot, 'robots.txt'), renderRobotsTxt(), 'utf8');
+
+  console.log(`Built GitHub Pages site at ${siteRoot}`);
 }
 
-await fs.writeFile(path.join(siteRoot, 'index.html'), renderHomePage(), 'utf8');
-await fs.writeFile(path.join(siteRoot, '404.html'), render404Page(), 'utf8');
-console.log(`Built GitHub Pages site at ${siteRoot}`);
+async function loadDocs() {
+  const markdownFiles = await collectMarkdownFiles(docsRoot);
+  const docs = [];
 
-function renderMarkdown(markdown, sourceRel) {
-  const renderer = new marked.Renderer();
-  renderer.link = ({ href, title, text }) => {
-    const safeHref = href ? rewriteHref(href, sourceRel) : '#';
-    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
-    return `<a href="${escapeHtml(safeHref)}"${titleAttr}>${text}</a>`;
-  };
-  renderer.image = ({ href, title, text }) => {
-    const safeHref = href ? rewriteHref(href, sourceRel) : '';
-    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
-    const alt = text ? escapeHtml(text) : '';
-    return `<img src="${escapeHtml(safeHref)}" alt="${alt}"${titleAttr} />`;
-  };
+  for (const filePath of markdownFiles) {
+    const sourceRel = path.relative(docsRoot, filePath).replace(/\\/g, '/');
+    const raw = await fs.readFile(filePath, 'utf8');
+    const stat = await fs.stat(filePath);
+    const { data, body } = parseFrontmatter(raw);
+    const { heading, markdown } = stripLeadingH1(body);
+    const title = heading ?? normalizeString(data.title) ?? deriveTitle(sourceRel);
+    const summary = normalizeString(data.summary);
+    const description = normalizeString(data.description) ?? summary ?? siteConfig.defaultDescription;
+    const navLabel = normalizeString(data.nav_label) ?? title;
+    const navGroup = toBoolean(data.hide_in_nav)
+      ? null
+      : normalizeString(data.nav_group) ?? inferNavGroup(sourceRel);
+    const navOrder = toNumber(data.nav_order) ?? inferNavOrder(sourceRel);
 
-  marked.setOptions({
-    gfm: true,
-    breaks: false,
-    renderer
+    docs.push({
+      sourceRel,
+      outRel: `reference/${sourceRel.replace(/\.md$/i, '.html')}`,
+      title,
+      summary,
+      description,
+      navLabel,
+      navGroup,
+      navOrder,
+      renderBody: markdown.trimStart(),
+      updatedAt: stat.mtime.toISOString()
+    });
+  }
+
+  return docs.sort((left, right) => {
+    const leftGroup = groupRank(left.navGroup);
+    const rightGroup = groupRank(right.navGroup);
+    if (leftGroup !== rightGroup) {
+      return leftGroup - rightGroup;
+    }
+
+    if (left.navOrder !== right.navOrder) {
+      return left.navOrder - right.navOrder;
+    }
+
+    return left.navLabel.localeCompare(right.navLabel);
+  });
+}
+
+async function loadDiagramManifest() {
+  const raw = await fs.readFile(diagramManifestPath, 'utf8');
+  return JSON.parse(raw);
+}
+
+async function finalizeDiagramViewerPage() {
+  const viewerPath = path.join(siteRoot, 'diagrams', 'viewer.html');
+  const raw = await fs.readFile(viewerPath, 'utf8');
+  const head = renderHead({
+    title: `${siteConfig.diagramViewerLabel} | ${siteConfig.referenceTitle}`,
+    description: siteConfig.diagramViewerDescription,
+    currentDir: 'diagrams',
+    canonicalPath: 'diagrams/viewer.html'
   });
 
-  return marked.parse(markdown);
+  const next = raw.replace(/<head>[\s\S]*?<\/head>/i, `<head>\n${head}\n</head>`);
+  await fs.writeFile(viewerPath, next, 'utf8');
 }
 
-function rewriteHref(href, sourceRel) {
-  if (/^(https?:|mailto:|#)/i.test(href)) {
-    return href;
-  }
-
-  const [rawPath, rawHash] = href.split('#');
-  const hash = rawHash ? `#${rawHash}` : '';
-  const sourceDir = path.posix.dirname(sourceRel);
-  const resolved = path.posix.normalize(path.posix.join(sourceDir, rawPath));
-
-  if (resolved.endsWith('.md')) {
-    const currentDir = path.posix.join('reference', path.posix.dirname(sourceRel));
-    const targetPath = path.posix.join('reference', resolved.replace(/\.md$/i, '.html'));
-    let relativeHref = path.posix.relative(currentDir, targetPath);
-    if (!relativeHref) {
-      relativeHref = path.posix.basename(targetPath);
-    }
-    return relativeHref + hash;
-  }
-
-  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/')) {
-    const currentDir = path.posix.join('reference', path.posix.dirname(sourceRel));
-    let relativeHref = path.posix.relative(currentDir, resolved);
-    if (!relativeHref) {
-      relativeHref = path.posix.basename(resolved);
-    }
-    return relativeHref + hash;
-  }
-
-  return href + hash;
+function transformDiagramManifestForSite(manifest) {
+  return {
+    ...manifest,
+    diagrams: manifest.diagrams.map((diagram) => ({
+      ...diagram,
+      relatedDocs: Array.isArray(diagram.relatedDocs)
+        ? diagram.relatedDocs.map(toBuiltDocHrefFromDiagram)
+        : []
+    }))
+  };
 }
 
-function renderPage({ title, bodyClass, navKey, pageTitle, pageIntro, sidebar, content, currentDir }) {
-  const toRoot = currentDir && currentDir !== '.' ? path.posix.relative(currentDir, '.') || '.' : '.';
-  const asset = (target) => path.posix.join(toRoot, target).replace(/\\/g, '/');
-  const homeHref = asset('index.html');
-  const topNav = renderTopNav(navKey, homeHref, asset('reference/index.html'), asset('diagrams/viewer.html'));
+function toBuiltDocHrefFromDiagram(relativeDocPath) {
+  const normalized = path.posix.normalize(path.posix.join('diagrams', relativeDocPath));
+  const docPath = normalized.replace(/^diagrams\//, '');
+  const target = `reference/${docPath.replace(/\.md$/i, '.html')}`;
+  return path.posix.relative('diagrams', target) || path.posix.basename(target);
+}
+
+function renderDocPage(doc, docs) {
+  const currentDir = path.posix.dirname(doc.outRel);
+  const asset = createAssetHelper(currentDir);
+  const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset('diagrams/viewer.html'));
+  const sidebar = renderSidebar(doc, docs);
+  const articleHtml = renderMarkdown(doc.renderBody, doc.sourceRel);
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(title)} | PolarH10 Unofficial Open-Source Reference</title>
-  <meta name="description" content="Unofficial open-source PolarH10 reference docs and architecture diagrams. Not endorsed by or affiliated with Polar Electro Oy." />
-  <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
+${renderHead({
+  title: `${doc.title} | ${siteConfig.referenceTitle}`,
+  description: doc.description,
+  currentDir,
+  canonicalPath: doc.outRel,
+  includeSearch: true,
+  updatedAt: doc.updatedAt
+})}
 </head>
-<body class="${bodyClass}">
+<body class="doc-page">
   ${renderArt()}
   <div class="site-shell">
-    ${renderHeader(topNav, homeHref)}
+    ${renderHeader(topNav, asset('index.html'))}
     <div class="page-layout">
-      <aside class="panel sidebar">
+      <aside class="panel sidebar" data-pagefind-ignore>
         ${sidebar}
       </aside>
       <main class="panel content-panel">
-        <div class="eyebrow">Unofficial Open-Source Reference</div>
-        <h1 class="page-title">${escapeHtml(pageTitle)}</h1>
-        ${pageIntro ? `<p class="page-intro">${escapeHtml(pageIntro)}</p>` : ''}
-        ${content}
+        <div class="page-marker">Unofficial Open-Source Reference</div>
+        <h1 class="page-title" data-pagefind-meta="title">${escapeHtml(doc.title)}</h1>
+        ${doc.summary ? `<p class="page-intro">${escapeHtml(doc.summary)}</p>` : ''}
+        <article class="prose" data-pagefind-body>
+          ${articleHtml}
+        </article>
       </main>
     </div>
     ${renderFooter()}
   </div>
+  ${renderSearchBoot(asset)}
 </body>
 </html>`;
 }
 
 function renderHomePage() {
   const topNav = renderTopNav('home', 'index.html', 'reference/index.html', 'diagrams/viewer.html');
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PolarH10 Unofficial Open-Source Telemetry Toolkit</title>
-  <meta name="description" content="Unofficial open-source PolarH10 telemetry monitor with multi-strap parallel tracking, CLI capture tooling, protocol docs, and Mermaid system maps. Not endorsed by or affiliated with Polar Electro Oy." />
-  <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
+${renderHead({
+  title: siteConfig.homeTitle,
+  description: siteConfig.sharedPromise,
+  currentDir: '.',
+  canonicalPath: 'index.html'
+})}
 </head>
 <body>
   ${renderArt()}
@@ -188,148 +225,122 @@ function renderHomePage() {
     ${renderHeader(topNav, 'index.html')}
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
-        <div class="eyebrow">Unofficial Open-Source Research Toolkit</div>
-        <h1>Scan.<br />Link.<br />Stream.<br />Record.</h1>
-        <p>
-          PolarH10 is a Windows-native toolchain for the Polar H10 chest strap. The WPF app and CLI let you
-          discover nearby straps over BLE/GATT, inspect live HR, ECG, and ACC data, run diagnostics before capture,
-          compare multiple active straps in parallel, and record reusable sessions without depending on Polar&apos;s
-          mobile SDK at runtime.
-        </p>
+        <div class="page-marker">Windows-first Polar H10 toolkit</div>
+        <h1>Scan.<br />Link.<br />Inspect.<br />Record.</h1>
+        <p>${escapeHtml(siteConfig.sharedPromise)}</p>
         <div class="action-row">
-          <a class="button primary" href="reference/app-overview.html">Open App Overview</a>
-          <a class="button primary" href="reference/getting-started.html">Get Started</a>
-          <a class="button" href="reference/ui-preview.html">View WPF UI</a>
-          <a class="button" href="diagrams/viewer.html">System Maps</a>
-        </div>
-        <div class="stats">
-          <div class="stat tone-cool"><strong>Live telemetry</strong><span>HR · RR · ECG · ACC with parallel multi-strap charting in the WPF monitor.</span></div>
-          <div class="stat tone-violet"><strong>Research workflow</strong><span>Keep one selected control target while tracking multiple active straps in parallel.</span></div>
-          <div class="stat tone-warm"><strong>Capture path</strong><span>CSV + JSONL session export, replay, and manifests.</span></div>
-          <div class="stat tone-signal"><strong>System maps</strong><span>4 Mermaid diagrams covering repo, architecture, flow, and lifecycle.</span></div>
+          <a class="button primary" href="reference/app-overview.html">Use the WPF app</a>
+          <a class="button primary" href="reference/cli.html">Use the CLI</a>
+          <a class="button" href="reference/first-recording.html">First recording</a>
+          <a class="button" href="reference/protocol/overview.html">Protocol guide</a>
         </div>
       </div>
       <aside class="panel hero-preview">
-        <div class="eyebrow">Reference App // Operator View</div>
-        <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview" />
+        <h2 class="section-heading">Choose your path</h2>
         <ul class="note-list feature-list">
           <li>
-            <strong>Device control</strong>
-            <p>Scan nearby straps, assign aliases, and keep a clear selected control target for connect, record, and diagnostics.</p>
+            <strong>WPF operator flow</strong>
+            <p>Scan nearby straps, connect one or more devices, inspect live telemetry, review coherence or breathing-dynamics entropy when ready, and capture a reusable session from the desktop app.</p>
           </li>
           <li>
-            <strong>Parallel tracking</strong>
-            <p>Use the tracked-device dropdown to follow the selected strap or pin multiple active Polar H10 units into the live charts.</p>
+            <strong>CLI diagnostics</strong>
+            <p>Run <code>scan</code>, <code>doctor</code>, <code>monitor</code>, <code>record</code>, <code>replay</code>, and <code>sessions</code> when you want a direct, scriptable path without the UI.</p>
           </li>
           <li>
-            <strong>Diagnostics + capture</strong>
-            <p>Use doctor-style validation, runtime logs, and direct recording flows before you commit to a longer session.</p>
+            <strong>Library + protocol study</strong>
+            <p>Use the protocol reference, diagrams, and transport notes when you need to understand PMD, GATT, decoding, and recording internals.</p>
           </li>
         </ul>
+        <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview" />
       </aside>
     </section>
 
     <section class="section panel section-panel">
       <h2 class="section-heading">First Session Path</h2>
-      <p class="section-subtitle">The shortest route from a strap on your desk to usable telemetry on Windows.</p>
+      <p class="section-subtitle">The shortest route from a strap on your desk to saved telemetry on Windows.</p>
       <div class="step-grid">
         <div class="step-card tone-cool">
           <div class="step-no">01</div>
           <h3>Scan nearby straps</h3>
-          <p>Find advertisements, check addresses and aliases, and confirm that the intended H10 is actually visible.</p>
+          <p>Find the intended H10, confirm the Bluetooth address, and decide whether you want the WPF app or the CLI for the session.</p>
         </div>
         <div class="step-card tone-violet">
           <div class="step-no">02</div>
-          <h3>Open the link</h3>
-          <p>Connect over GATT, verify the service surface, and negotiate PMD settings before you trust the stream.</p>
+          <h3>Connect and validate</h3>
+          <p>Open the BLE/GATT link, confirm HR plus ACC are live, and use the diagnostics path before you trust a long capture.</p>
         </div>
         <div class="step-card tone-signal">
           <div class="step-no">03</div>
-          <h3>Inspect live data</h3>
-          <p>Use the WPF monitor for charts and diagnostics, or pin multiple straps into the live charts when you need side-by-side comparison.</p>
+          <h3>Inspect the live stream</h3>
+          <p>Check HR, ECG, and ACC in the app or terminal, open coherence once RR is stable, and open breathing dynamics only after breathing calibration is already live.</p>
         </div>
         <div class="step-card tone-warm">
           <div class="step-no">04</div>
-          <h3>Capture and replay</h3>
-          <p>Write HR, ECG, ACC, and protocol logs to disk, then replay those sessions when you need deterministic review.</p>
+          <h3>Record and replay</h3>
+          <p>Write <code>session.json</code>, CSV sensor output, and <code>protocol.jsonl</code>, then replay or review the capture without hardware attached.</p>
         </div>
       </div>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">What The App Gives You</h2>
-      <p class="section-subtitle">This repo is most useful when you read it as an operator tool and a protocol reference at the same time.</p>
-      <div class="card-grid feature-grid">
-        <a class="path-card tone-cool" href="reference/app-overview.html">
-          <div class="kicker">App surface</div>
-          <h3>Operator overview</h3>
-          <p>See how the WPF monitor is structured and what each major panel, tab, and diagnostic area is for.</p>
-        </a>
-        <a class="path-card tone-signal" href="reference/ui-preview.html">
-          <div class="kicker">Live UI</div>
-          <h3>Telemetry monitor</h3>
-          <p>Review the current WPF visual system, tracked-device workflow, and chart treatment before you dive into code.</p>
-        </a>
-        <a class="path-card tone-warm" href="reference/cli.html">
-          <div class="kicker">Direct control</div>
-          <h3>CLI diagnostics</h3>
-          <p>Use scan, doctor, record, replay, and stream commands when you want a precise, scriptable path.</p>
-        </a>
-        <a class="path-card tone-violet" href="reference/protocol/overview.html">
-          <div class="kicker">Wire format</div>
-          <h3>Protocol reference</h3>
-          <p>Cross-check services, control points, and frame formats once the app flow makes sense.</p>
-        </a>
-      </div>
-    </section>
-
-    <section class="section panel section-panel">
-      <h2 class="section-heading">System Maps</h2>
-      <p class="section-subtitle">Use the diagrams after the app overview. They are there to explain roles, boundaries, and runtime paths, not to replace onboarding.</p>
-      <div class="preview-grid">
-        <a class="preview-card tone-violet" href="diagrams/viewer.html#repo-structure">
-          <div class="meta">Repository structure</div>
-          <h3>What belongs where</h3>
-          <p>Use this when you need to understand how protocol, app, tooling, docs, and test projects are split.</p>
-          <img src="diagrams/repo-structure.svg" alt="Repository structure diagram" />
-        </a>
-        <a class="preview-card tone-cool" href="diagrams/viewer.html#code-architecture">
-          <div class="meta">Code architecture</div>
-          <h3>How runtime roles fit together</h3>
-          <p>Maps protocol decoders, Windows BLE transport, orchestration, recording, and the user-facing surfaces.</p>
-          <img src="diagrams/code-architecture.svg" alt="Code architecture diagram" />
-        </a>
-        <a class="preview-card tone-warm" href="diagrams/viewer.html#session-lifecycle">
-          <div class="meta">Runtime lifecycle</div>
-          <h3>What a real session does</h3>
-          <p>Follow the route from discovery to PMD start, live telemetry, recording, diagnostics, and teardown.</p>
-          <img src="diagrams/session-lifecycle.svg" alt="Session lifecycle diagram" />
-        </a>
-      </div>
-    </section>
-
-    <section class="section panel section-panel">
-      <h2 class="section-heading">Reference Paths</h2>
+      <h2 class="section-heading">Docs That Matter First</h2>
       <div class="card-grid">
         <a class="path-card tone-cool" href="reference/getting-started.html">
-          <div class="kicker">Build + run</div>
           <h3>Getting Started</h3>
-          <p>Environment prerequisites, first build, and live-device verification.</p>
+          <p>Real clone URL, prerequisites, first build, and the safest path to a successful local run.</p>
         </a>
-        <a class="path-card tone-signal" href="reference/app-overview.html">
-          <div class="kicker">Operator model</div>
-          <h3>App Overview</h3>
-          <p>Start here if you need to understand what the app is doing before you read the lower-level docs.</p>
+        <a class="path-card tone-cool" href="reference/first-recording.html">
+          <h3>First Recording</h3>
+          <p>The first end-to-end WPF and CLI session, including what to save and how to verify the result.</p>
         </a>
-        <a class="path-card tone-warm" href="reference/ui-preview.html">
-          <div class="kicker">Visual system</div>
-          <h3>WPF UI Preview</h3>
-          <p>Review the current monitor shell, multi-device tracking controls, telemetry layout, and chart language in one page.</p>
+        <a class="path-card tone-cool" href="reference/coherence-workflow.html">
+          <h3>Coherence Workflow</h3>
+          <p>Use the RR-derived coherence window, understand the warmup phase, and read confidence instead of trusting a raw number too early.</p>
         </a>
-        <a class="path-card tone-violet" href="reference/cli.html">
-          <div class="kicker">Command surface</div>
-          <h3>CLI Reference</h3>
-          <p>Scan, doctor, record, replay, and sessions command behavior.</p>
+        <a class="path-card tone-violet" href="reference/breathing-dynamics-workflow.html">
+          <h3>Breathing Dynamics Workflow</h3>
+          <p>Use the dedicated interval and amplitude entropy window once breathing calibration is already stable.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/output-formats.html">
+          <h3>Output Formats</h3>
+          <p>What each capture file contains, how session folders are named, and when <code>run.json</code> appears.</p>
+        </a>
+        <a class="path-card tone-warm" href="reference/troubleshooting.html">
+          <h3>Troubleshooting</h3>
+          <p>Fix the common failure cases first: hidden devices, Windows BLE access issues, stale streams, and blocked app launch.</p>
+        </a>
+        <a class="path-card tone-signal" href="reference/cli.html">
+          <h3>CLI Guide</h3>
+          <p>Command-focused workflows for scanning, recording, replaying, and doctor-style validation.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/protocol/overview.html">
+          <h3>Protocol Internals</h3>
+          <p>PMD service layout, measurement formats, and lower-level notes once the operator path already makes sense.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section panel section-panel">
+      <h2 class="section-heading">Diagram Viewer</h2>
+      <p class="section-subtitle">Use the onboarding diagrams first, then move into the runtime and architecture maps when you need deeper internals.</p>
+      <div class="preview-grid">
+        <a class="preview-card tone-cool" href="diagrams/viewer.html#choose-your-path">
+          <div class="meta">Onboarding</div>
+          <h3>Choose your path</h3>
+          <p>Pick the WPF, CLI, or protocol route based on whether you need raw telemetry only or the new derived coherence and entropy views.</p>
+          <img src="diagrams/choose-your-path.svg" alt="Choose your path diagram" />
+        </a>
+        <a class="preview-card tone-warm" href="diagrams/viewer.html#first-session-flow">
+          <div class="meta">Onboarding</div>
+          <h3>First session flow</h3>
+          <p>See the scan, connect, inspect, record, and replay loop before you drop into code or protocol details.</p>
+          <img src="diagrams/first-session-flow.svg" alt="First session flow diagram" />
+        </a>
+        <a class="preview-card tone-violet" href="diagrams/viewer.html#code-architecture">
+          <div class="meta">Architecture</div>
+          <h3>Code architecture</h3>
+          <p>Map protocol decoders, Windows BLE transport, orchestration, recording, and the operator surfaces.</p>
+          <img src="diagrams/code-architecture.svg" alt="Code architecture diagram" />
         </a>
       </div>
     </section>
@@ -342,14 +353,17 @@ function renderHomePage() {
 
 function render404Page() {
   const topNav = renderTopNav('', 'index.html', 'reference/index.html', 'diagrams/viewer.html');
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>404 | PolarH10 Unofficial Open-Source Reference</title>
-  <meta name="description" content="This unofficial PolarH10 reference page could not be found." />
-  <link rel="stylesheet" href="assets/site.css?v=${assetVersion}" />
+${renderHead({
+  title: `404 | ${siteConfig.referenceTitle}`,
+  description: 'This unofficial PolarH10 reference page could not be found.',
+  currentDir: '.',
+  canonicalPath: '404.html',
+  noIndex: true
+})}
 </head>
 <body>
   ${renderArt()}
@@ -371,18 +385,92 @@ function render404Page() {
 </html>`;
 }
 
-function renderSidebar(currentRel) {
-  const groups = docGroups.map((group) => {
+function renderHead({ title, description, currentDir, canonicalPath, includeSearch = false, updatedAt = null, noIndex = false }) {
+  const asset = createAssetHelper(currentDir);
+  const canonicalUrl = absoluteUrl(canonicalPath);
+  const socialImage = absoluteUrl(siteConfig.socialImage);
+
+  return `  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(title)}</title>
+  <meta name="description" content="${escapeHtml(description)}" />
+  <meta name="theme-color" content="${siteConfig.themeColor}" />
+  ${noIndex ? '<meta name="robots" content="noindex" />' : ''}
+  ${updatedAt ? `<meta property="article:modified_time" content="${escapeHtml(updatedAt)}" />` : ''}
+  <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
+  <link rel="icon" href="${asset(siteConfig.favicon)}" />
+  <link rel="apple-touch-icon" href="${asset(siteConfig.favicon)}" />
+  <link rel="manifest" href="${asset('site.webmanifest')}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="${escapeHtml(siteConfig.siteName)}" />
+  <meta property="og:title" content="${escapeHtml(title)}" />
+  <meta property="og:description" content="${escapeHtml(description)}" />
+  <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />
+  <meta property="og:image" content="${escapeHtml(socialImage)}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${escapeHtml(title)}" />
+  <meta name="twitter:description" content="${escapeHtml(description)}" />
+  <meta name="twitter:image" content="${escapeHtml(socialImage)}" />
+  <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
+  ${includeSearch ? `<link rel="stylesheet" href="${asset('pagefind/pagefind-ui.css')}" />` : ''}`;
+}
+
+function renderSidebar(currentDoc, docs) {
+  const groups = buildNavGroups(currentDoc, docs).map((group) => {
     const items = group.items.map((item) => {
-      const href = item.href ?? toReferenceHref(item.file, currentRel);
-      const isActive = item.file === currentRel;
-      return `<a class="${isActive ? 'nav-item active' : 'nav-item'}" href="${href}"><strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(item.description)}</span></a>`;
+      const isActive = item.isActive ? ' active' : '';
+      return `<a class="nav-item${isActive}" href="${escapeHtml(item.href)}"><strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(item.description)}</span></a>`;
     }).join('');
 
-    return `<section><div class="category-label">${escapeHtml(group.title)}</div>${items}</section>`;
+    return `<section><h2 class="category-heading">${escapeHtml(group.title)}</h2>${items}</section>`;
   }).join('');
 
-  return `<h2>Documentation</h2><p>Read the app surfaces first, then move into protocol detail, diagnostics, and Mermaid system maps.</p>${groups}`;
+  return `<section class="search-panel">
+    <h2>Search docs</h2>
+    <p>Find commands, file formats, and protocol notes without digging through the repo tree.</p>
+    <div id="pagefind-search"></div>
+  </section>
+  ${groups}`;
+}
+
+function buildNavGroups(currentDoc, docs) {
+  const currentDir = path.posix.dirname(currentDoc.outRel);
+  const groups = [];
+
+  for (const groupName of siteConfig.navGroups) {
+    const docItems = docs
+      .filter((doc) => doc.navGroup === groupName)
+      .map((doc) => ({
+        label: doc.navLabel,
+        description: doc.description,
+        href: relativeHref(currentDir, doc.outRel),
+        order: doc.navOrder,
+        isActive: doc.sourceRel === currentDoc.sourceRel
+      }));
+
+    const extraItems = specialNavItems
+      .filter((item) => item.group === groupName)
+      .map((item) => ({
+        label: item.label,
+        description: item.description,
+        href: relativeHref(currentDir, item.target),
+        order: item.order,
+        isActive: false
+      }));
+
+    const items = [...docItems, ...extraItems].sort((left, right) => {
+      if (left.order !== right.order) {
+        return left.order - right.order;
+      }
+      return left.label.localeCompare(right.label);
+    });
+
+    if (items.length > 0) {
+      groups.push({ title: groupName, items });
+    }
+  }
+
+  return groups;
 }
 
 function renderTopNav(activeKey, homeHref, docsHref, diagramsHref) {
@@ -390,7 +478,7 @@ function renderTopNav(activeKey, homeHref, docsHref, diagramsHref) {
     { key: 'home', label: 'Home', href: homeHref },
     { key: 'reference', label: 'Docs', href: docsHref },
     { key: 'diagrams', label: 'Diagrams', href: diagramsHref },
-    { key: 'repo', label: 'GitHub', href: repoUrl }
+    { key: 'repo', label: 'GitHub', href: siteConfig.repoUrl }
   ];
 
   return items.map((item) => {
@@ -400,17 +488,17 @@ function renderTopNav(activeKey, homeHref, docsHref, diagramsHref) {
 }
 
 function renderHeader(topNav, homeHref) {
-  return `<header class="site-header">
+  return `<header class="site-header" data-pagefind-ignore>
     <a class="brand" href="${homeHref}">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-copy"><small>Unofficial Open-Source Toolkit</small><strong>PolarH10</strong></span>
+      <span class="brand-copy"><strong>${siteConfig.siteName}</strong><span>Unofficial Open-Source Toolkit</span></span>
     </a>
     <nav class="top-nav" aria-label="Primary">${topNav}</nav>
   </header>`;
 }
 
 function renderFooter() {
-  return `<footer class="footer">PolarH10 WPF monitor, CLI capture tooling, protocol docs, and Mermaid system maps. Unofficial open-source reference build; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
+  return `<footer class="footer" data-pagefind-ignore>PolarH10 WPF monitor, CLI capture tooling, protocol docs, and Mermaid system maps. Unofficial open-source reference build; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
 }
 
 function renderArt() {
@@ -426,19 +514,296 @@ function renderArt() {
   </div>`;
 }
 
-function toReferenceHref(file, currentRel) {
-  const currentDir = path.posix.dirname(currentRel);
-  const target = file.replace(/\.md$/i, '.html');
-  let href = path.posix.relative(currentDir, target);
-  if (!href) {
-    href = path.posix.basename(target);
-  }
-  return href;
+function renderSearchBoot(asset) {
+  const jsHref = asset('pagefind/pagefind-ui.js');
+
+  return `<script src="${jsHref}"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const mount = document.getElementById('pagefind-search');
+    if (!mount || typeof window.PagefindUI !== 'function') {
+      return;
+    }
+
+    new window.PagefindUI({
+      element: '#pagefind-search',
+      showImages: false,
+      resetStyles: false,
+      excerptLength: 18,
+      showSubResults: true
+    });
+  });
+</script>`;
 }
 
-function extractTitle(markdown) {
-  const match = markdown.match(/^#\s+(.+)$/m);
-  return match ? match[1].trim() : null;
+function renderWebManifest() {
+  return {
+    name: siteConfig.homeTitle,
+    short_name: siteConfig.siteName,
+    start_url: `${siteConfig.baseUrl}index.html`,
+    display: 'standalone',
+    background_color: siteConfig.themeColor,
+    theme_color: siteConfig.themeColor,
+    icons: [
+      {
+        src: absoluteUrl(siteConfig.favicon),
+        sizes: '512x512',
+        type: 'image/png'
+      }
+    ]
+  };
+}
+
+function renderSitemap(docs) {
+  const pages = [
+    { path: 'index.html', lastmod: new Date().toISOString() },
+    { path: 'reference/index.html', lastmod: docs.find((doc) => doc.sourceRel === 'index.md')?.updatedAt ?? new Date().toISOString() },
+    { path: 'diagrams/viewer.html', lastmod: new Date().toISOString() },
+    ...docs.map((doc) => ({ path: doc.outRel, lastmod: doc.updatedAt }))
+  ];
+
+  const uniquePages = dedupeBy(pages, (page) => page.path);
+  const urls = uniquePages.map((page) => `  <url>
+    <loc>${escapeHtml(absoluteUrl(page.path))}</loc>
+    <lastmod>${escapeHtml(page.lastmod)}</lastmod>
+  </url>`).join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+}
+
+function renderRobotsTxt() {
+  return `User-agent: *
+Allow: /
+Sitemap: ${absoluteUrl('sitemap.xml')}
+`;
+}
+
+function renderMarkdown(markdown, sourceRel) {
+  const renderer = new marked.Renderer();
+  renderer.link = ({ href, title, text }) => {
+    const safeHref = href ? rewriteHref(href, sourceRel) : '#';
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    return `<a href="${escapeHtml(safeHref)}"${titleAttr}>${text}</a>`;
+  };
+  renderer.image = ({ href, title, text }) => {
+    const safeHref = href ? rewriteHref(href, sourceRel) : '';
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    const alt = text ? escapeHtml(text) : '';
+    return `<img src="${escapeHtml(safeHref)}" alt="${alt}"${titleAttr} />`;
+  };
+
+  return marked.parse(markdown, {
+    gfm: true,
+    breaks: false,
+    renderer
+  });
+}
+
+function rewriteHref(href, sourceRel) {
+  if (/^(https?:|mailto:|tel:|#)/i.test(href)) {
+    return href;
+  }
+
+  const [rawPath, rawHash] = href.split('#');
+  const hash = rawHash ? `#${rawHash}` : '';
+  const sourceDir = path.posix.dirname(sourceRel);
+  const resolved = path.posix.normalize(path.posix.join(sourceDir, rawPath));
+
+  if (resolved.endsWith('.md')) {
+    const target = `reference/${resolved.replace(/\.md$/i, '.html')}`;
+    return relativeHref(`reference/${sourceDir}`, target) + hash;
+  }
+
+  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/')) {
+    return relativeHref(`reference/${sourceDir}`, resolved) + hash;
+  }
+
+  return href + hash;
+}
+
+function createAssetHelper(currentDir) {
+  const toRoot = currentDir && currentDir !== '.'
+    ? path.posix.relative(currentDir, '.') || '.'
+    : '.';
+
+  return (target) => path.posix.join(toRoot, target).replace(/\\/g, '/');
+}
+
+function absoluteUrl(sitePath) {
+  return new URL(sitePath, siteConfig.baseUrl).toString();
+}
+
+function relativeHref(fromDir, targetPath) {
+  let href = path.posix.relative(fromDir, targetPath);
+  if (!href) {
+    href = path.posix.basename(targetPath);
+  }
+  return href.replace(/\\/g, '/');
+}
+
+function parseFrontmatter(raw) {
+  if (!raw.startsWith('---\n') && !raw.startsWith('---\r\n')) {
+    return { data: {}, body: raw };
+  }
+
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match) {
+    return { data: {}, body: raw };
+  }
+
+  const data = {};
+  for (const line of match[1].split(/\r?\n/)) {
+    if (!line.trim() || line.trimStart().startsWith('#')) {
+      continue;
+    }
+
+    const separator = line.indexOf(':');
+    if (separator === -1) {
+      continue;
+    }
+
+    const key = line.slice(0, separator).trim();
+    const rawValue = line.slice(separator + 1).trim();
+    data[key] = parseFrontmatterValue(rawValue);
+  }
+
+  return {
+    data,
+    body: raw.slice(match[0].length)
+  };
+}
+
+function parseFrontmatterValue(rawValue) {
+  if (!rawValue) {
+    return '';
+  }
+
+  if ((rawValue.startsWith('"') && rawValue.endsWith('"')) || (rawValue.startsWith("'") && rawValue.endsWith("'"))) {
+    return rawValue.slice(1, -1);
+  }
+
+  if (/^(true|false)$/i.test(rawValue)) {
+    return rawValue.toLowerCase() === 'true';
+  }
+
+  if (/^-?\d+(\.\d+)?$/.test(rawValue)) {
+    return Number(rawValue);
+  }
+
+  return rawValue;
+}
+
+function stripLeadingH1(markdown) {
+  const trimmed = markdown.replace(/^\uFEFF/, '');
+  const match = trimmed.match(/^\s*#\s+(.+?)\s*(?:\r?\n|$)/);
+
+  if (!match) {
+    return { heading: null, markdown: trimmed };
+  }
+
+  return {
+    heading: match[1].trim(),
+    markdown: trimmed.slice(match[0].length).replace(/^\s+/, '')
+  };
+}
+
+function inferNavGroup(sourceRel) {
+  if (
+    sourceRel === 'index.md' ||
+    sourceRel === 'app-overview.md' ||
+    sourceRel === 'getting-started.md' ||
+    sourceRel === 'cli.md' ||
+    sourceRel === 'ui-preview.md'
+  ) {
+    return 'Start Here';
+  }
+
+  if (
+    sourceRel === 'first-recording.md' ||
+    sourceRel === 'breathing-workflow.md' ||
+    sourceRel === 'output-formats.md'
+  ) {
+    return 'Task Guides';
+  }
+
+  if (
+    sourceRel === 'troubleshooting.md' ||
+    sourceRel === 'faq.md' ||
+    sourceRel.startsWith('platform-guides/')
+  ) {
+    return 'Troubleshooting';
+  }
+
+  return 'Internals';
+}
+
+function inferNavOrder(sourceRel) {
+  const orderMap = new Map([
+    ['index.md', 10],
+    ['app-overview.md', 20],
+    ['getting-started.md', 30],
+    ['cli.md', 40],
+    ['ui-preview.md', 50],
+    ['first-recording.md', 10],
+    ['breathing-workflow.md', 20],
+    ['output-formats.md', 30],
+    ['troubleshooting.md', 10],
+    ['faq.md', 20],
+    ['platform-guides/index.md', 30],
+    ['protocol/overview.md', 10],
+    ['protocol/gatt-map.md', 20],
+    ['protocol/pmd-commands.md', 30],
+    ['protocol/ecg-format.md', 40],
+    ['protocol/acc-format.md', 50],
+    ['protocol/hr-measurement.md', 60],
+    ['references.md', 90]
+  ]);
+
+  return orderMap.get(sourceRel) ?? 999;
+}
+
+function groupRank(groupName) {
+  const rank = siteConfig.navGroups.indexOf(groupName);
+  return rank === -1 ? 999 : rank;
+}
+
+function deriveTitle(sourceRel) {
+  const fileName = path.posix.basename(sourceRel, '.md');
+  return fileName
+    .split(/[-_]/g)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function normalizeString(value) {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function toNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function toBoolean(value) {
+  return typeof value === 'boolean' ? value : false;
+}
+
+function dedupeBy(items, keySelector) {
+  const seen = new Set();
+  const result = [];
+
+  for (const item of items) {
+    const key = keySelector(item);
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    result.push(item);
+  }
+
+  return result;
 }
 
 function escapeHtml(value) {

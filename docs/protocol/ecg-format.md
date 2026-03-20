@@ -1,3 +1,12 @@
+---
+title: ECG Data Format
+description: Frame layout, sample encoding, and runtime notes for Polar H10 ECG data on the PMD stream.
+summary: Use this page when you need the exact ECG frame structure and 24-bit signed microvolt sample encoding.
+nav_label: ECG Format
+nav_group: Internals
+nav_order: 40
+---
+
 # ECG Data Format
 
 ECG data arrives on the PMD Data characteristic as notification payloads.

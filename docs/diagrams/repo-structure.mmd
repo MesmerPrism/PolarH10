@@ -5,22 +5,22 @@ flowchart LR
     R["POLARH10<br/>WINDOWS H10 WORKSPACE"]
 
     subgraph Source["src/ // runtime code"]
-        P1["Protocol<br/>decoders · PMD · recording"]
+        P1["Protocol<br/>decoders · coherence · breathing"]
         P2["Transport.Abstractions<br/>BLE contracts"]
         P3["Transport.Windows<br/>scanner · GATT · session"]
-        P4["Cli<br/>diagnostics · capture"]
-        P5["App<br/>WPF telemetry monitor"]
+        P4["Cli<br/>diagnostics · capture · replay"]
+        P5["App<br/>shell · coherence · dynamics"]
     end
 
     subgraph Tests["tests/ // verification"]
-        T1["Protocol.Tests<br/>unit decoders"]
+        T1["Protocol.Tests<br/>decoders · coherence · entropy"]
         T2["Playback.Tests<br/>session compatibility"]
         T3["Transport.Windows.Tests<br/>smoke coverage"]
     end
 
     subgraph Docs["docs/ // published reference"]
         D1["protocol/<br/>GATT · PMD · ECG · ACC · HR"]
-        D2["getting-started.md<br/>cli.md · references.md"]
+        D2["getting-started.md<br/>first-recording · coherence · entropy guides"]
         D3["diagrams/<br/>mmd sources · svg output"]
     end
 

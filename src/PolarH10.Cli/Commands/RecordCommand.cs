@@ -1,4 +1,5 @@
 using System.CommandLine;
+using PolarH10.Cli;
 using PolarH10.Protocol;
 using PolarH10.Transport.Windows;
 
@@ -26,17 +27,22 @@ internal static class RecordCommand
             "--duration",
             "Recording duration in seconds (omit for indefinite)");
 
+        var transportOption = CliTransportOptions.CreateTransportOption();
+        var syntheticPipeOption = CliTransportOptions.CreateSyntheticPipeOption();
+
         var cmd = new Command("record", "Record a session to disk: session.json, hr_rr.csv, ecg.csv, acc.csv, protocol.jsonl")
         {
             deviceOption,
             outOption,
             formatOption,
             durationOption,
+            transportOption,
+            syntheticPipeOption,
         };
 
-        cmd.SetHandler(async (string device, string outDir, string format, int? duration) =>
+        cmd.SetHandler(async (string device, string outDir, string format, int? duration, string transport, string syntheticPipe) =>
         {
-            var factory = new WindowsBleAdapterFactory();
+            var factory = CliTransportOptions.CreateFactory(transport, syntheticPipe);
             var session = new PolarH10Session(factory);
 
             var registry = new PolarDeviceRegistry(PolarDeviceRegistry.DefaultFilePath);
@@ -98,7 +104,7 @@ internal static class RecordCommand
             {
                 await session.DisposeAsync();
             }
-        }, deviceOption, outOption, formatOption, durationOption);
+        }, deviceOption, outOption, formatOption, durationOption, transportOption, syntheticPipeOption);
 
         return cmd;
     }

@@ -1,0 +1,439 @@
+<Window x:Class="PolarH10.App.BreathingDynamicsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Polar H10 // Breathing Dynamics"
+        Width="1320"
+        Height="980"
+        MinWidth="1120"
+        MinHeight="820"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <Style x:Key="PanelFrameStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+        </Style>
+
+        <Style x:Key="DarkPanelFrameStyle" TargetType="Border" BasedOn="{StaticResource PanelFrameStyle}">
+            <Setter Property="Background" Value="{StaticResource SurfaceTintBrush}" />
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+        </Style>
+
+        <Style x:Key="MetricLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource GraphiteBrush}" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <Style x:Key="ConsoleListStyle" TargetType="ListBox">
+            <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style x:Key="ConsoleListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceLightBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SurfaceTintBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20,18,20,12">
+            <Border Style="{StaticResource DarkPanelFrameStyle}">
+                <StackPanel>
+                    <TextBlock x:Name="SelectedBreathingDynamicsDeviceText"
+                               Text="No device selected"
+                               FontSize="30"
+                               FontWeight="Bold"
+                               Margin="0,0,0,4" />
+                    <TextBlock x:Name="BreathingDynamicsSummaryText"
+                               Text="Breath interval uses same-polarity extrema spacing; breath amplitude uses peak-trough excursion from the calibrated base waveform."
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource GraphiteBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1.1*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource DarkPanelFrameStyle}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="Interval entropy" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="IntervalEntropyValueText"
+                                   Text="--"
+                                   FontSize="52"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource FocusBlueBrush}" />
+                        <TextBlock x:Name="IntervalEntropyHintText"
+                                   Text="Waiting for enough breaths"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource GraphiteBrush}"
+                                   Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource DarkPanelFrameStyle}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="Amplitude entropy" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="AmplitudeEntropyValueText"
+                                   Text="--"
+                                   FontSize="52"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TelemetryGreenBrush}" />
+                        <TextBlock x:Name="AmplitudeEntropyHintText"
+                                   Text="Waiting for enough breaths"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource GraphiteBrush}"
+                                   Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource PanelFrameStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Control" Style="{StaticResource MetricLabelStyle}" />
+                        <WrapPanel>
+                            <Button Content="Reset tracker"
+                                    Width="112"
+                                    Margin="0,0,8,8"
+                                    Click="OnResetTrackerClick" />
+                            <Button Content="Apply tuning"
+                                    Width="108"
+                                    Margin="0,0,8,8"
+                                    Click="OnApplyTuningClick" />
+                            <Button Content="Restore defaults"
+                                    Width="128"
+                                    Margin="0,0,0,8"
+                                    Background="{StaticResource AppPaperBrush}"
+                                    Foreground="{StaticResource CarbonBrush}"
+                                    BorderBrush="{StaticResource PanelEdgeBrush}"
+                                    Click="OnRestoreDefaultsClick" />
+                        </WrapPanel>
+                        <TextBlock x:Name="BreathingDynamicsStatusText"
+                                   Text="No device selected"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource GraphiteBrush}"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <TextBlock Text="Entropy telemetry"
+                       Style="{StaticResource SectionTitleStyle}"
+                       Margin="0,0,0,8" />
+            <Border x:Name="BreathingDynamicsChartHost"
+                    Style="{StaticResource PanelFrameStyle}"
+                    Height="214"
+                    Padding="0"
+                    Margin="0,0,0,10" />
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource PanelFrameStyle}" Margin="0,0,10,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Tracking" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="BreathingDynamicsTrackingText" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="1" Text="Last waveform" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="BreathingDynamicsLastWaveformText" Grid.Row="1" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="2" Text="Last breath" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="BreathingDynamicsLastBreathText" Grid.Row="2" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="3" Text="Accepted extrema" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="BreathingDynamicsExtremaCountText" Grid.Row="3" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="4"
+                                   Text="Entropy confidence"
+                                   Style="{StaticResource MetricLabelStyle}"
+                                   ToolTip="A longer-recording confidence score. It stays at zero until both interval and amplitude entropy are available, then ramps toward the configured confidence target." />
+                        <TextBlock x:Name="BreathingDynamicsConfidenceText" Grid.Row="4" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource PanelFrameStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Interval series"
+                                   Style="{StaticResource MetricLabelStyle}"
+                                   ToolTip="The count of accepted breath-interval samples derived from consecutive same-polarity extrema." />
+                        <TextBlock x:Name="BreathingDynamicsIntervalCountText" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="1"
+                                   Text="Amplitude series"
+                                   Style="{StaticResource MetricLabelStyle}"
+                                   ToolTip="The count of accepted breath-amplitude samples derived from peak-trough excursion within each completed breath." />
+                        <TextBlock x:Name="BreathingDynamicsAmplitudeCountText" Grid.Row="1" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="2"
+                                   Text="Recording maturity"
+                                   Style="{StaticResource MetricLabelStyle}"
+                                   ToolTip="A warmup score based on the smaller of the interval and amplitude series sizes, scaled from the basic-stats threshold to the configured full-confidence target." />
+                        <TextBlock x:Name="BreathingDynamicsStabilizationText" Grid.Row="2" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="3" Text="Interval readiness" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="BreathingDynamicsIntervalReadinessText" Grid.Row="3" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+
+                        <TextBlock Grid.Row="4" Text="Amplitude readiness" Style="{StaticResource MetricLabelStyle}" />
+                        <TextBlock x:Name="BreathingDynamicsAmplitudeReadinessText" Grid.Row="4" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource PanelFrameStyle}" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="Interval feature bundle"
+                                   Style="{StaticResource SectionTitleStyle}"
+                                   Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Mean" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalMeanText" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="1" Text="Std dev" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalSdText" Grid.Row="1" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="2" Text="CV" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalCvText" Grid.Row="2" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="3" Text="ACW50" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalAcwText" Grid.Row="3" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="4" Text="PSD slope" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalPsdSlopeText" Grid.Row="4" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="5" Text="LZC" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalLzcText" Grid.Row="5" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="6" Text="Sample entropy" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalSampleEntropyText" Grid.Row="6" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="7" Text="MSE AUC" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="IntervalMultiscaleEntropyText" Grid.Row="7" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource PanelFrameStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Amplitude feature bundle"
+                                   Style="{StaticResource SectionTitleStyle}"
+                                   Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Mean" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeMeanText" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="1" Text="Std dev" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeSdText" Grid.Row="1" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="2" Text="CV" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeCvText" Grid.Row="2" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="3" Text="ACW50" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeAcwText" Grid.Row="3" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="4" Text="PSD slope" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudePsdSlopeText" Grid.Row="4" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="5" Text="LZC" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeLzcText" Grid.Row="5" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="6" Text="Sample entropy" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeSampleEntropyText" Grid.Row="6" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="7" Text="MSE AUC" Style="{StaticResource MetricLabelStyle}" />
+                            <TextBlock x:Name="AmplitudeMultiscaleEntropyText" Grid.Row="7" Grid.Column="1" FontSize="14" FontWeight="SemiBold" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <TextBlock Text="Tuning"
+                       Style="{StaticResource SectionTitleStyle}"
+                       Margin="0,0,0,8" />
+            <Border Style="{StaticResource PanelFrameStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="118" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="118" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="118" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Extremum delta" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsTurningThresholdBox" Grid.Column="1" Margin="0,0,0,8" />
+                    <TextBlock Grid.Column="3" Text="Peak/trough gap (s)" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsMinSpacingBox" Grid.Column="4" Margin="0,0,0,8" />
+                    <TextBlock Grid.Column="6" Text="Peak-trough excursion" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsMinExcursionBox" Grid.Column="7" Margin="0,0,0,8" />
+
+                    <TextBlock Grid.Row="1" Text="Retained series size" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsRetainedBreathsBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" />
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Basic-stats warmup" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsMinBasicBreathsBox" Grid.Row="1" Grid.Column="4" Margin="0,0,0,8" />
+                    <TextBlock Grid.Row="1" Grid.Column="6" Text="Entropy warmup" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsMinEntropyBreathsBox" Grid.Row="1" Grid.Column="7" Margin="0,0,0,8" />
+
+                    <TextBlock Grid.Row="2" Text="Confidence target" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsFullConfidenceBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" />
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text="Stale timeout (s)" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsStaleTimeoutBox" Grid.Row="2" Grid.Column="4" Margin="0,0,0,8" />
+                    <TextBlock Grid.Row="2" Grid.Column="6" Text="MSE max scale" Style="{StaticResource MetricLabelStyle}" />
+                    <TextBox x:Name="DynamicsMseMaxScaleBox" Grid.Row="2" Grid.Column="7" Margin="0,0,0,8" />
+
+                    <TextBlock Grid.Row="3" Text="SampEn m / delay / r·SD" Style="{StaticResource MetricLabelStyle}" />
+                    <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                        <TextBox x:Name="DynamicsSampleEntropyDimensionBox" Width="34" Margin="0,0,6,0" />
+                        <TextBox x:Name="DynamicsSampleEntropyDelayBox" Width="34" Margin="0,0,6,0" />
+                        <TextBox x:Name="DynamicsSampleEntropyToleranceBox" Width="56" />
+                    </StackPanel>
+                    <TextBlock Grid.Row="3" Grid.Column="3" Text="MSE m / delay / r·SD" Style="{StaticResource MetricLabelStyle}" />
+                    <StackPanel Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="2" Orientation="Horizontal">
+                        <TextBox x:Name="DynamicsMultiscaleEntropyDimensionBox" Width="34" Margin="0,0,6,0" />
+                        <TextBox x:Name="DynamicsMultiscaleEntropyDelayBox" Width="34" Margin="0,0,6,0" />
+                        <TextBox x:Name="DynamicsMultiscaleEntropyToleranceBox" Width="56" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <TextBlock Text="Method references"
+                       Style="{StaticResource SectionTitleStyle}"
+                       Margin="0,4,0,8" />
+            <Border Style="{StaticResource PanelFrameStyle}">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="{StaticResource GraphiteBrush}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="This window follows the breathing-dynamics feature family from Goheen et al. (Psychophysiology, 2025), but adapts it to the app's calibrated ACC breathing base waveform rather than the paper's respiration-belt signal. Where the paper leaves entropy parameters unspecified, the defaults shown here follow the NeuroKit2 implementation path used by the paper's methods." />
+                    <TextBlock Margin="0,10,0,0" TextWrapping="Wrap">
+                        <Run Text="Paper: " />
+                        <Hyperlink NavigateUri="https://doi.org/10.1111/psyp.70149"
+                                   RequestNavigate="OnReferenceNavigate">Goheen et al. 2025 (Psychophysiology)</Hyperlink>
+                    </TextBlock>
+                    <TextBlock Margin="0,6,0,0" TextWrapping="Wrap">
+                        <Run Text="Paper code: " />
+                        <Hyperlink NavigateUri="https://github.com/CANALLAB/breathing_wm"
+                                   RequestNavigate="OnReferenceNavigate">CANALLAB/breathing_wm</Hyperlink>
+                    </TextBlock>
+                    <TextBlock Margin="0,6,0,0" TextWrapping="Wrap">
+                        <Run Text="Entropy implementation: " />
+                        <Hyperlink NavigateUri="https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/complexity/entropy_sample.html"
+                                   RequestNavigate="OnReferenceNavigate">NeuroKit2 sample entropy</Hyperlink>
+                        <Run Text=" · " />
+                        <Hyperlink NavigateUri="https://neuropsychology.github.io/NeuroKit/_modules/neurokit2/complexity/entropy_multiscale.html"
+                                   RequestNavigate="OnReferenceNavigate">NeuroKit2 multiscale entropy</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="Breathing dynamics log"
+                       Style="{StaticResource SectionTitleStyle}"
+                       Margin="0,4,0,8" />
+            <ListBox x:Name="BreathingDynamicsLogList"
+                     Height="140"
+                     Style="{StaticResource ConsoleListStyle}"
+                     ItemContainerStyle="{StaticResource ConsoleListItemStyle}" />
+        </StackPanel>
+    </ScrollViewer>
+</Window>

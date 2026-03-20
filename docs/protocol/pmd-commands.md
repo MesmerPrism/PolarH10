@@ -1,3 +1,12 @@
+---
+title: PMD Control Point Commands
+description: Request and response structure for PMD get-settings, start-measurement, and stop-measurement commands.
+summary: This is the command-level reference for the PMD control point once you already know the service layout.
+nav_label: PMD Commands
+nav_group: Internals
+nav_order: 30
+---
+
 # PMD Control Point Commands
 
 The PMD Control Point characteristic (`FB005C81-...`) accepts write requests and returns

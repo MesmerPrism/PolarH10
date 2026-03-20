@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolarH10 Diagram Viewer // Unofficial Open-Source Reference</title>
-  <link rel="stylesheet" href="../assets/site.css?v=20260319-polaroid-site-12" />
+  <link rel="stylesheet" href="../assets/site.css" />
 </head>
 <body class="viewer-page">
   <div class="page-art" aria-hidden="true">
@@ -18,7 +18,7 @@
     <header class="site-header">
       <a class="brand" href="../index.html">
         <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-copy"><small>Unofficial Open-Source Toolkit</small><strong>PolarH10</strong></span>
+        <span class="brand-copy"><strong>PolarH10</strong><span>Unofficial Open-Source Toolkit</span></span>
       </a>
       <nav class="top-nav" aria-label="Primary">
         <a href="../index.html">Home</a>
@@ -68,6 +68,13 @@
               <code id="viewer-source"></code>
             </div>
           </div>
+          <div id="viewer-actions" class="viewer-actions" hidden>
+            <button id="btn-copy-link" class="button" type="button">Copy link</button>
+            <a id="link-svg" class="button" href="#" target="_blank" rel="noreferrer">Open SVG</a>
+            <a id="link-source-file" class="button" href="#" target="_blank" rel="noreferrer">Open source</a>
+            <a id="link-related-doc" class="button" href="#" hidden>Open related doc</a>
+          </div>
+          <p id="viewer-related-note" class="viewer-related-note" hidden></p>
           <div id="viewer" class="viewer-stage"><div class="empty-state">Choose a diagram from the sidebar.</div></div>
           <div id="source-panel" class="source-stage" hidden><pre id="source-code"></pre></div>
         </main>
@@ -97,6 +104,12 @@
       const btnZoomIn = document.getElementById('btn-zoom-in');
       const btnSrc = document.getElementById('btn-source');
       const btnFs = document.getElementById('btn-fullscreen');
+      const viewerActions = document.getElementById('viewer-actions');
+      const btnCopyLink = document.getElementById('btn-copy-link');
+      const linkSvg = document.getElementById('link-svg');
+      const linkSourceFile = document.getElementById('link-source-file');
+      const linkRelatedDoc = document.getElementById('link-related-doc');
+      const viewerRelatedNote = document.getElementById('viewer-related-note');
 
       let showSource = false;
       let manifest;
@@ -113,6 +126,7 @@
       let programmaticChange = false;
       let fitFramePending = false;
       let lastViewerFullscreen = false;
+      const renderReady = waitForRenderReady();
 
       function updateZoomLabel(scale = 1) {
         viewerZoom.textContent = `${Math.round(scale * 100)}%`;
@@ -500,6 +514,23 @@
         requestDiagramFit();
       });
 
+      btnCopyLink.addEventListener('click', async () => {
+        if (!activeDiagram) {
+          return;
+        }
+
+        const deepLink = new URL(`#${activeDiagram.id}`, location.href).href;
+        try {
+          await navigator.clipboard.writeText(deepLink);
+          btnCopyLink.textContent = 'Link copied';
+          setTimeout(() => {
+            btnCopyLink.textContent = 'Copy link';
+          }, 1500);
+        } catch {
+          window.prompt('Copy diagram link', deepLink);
+        }
+      });
+
       document.addEventListener('fullscreenchange', () => {
         const viewerFullscreen = document.fullscreenElement === viewer;
         const viewerExited = lastViewerFullscreen && !viewerFullscreen;
@@ -522,6 +553,7 @@
       }
 
       async function selectDiagram(diagram) {
+        await renderReady;
         activeDiagram = diagram;
         navList.querySelectorAll('.nav-item').forEach((element) => {
           element.classList.toggle('active', element.dataset.id === diagram.id);
@@ -532,6 +564,7 @@
         viewerCategory.textContent = (diagram.category || 'other').toUpperCase();
         viewerSource.textContent = diagram.source;
         viewerMeta.hidden = false;
+        updateActionLinks(diagram);
         location.hash = diagram.id;
 
         const svgPath = diagram.source.replace(/\.mmd$/, '.svg');
@@ -565,6 +598,55 @@
 
         mountDiagram(renderedSvg);
         syncFullscreenButton();
+      }
+
+      async function waitForRenderReady() {
+        if (document.readyState !== 'complete') {
+          await new Promise((resolve) => window.addEventListener('load', resolve, { once: true }));
+        }
+
+        if (document.fonts?.ready) {
+          try {
+            await document.fonts.ready;
+          } catch {
+            // Ignore font-readiness failures and keep the viewer usable.
+          }
+        }
+      }
+
+      function updateActionLinks(diagram) {
+        viewerActions.hidden = false;
+        linkSvg.href = diagram.source.replace(/\.mmd$/, '.svg');
+        linkSourceFile.href = diagram.source;
+
+        const relatedDocs = Array.isArray(diagram.relatedDocs) ? diagram.relatedDocs : [];
+        if (relatedDocs.length > 0) {
+          linkRelatedDoc.hidden = false;
+          linkRelatedDoc.href = relatedDocs[0];
+          linkRelatedDoc.textContent = 'Open related doc';
+
+          if (relatedDocs.length > 1) {
+            viewerRelatedNote.hidden = false;
+            viewerRelatedNote.textContent = `Also related: ${relatedDocs.slice(1).map(formatDocLabel).join(' | ')}`;
+          } else {
+            viewerRelatedNote.hidden = true;
+            viewerRelatedNote.textContent = '';
+          }
+        } else {
+          linkRelatedDoc.hidden = true;
+          linkRelatedDoc.removeAttribute('href');
+          viewerRelatedNote.hidden = true;
+          viewerRelatedNote.textContent = '';
+        }
+      }
+
+      function formatDocLabel(docPath) {
+        const fileName = docPath.split('/').pop().replace(/\.(md|html)$/i, '');
+        return fileName
+          .split(/[-_]/g)
+          .filter(Boolean)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(' ');
       }
     })();
   </script>

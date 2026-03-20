@@ -1,3 +1,12 @@
+---
+title: WPF UI Preview
+description: Review the current WPF shell, chart treatment, and tracked-device workflow before running the app yourself.
+summary: This page shows the current operator-facing visual system so you can understand the desktop surface before you build or modify it.
+nav_label: WPF UI Preview
+nav_group: Start Here
+nav_order: 50
+---
+
 # WPF UI Preview
 
 `PolarH10.App` is the operator-facing desktop monitor in this repo. This page
@@ -14,12 +23,13 @@ multi-strap telemetry review.
 - simplified tab, button, and panel treatment with stronger text contrast
 - light chart canvases with clearer traces for live ECG and ACC reading
 - a tracked-device dropdown that can follow the selected strap or pin multiple straps into the live charts
+- dedicated raw telemetry, coherence, and breathing-dynamics windows for focused review beyond the main shell
 - per-chart legends so parallel traces stay attributable during comparison work
 - an operator-first layout that stays direct without decorative dashboard chrome
 
 ## Notes
 
 - The screenshot is generated from the current local build of `PolarH10.App` using the scripted preview mode in `tools/site/capture-wpf-preview.ps1`.
-- This preview focuses on the main shell, device rail, tracked-device workflow, telemetry panels, and chart language.
+- This preview focuses on the main shell, device rail, tracked-device workflow, telemetry panels, and chart language; the dedicated coherence and breathing-dynamics windows follow the same visual system.
 - The preview image intentionally shows two tracked straps in parallel because that comparison view is now a first-class feature.
 - Runtime data states will populate once a device is connected.

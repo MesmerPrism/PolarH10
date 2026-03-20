@@ -1,3 +1,12 @@
+---
+title: Protocol Overview
+description: Understand the Polar H10 service surface and the end-to-end scan, connect, configure, stream, and disconnect lifecycle.
+summary: Start here if you need the high-level PMD and Heart Rate service model before reading field-level format docs.
+nav_label: Protocol Overview
+nav_group: Internals
+nav_order: 10
+---
+
 # Protocol Overview
 
 The Polar H10 exposes two primary BLE services for data access:

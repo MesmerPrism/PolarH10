@@ -1,0 +1,26 @@
+namespace PolarH10.Protocol;
+
+public readonly record struct PolarCoherenceTelemetry(
+    bool IsTransportConnected,
+    bool HasReceivedAnyRrSample,
+    bool HasCoherenceSample,
+    PolarCoherenceTrackingState TrackingState,
+    bool HasTracking,
+    float CurrentCoherence01,
+    float NormalizedCoherence01,
+    float Confidence01,
+    float CurrentHeartbeatBpm,
+    float CurrentHeartbeatIbiMs,
+    int RrSampleCount,
+    int ConsecutiveValidCount,
+    int StabilizationRequiredCount,
+    float StabilizationProgress01,
+    float WindowCoverage01,
+    float LastRrSampleAgeSeconds,
+    float LastCoherenceAgeSeconds,
+    float PeakFrequencyHz,
+    float PeakBandPower,
+    float TotalBandPower,
+    float PaperCoherenceRatio,
+    PolarCoherenceSettings Settings,
+    DateTimeOffset? LastRrReceivedAtUtc);

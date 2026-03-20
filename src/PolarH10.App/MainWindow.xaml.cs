@@ -1,4 +1,5 @@
 using System.IO;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -33,7 +34,9 @@ public partial class MainWindow : Window
         Environment.GetEnvironmentVariable("POLARH10_PREVIEW"),
         "1",
         StringComparison.Ordinal);
+    private readonly LaunchStamp _launchStamp = DetectLaunchStamp(Environment.ProcessPath);
 
+    private readonly AppTransportSettings _transportSettings = AppTransportSettings.FromEnvironmentAndArgs();
     private readonly PolarDeviceRegistry _deviceRegistry = new(PolarDeviceRegistry.DefaultFilePath);
     private readonly PolarMultiDeviceCoordinator _coordinator;
     private readonly string? _capturePath = Environment.GetEnvironmentVariable("POLARH10_CAPTURE_PATH");
@@ -57,10 +60,21 @@ public partial class MainWindow : Window
     private WaveformChart _hrChart = null!;
     private WaveformChart _rrChart = null!;
     private WaveformChart _ecgChart = null!;
+    private WaveformChart _liveBreathingChart = null!;
     private WaveformChart _accXChart = null!;
     private WaveformChart _accYChart = null!;
     private WaveformChart _accZChart = null!;
     private readonly Dictionary<string, LiveSeriesBinding> _liveSeriesBindings = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ChartAxisOptions _hrChartAxisOptions = new();
+    private readonly ChartAxisOptions _rrChartAxisOptions = new();
+    private readonly ChartAxisOptions _ecgChartAxisOptions = new() { ManualYAxisSymmetric = true };
+    private readonly ChartAxisOptions _liveBreathingChartAxisOptions = new();
+    private readonly ChartAxisOptions _accXChartAxisOptions = new() { ManualYAxisSymmetric = true };
+    private readonly ChartAxisOptions _accYChartAxisOptions = new() { ManualYAxisSymmetric = true };
+    private readonly ChartAxisOptions _accZChartAxisOptions = new() { ManualYAxisSymmetric = true };
+    private readonly ChartAxisOptions _breathingChartAxisOptions = new();
+    private readonly ChartAxisOptions _coherenceChartAxisOptions = new() { AdaptiveYAxis = false, ManualYAxisMaxText = "1" };
+    private readonly ChartAxisOptions _breathingDynamicsChartAxisOptions = new() { AdaptiveYAxis = false, ManualYAxisMaxText = "2" };
 
     // Overlay chart + series indices
     private WaveformChart _overlayChart = null!;
@@ -69,13 +83,22 @@ public partial class MainWindow : Window
     private DispatcherTimer _refreshTimer = null!;
     private bool _previewPrepared;
 
+    private sealed class LaunchStamp
+    {
+        public required string TitleSuffix { get; init; }
+        public required string FooterText { get; init; }
+        public string? BannerText { get; init; }
+    }
+
     public MainWindow()
     {
         InitializeComponent();
+        ApplyLaunchStamp();
+        InitializeEmbeddedDetailTabs();
         InitializeCharts();
         _deviceRegistry.Load();
 
-        var factory = new WindowsBleAdapterFactory();
+        var factory = _transportSettings.CreateFactory();
         _coordinator = new PolarMultiDeviceCoordinator(factory, _deviceRegistry);
         _coordinator.DeviceStatusChanged += ctx =>
             Dispatcher.Invoke(() => RefreshDeviceList());
@@ -89,10 +112,161 @@ public partial class MainWindow : Window
             Dispatcher.Invoke(() =>
             {
                 _chartStates.Remove(ctx.BluetoothAddress);
+                RemoveBreathingState(ctx.BluetoothAddress);
+                RemoveCoherenceState(ctx.BluetoothAddress);
+                RemoveBreathingDynamicsState(ctx.BluetoothAddress);
                 RefreshDeviceList();
             });
 
         Loaded += OnLoaded;
+    }
+
+    private void InitializeEmbeddedDetailTabs()
+    {
+        EnsureRawTelemetryWindow();
+        EnsureCoherenceWindow();
+        EnsureBreathingDynamicsWindow();
+    }
+
+    private static object? DetachWindowContent(Window window)
+    {
+        object? content = window.Content;
+        window.Content = null;
+        return content;
+    }
+
+    private static LaunchStamp DetectLaunchStamp(string? processPath)
+    {
+        if (string.IsNullOrWhiteSpace(processPath))
+        {
+            return new LaunchStamp
+            {
+                TitleSuffix = "[unknown build]",
+                FooterText = "Unknown build",
+            };
+        }
+
+        string fullProcessPath;
+        try
+        {
+            fullProcessPath = Path.GetFullPath(processPath);
+        }
+        catch
+        {
+            return new LaunchStamp
+            {
+                TitleSuffix = "[unknown build]",
+                FooterText = "Unknown build",
+            };
+        }
+
+        string normalizedProcessPath = fullProcessPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        string marker = $"{Path.DirectorySeparatorChar}tmp-live-check{Path.DirectorySeparatorChar}";
+        if (normalizedProcessPath.Contains(marker, StringComparison.OrdinalIgnoreCase))
+        {
+            string? repoRoot = FindRepoRoot(Path.GetDirectoryName(fullProcessPath));
+            string? recommendedPath = FindPreferredLaunchPath(repoRoot);
+            string bannerText = $"Scratch validation build detected: {fullProcessPath}.";
+
+            bannerText += string.IsNullOrWhiteSpace(recommendedPath)
+                ? " Launch the normal app from the main build output under src\\PolarH10.App\\bin or out\\app-single."
+                : $" Launch the normal app from {recommendedPath}.";
+
+            return new LaunchStamp
+            {
+                TitleSuffix = "[scratch build]",
+                FooterText = "Scratch validation build",
+                BannerText = bannerText,
+            };
+        }
+
+        string canonicalPublishedPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "PolarH10",
+            "app-single",
+            "PolarH10.App.exe");
+        if (string.Equals(fullProcessPath, canonicalPublishedPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return new LaunchStamp
+            {
+                TitleSuffix = "[current build]",
+                FooterText = "Current launcher",
+            };
+        }
+
+        string? currentDirectory = Path.GetDirectoryName(fullProcessPath);
+        string? repo = FindRepoRoot(currentDirectory);
+        if (!string.IsNullOrWhiteSpace(repo))
+        {
+            string workspaceDebugPath = Path.Combine(repo, "src", "PolarH10.App", "bin", "Debug", "net8.0-windows10.0.19041.0", "PolarH10.App.exe");
+            string workspaceReleasePath = Path.Combine(repo, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "win-x64", "PolarH10.App.exe");
+            string workspaceFlatReleasePath = Path.Combine(repo, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "PolarH10.App.exe");
+
+            if (string.Equals(fullProcessPath, workspaceDebugPath, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(fullProcessPath, workspaceReleasePath, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(fullProcessPath, workspaceFlatReleasePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return new LaunchStamp
+                {
+                    TitleSuffix = "[workspace build]",
+                    FooterText = "Workspace build",
+                };
+            }
+        }
+
+        return new LaunchStamp
+        {
+            TitleSuffix = "[external build]",
+            FooterText = "External build",
+        };
+    }
+
+    private static string? FindRepoRoot(string? startingDirectory)
+    {
+        string? current = startingDirectory;
+        while (!string.IsNullOrWhiteSpace(current))
+        {
+            if (File.Exists(Path.Combine(current, "PolarH10.sln")))
+                return current;
+
+            current = Directory.GetParent(current)?.FullName;
+        }
+
+        return null;
+    }
+
+    private static string? FindPreferredLaunchPath(string? repoRoot)
+    {
+        if (string.IsNullOrWhiteSpace(repoRoot))
+            return null;
+
+        string[] candidates =
+        [
+            Path.Combine(repoRoot, "out", "app-single", "PolarH10.App.exe"),
+            Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Release", "net8.0-windows10.0.19041.0", "win-x64", "PolarH10.App.exe"),
+            Path.Combine(repoRoot, "src", "PolarH10.App", "bin", "Debug", "net8.0-windows10.0.19041.0", "PolarH10.App.exe"),
+        ];
+
+        foreach (string candidate in candidates)
+        {
+            if (File.Exists(candidate))
+                return candidate;
+        }
+
+        return null;
+    }
+
+    private void ApplyLaunchStamp()
+    {
+        Title = $"{Title} {_launchStamp.TitleSuffix}";
+        BuildStampTextBlock.Text = _launchStamp.FooterText;
+        BuildStampTextBlock.Visibility = Visibility.Visible;
+
+        if (!string.IsNullOrWhiteSpace(_launchStamp.BannerText))
+        {
+            LaunchNoticeTextBlock.Text = _launchStamp.BannerText;
+            LaunchNoticeBanner.Visibility = Visibility.Visible;
+        }
     }
 
     private sealed class LiveSeriesBinding
@@ -100,15 +274,27 @@ public partial class MainWindow : Window
         public required int Hr;
         public required int Rr;
         public required int Ecg;
+        public required int Breathing;
         public required int AccX;
         public required int AccY;
         public required int AccZ;
+    }
+
+    private sealed class ChartAxisOptions
+    {
+        public bool AdaptiveYAxis { get; set; } = true;
+        public string ManualYAxisMaxText { get; set; } = string.Empty;
+        public bool ManualYAxisSymmetric { get; set; }
     }
 
     // ── Chart init (same per-signal charts, rebound when tracked devices change) ──
     private void InitializeCharts()
     {
         RebuildTelemetryCharts();
+        InitializeBreathingChart();
+        InitializeCoherenceChart();
+        InitializeBreathingDynamicsChart();
+        InitializeTelemetrySummarySlots();
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
         _refreshTimer.Tick += (_, _) =>
@@ -116,22 +302,145 @@ public partial class MainWindow : Window
             _hrChart.Refresh();
             _rrChart.Refresh();
             _ecgChart.Refresh();
+            _liveBreathingChart.Refresh();
             _accXChart.Refresh();
             _accYChart.Refresh();
             _accZChart.Refresh();
             _overlayChart.Refresh();
+            RefreshTelemetrySummaryCharts();
+            RefreshBreathingTrackers();
+            _breathingChart.Refresh();
+            RefreshCoherenceTrackers();
+            _coherenceChart.Refresh();
+            RefreshBreathingDynamicsTrackers();
+            _breathingDynamicsChart.Refresh();
         };
         _refreshTimer.Start();
     }
 
-    private static WaveformChart CreateChart(string title, bool normalizePerSeries = false)
+    private static WaveformChart CreateChart(string title, ChartAxisOptions? axisOptions = null, bool normalizePerSeries = false)
     {
-        return new WaveformChart
+        var chart = new WaveformChart
         {
             Title = title,
             NormalizePerSeries = normalizePerSeries,
         };
+
+        ApplyAxisOptions(chart, axisOptions);
+        return chart;
     }
+
+    private static void ApplyAxisOptions(WaveformChart chart, ChartAxisOptions? axisOptions)
+    {
+        if (axisOptions is null)
+            return;
+
+        chart.AdaptiveYAxis = axisOptions.AdaptiveYAxis;
+        chart.ManualYAxisSymmetric = axisOptions.ManualYAxisSymmetric;
+        chart.ManualYAxisMax = axisOptions.AdaptiveYAxis
+            ? null
+            : TryParseManualYAxisMax(axisOptions.ManualYAxisMaxText);
+    }
+
+    private void SetChartHostContent(Border? host, WaveformChart chart, ChartAxisOptions? axisOptions)
+    {
+        if (host is null)
+            return;
+
+        if (axisOptions is null)
+        {
+            host.Child = chart;
+            return;
+        }
+
+        var root = new Grid();
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+        var controls = new DockPanel
+        {
+            Margin = new Thickness(10, 8, 10, 6),
+            LastChildFill = false,
+        };
+
+        var adaptiveToggle = new CheckBox
+        {
+            Content = "Adaptive Y",
+            IsChecked = axisOptions.AdaptiveYAxis,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 14, 0),
+        };
+
+        var yMaxLabel = new TextBlock
+        {
+            Text = "Y max",
+            VerticalAlignment = VerticalAlignment.Center,
+            Foreground = ResourceBrush("GraphiteBrush"),
+            FontSize = 12,
+            FontWeight = FontWeights.SemiBold,
+            Margin = new Thickness(0, 0, 8, 0),
+        };
+
+        var yMaxBox = new TextBox
+        {
+            Width = 78,
+            Text = axisOptions.ManualYAxisMaxText,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Padding = new Thickness(6, 2, 6, 2),
+            Background = ResourceBrush("AppPaperBrush"),
+            Foreground = ResourceBrush("CarbonBrush"),
+            BorderBrush = ResourceBrush("PanelEdgeBrush"),
+            BorderThickness = new Thickness(1),
+            IsEnabled = !axisOptions.AdaptiveYAxis,
+            ToolTip = "Leave blank to keep the current frozen range.",
+        };
+
+        void ApplyAxisSelection()
+        {
+            axisOptions.AdaptiveYAxis = adaptiveToggle.IsChecked == true;
+            axisOptions.ManualYAxisMaxText = yMaxBox.Text.Trim();
+            yMaxBox.IsEnabled = !axisOptions.AdaptiveYAxis;
+            yMaxBox.BorderBrush = IsValidManualYAxisMax(axisOptions.ManualYAxisMaxText)
+                ? ResourceBrush("PanelEdgeBrush")
+                : ResourceBrush("SignalRedBrush");
+            ApplyAxisOptions(chart, axisOptions);
+            chart.Refresh();
+        }
+
+        adaptiveToggle.Checked += (_, _) => ApplyAxisSelection();
+        adaptiveToggle.Unchecked += (_, _) => ApplyAxisSelection();
+        yMaxBox.TextChanged += (_, _) => ApplyAxisSelection();
+
+        controls.Children.Add(adaptiveToggle);
+        controls.Children.Add(yMaxLabel);
+        controls.Children.Add(yMaxBox);
+
+        Grid.SetRow(controls, 0);
+        Grid.SetRow(chart, 1);
+        root.Children.Add(controls);
+        root.Children.Add(chart);
+
+        host.Child = root;
+    }
+
+    private static double? TryParseManualYAxisMax(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return null;
+
+        if (!double.TryParse(text.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out double value) ||
+            double.IsNaN(value) ||
+            double.IsInfinity(value) ||
+            value <= 0)
+        {
+            return null;
+        }
+
+        return value;
+    }
+
+    private static bool IsValidManualYAxisMax(string? text)
+        => string.IsNullOrWhiteSpace(text) || TryParseManualYAxisMax(text).HasValue;
 
     // ── Per-device chart data tracking ──────────────────────────
     private sealed class DeviceChartState
@@ -141,6 +450,11 @@ public partial class MainWindow : Window
         public readonly List<float> HrValues = [];
         public readonly List<float> RrValues = [];
         public readonly List<float> EcgValues = [];
+        public readonly List<float> BreathingValues = [];
+        public readonly List<float> CoherenceValues = [];
+        public readonly List<float> CoherenceConfidenceValues = [];
+        public readonly List<float> BreathIntervalEntropyValues = [];
+        public readonly List<float> BreathAmplitudeEntropyValues = [];
         public readonly List<float> AccXValues = [];
         public readonly List<float> AccYValues = [];
         public readonly List<float> AccZValues = [];
@@ -211,20 +525,25 @@ public partial class MainWindow : Window
     private void RebuildTelemetryCharts()
     {
         RebuildLiveCharts();
+        RebuildTelemetrySummaryCharts();
         RebuildOverlayChart();
         UpdateTrackedDevicesSummary();
+        UpdateRawTelemetryWindow();
+        UpdateCoherencePanel(_selectedAddress);
+        UpdateBreathingDynamicsPanel(_selectedAddress);
     }
 
     private void RebuildLiveCharts()
     {
         _liveSeriesBindings.Clear();
 
-        _hrChart = CreateChart("HR");
-        _rrChart = CreateChart("RR");
-        _ecgChart = CreateChart("ECG");
-        _accXChart = CreateChart("ACC X");
-        _accYChart = CreateChart("ACC Y");
-        _accZChart = CreateChart("ACC Z");
+        _hrChart = CreateChart("HR", _hrChartAxisOptions);
+        _rrChart = CreateChart("RR", _rrChartAxisOptions);
+        _ecgChart = CreateChart("ECG", _ecgChartAxisOptions);
+        _liveBreathingChart = CreateChart("Breathing", _liveBreathingChartAxisOptions);
+        _accXChart = CreateChart("ACC X", _accXChartAxisOptions);
+        _accYChart = CreateChart("ACC Y", _accYChartAxisOptions);
+        _accZChart = CreateChart("ACC Z", _accZChartAxisOptions);
 
         var trackedAddresses = GetTrackedChartAddresses();
         for (var index = 0; index < trackedAddresses.Count; index++)
@@ -238,6 +557,7 @@ public partial class MainWindow : Window
                 Hr = _hrChart.AddSeries(label, color, 120),
                 Rr = _rrChart.AddSeries(label, color, 120),
                 Ecg = _ecgChart.AddSeries(label, color, 650),
+                Breathing = _liveBreathingChart.AddSeries(label, color, 360),
                 AccX = _accXChart.AddSeries(label, color, 500),
                 AccY = _accYChart.AddSeries(label, color, 500),
                 AccZ = _accZChart.AddSeries(label, color, 500),
@@ -249,16 +569,12 @@ public partial class MainWindow : Window
                 ReplayLiveSeries(binding, state);
         }
 
-        HrChartHost.Child = _hrChart;
-        RrChartHost.Child = _rrChart;
-        EcgChartHost.Child = _ecgChart;
-        AccXChartHost.Child = _accXChart;
-        AccYChartHost.Child = _accYChart;
-        AccZChartHost.Child = _accZChart;
+        ApplyRawTelemetryWindowChartHosts();
 
         _hrChart.Refresh();
         _rrChart.Refresh();
         _ecgChart.Refresh();
+        _liveBreathingChart.Refresh();
         _accXChart.Refresh();
         _accYChart.Refresh();
         _accZChart.Refresh();
@@ -272,6 +588,8 @@ public partial class MainWindow : Window
             _rrChart.Push(binding.Rr, value);
         foreach (var value in state.EcgValues)
             _ecgChart.Push(binding.Ecg, value);
+        foreach (var value in state.BreathingValues)
+            _liveBreathingChart.Push(binding.Breathing, value);
         foreach (var value in state.AccXValues)
             _accXChart.Push(binding.AccX, value);
         foreach (var value in state.AccYValues)
@@ -293,7 +611,7 @@ public partial class MainWindow : Window
         if (!string.IsNullOrWhiteSpace(_selectedAddress) && _chartStates.TryGetValue(_selectedAddress, out var state))
             ReplayOverlaySeries(state);
 
-        OverlayChartHost.Child = _overlayChart;
+        SetChartHostContent(OverlayChartHost, _overlayChart, axisOptions: null);
         ApplyOverlayVisibility();
         _overlayChart.Refresh();
     }
@@ -385,7 +703,7 @@ public partial class MainWindow : Window
         {
             TrackedDevicesSummaryText.Text = string.IsNullOrWhiteSpace(_selectedAddress)
                 ? "No device selected"
-                : $"Following {CompactDisplayName(_selectedAddress)} on the live charts";
+                : $"Following {CompactDisplayName(_selectedAddress)} on the telemetry charts";
         }
         else
         {
@@ -427,6 +745,28 @@ public partial class MainWindow : Window
         ctx.Session.ConnectionChanged += connected =>
             Dispatcher.Invoke(() =>
             {
+                var breathingState = GetOrCreateBreathingState(address);
+                var coherenceState = GetOrCreateCoherenceState(address);
+                var breathingDynamicsState = GetOrCreateBreathingDynamicsState(address);
+                if (breathingState.UsesExternalTelemetry && breathingState.HasTelemetry)
+                {
+                    var externalTelemetry = breathingState.LastTelemetry with
+                    {
+                        IsTransportConnected = connected,
+                        HasTracking = connected && breathingState.LastTelemetry.HasTracking,
+                    };
+                    CaptureSyntheticBreathingTelemetry(address, breathingState, externalTelemetry, pushChartValue: false);
+                }
+                else
+                {
+                    breathingState.Tracker.SetTransportConnected(connected);
+                    CaptureBreathingTelemetry(address, breathingState, pushChartValue: false);
+                }
+                coherenceState.Tracker.SetTransportConnected(connected);
+                breathingDynamicsState.Tracker.SetTransportConnected(connected);
+                CaptureCoherenceTelemetry(address, coherenceState, pushChartValue: false);
+                CaptureBreathingDynamicsTelemetry(address, breathingDynamicsState, pushChartValue: false);
+
                 if (_selectedAddress?.Equals(address, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     SetConnectionStatus(connected ? "Connected" : "Offline", connected ? "FocusBlueBrush" : "GraphiteBrush");
@@ -450,11 +790,12 @@ public partial class MainWindow : Window
             Dispatcher.Invoke(() =>
             {
                 var cs = GetOrCreateChartState(address);
+                var coherenceState = GetOrCreateCoherenceState(address);
                 cs.HrCount++;
 
-                cs.HrValues.Add(sample.HeartRateBpm);
+                AppendRolling(cs.HrValues, sample.HeartRateBpm, maxCount: 120);
                 foreach (var rr in sample.RrIntervalsMs)
-                    cs.RrValues.Add(rr);
+                    AppendRolling(cs.RrValues, rr, maxCount: 120);
 
                 if (_liveSeriesBindings.TryGetValue(address, out var binding))
                 {
@@ -475,6 +816,13 @@ public partial class MainWindow : Window
                     foreach (var rr in sample.RrIntervalsMs)
                         _overlayChart.Push(_ovRr, rr);
                 }
+
+                PushMetricSampleToTelemetryCharts(address, TelemetryMetric.HeartRate, sample.HeartRateBpm);
+                foreach (var rr in sample.RrIntervalsMs)
+                    PushMetricSampleToTelemetryCharts(address, TelemetryMetric.RrInterval, rr);
+
+                coherenceState.Tracker.SubmitHrRrSample(sample);
+                CaptureCoherenceTelemetry(address, coherenceState, pushChartValue: true);
             });
 
         ctx.Session.EcgFrameReceived += frame =>
@@ -484,7 +832,7 @@ public partial class MainWindow : Window
                 cs.EcgCount++;
 
                 foreach (var uv in frame.MicroVolts)
-                    cs.EcgValues.Add(uv);
+                    AppendRolling(cs.EcgValues, uv, maxCount: 650);
 
                 if (_liveSeriesBindings.TryGetValue(address, out var binding))
                 {
@@ -500,19 +848,24 @@ public partial class MainWindow : Window
                         _overlayChart.Push(_ovEcg, uv);
                     }
                 }
+
+                foreach (var uv in frame.MicroVolts)
+                    PushMetricSampleToTelemetryCharts(address, TelemetryMetric.Ecg, uv);
             });
 
         ctx.Session.AccFrameReceived += frame =>
             Dispatcher.Invoke(() =>
             {
                 var cs = GetOrCreateChartState(address);
+                var breathingState = GetOrCreateBreathingState(address);
+                var breathingDynamicsState = GetOrCreateBreathingDynamicsState(address);
                 cs.AccCount++;
 
                 foreach (var s in frame.Samples)
                 {
-                    cs.AccXValues.Add(s.X);
-                    cs.AccYValues.Add(s.Y);
-                    cs.AccZValues.Add(s.Z);
+                    AppendRolling(cs.AccXValues, s.X, maxCount: 500);
+                    AppendRolling(cs.AccYValues, s.Y, maxCount: 500);
+                    AppendRolling(cs.AccZValues, s.Z, maxCount: 500);
                 }
 
                 if (_liveSeriesBindings.TryGetValue(address, out var binding))
@@ -535,6 +888,29 @@ public partial class MainWindow : Window
                         _overlayChart.Push(_ovAccZ, s.Z);
                     }
                 }
+
+                breathingState.Tracker.SubmitAccFrame(frame);
+                CaptureBreathingTelemetry(address, breathingState, pushChartValue: true);
+                breathingDynamicsState.Tracker.SubmitBreathingTelemetry(breathingState.LastTelemetry);
+                CaptureBreathingDynamicsTelemetry(address, breathingDynamicsState, pushChartValue: true);
+
+                foreach (var s in frame.Samples)
+                {
+                    PushMetricSampleToTelemetryCharts(address, TelemetryMetric.AccX, s.X);
+                    PushMetricSampleToTelemetryCharts(address, TelemetryMetric.AccY, s.Y);
+                    PushMetricSampleToTelemetryCharts(address, TelemetryMetric.AccZ, s.Z);
+                }
+            });
+
+        ctx.Session.BreathingTelemetryReceived += telemetry =>
+            Dispatcher.Invoke(() =>
+            {
+                var breathingState = GetOrCreateBreathingState(address);
+                var breathingDynamicsState = GetOrCreateBreathingDynamicsState(address);
+
+                CaptureSyntheticBreathingTelemetry(address, breathingState, telemetry, pushChartValue: true);
+                breathingDynamicsState.Tracker.SubmitBreathingTelemetry(telemetry);
+                CaptureBreathingDynamicsTelemetry(address, breathingDynamicsState, pushChartValue: true);
             });
 
         ctx.Session.PmdCtrlResponse += resp =>
@@ -546,6 +922,7 @@ public partial class MainWindow : Window
     private void RefreshDeviceList()
     {
         var prevSelected = _selectedAddress;
+        string? selectedAddress = null;
         DeviceListBox.Items.Clear();
 
         // Show all seen devices (from scan) + all connected devices
@@ -573,11 +950,27 @@ public partial class MainWindow : Window
             DeviceListBox.Items.Add(item);
 
             if (addr.Equals(prevSelected, StringComparison.OrdinalIgnoreCase))
+            {
                 item.IsSelected = true;
+                selectedAddress = addr;
+            }
         }
+
+        if (selectedAddress is null &&
+            DeviceListBox.SelectedItem is ListBoxItem selectedItem &&
+            selectedItem.Tag is string uiSelectedAddress)
+        {
+            selectedAddress = uiSelectedAddress;
+        }
+
+        _selectedAddress = selectedAddress;
 
         PopulateTrackedDevicesPanel();
         UpdateTrackedDevicesSummary();
+        UpdateBreathingPanel(selectedAddress);
+        UpdateCoherencePanel(selectedAddress);
+        UpdateBreathingDynamicsPanel(selectedAddress);
+        UpdateRawTelemetryWindow();
     }
 
     private void OnDeviceSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -593,6 +986,10 @@ public partial class MainWindow : Window
             RebuildTelemetryCharts();
             PopulateTrackedDevicesPanel();
             UpdateDetailPanel(addr);
+            EnsureBreathingEditorLoaded(addr);
+            UpdateRawTelemetryWindow();
+            UpdateCoherencePanel(addr);
+            UpdateBreathingDynamicsPanel(addr);
         }
     }
 
@@ -630,6 +1027,11 @@ public partial class MainWindow : Window
             RrValueText.Text = "RR intervals --";
         }
 
+        UpdateBreathingPanel(address);
+        UpdateCoherencePanel(address);
+        UpdateBreathingDynamicsPanel(address);
+        UpdateRawTelemetryWindow();
+
         // Update recording UI
         var isRecording = ctx?.Recorder != null;
         StartRecordButton.IsEnabled = isConnected && !isRecording;
@@ -664,8 +1066,8 @@ public partial class MainWindow : Window
         _seenDevices.Clear();
         AddLiveLog("Scanning for Polar devices...");
 
-        var factory = new WindowsBleAdapterFactory();
-        using var scanner = (WindowsBleScanner)factory.CreateScanner();
+        var factory = _transportSettings.CreateFactory();
+        var scanner = factory.CreateScanner();
         var scanCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         scanner.ScanCompleted += () => scanCompleted.TrySetResult();
@@ -698,8 +1100,16 @@ public partial class MainWindow : Window
             });
         };
 
-        await scanner.StartScanAsync(TimeSpan.FromSeconds(8));
-        await scanCompleted.Task;
+        try
+        {
+            await scanner.StartScanAsync(TimeSpan.FromSeconds(8));
+            await scanCompleted.Task;
+        }
+        finally
+        {
+            if (scanner is IDisposable disposable)
+                disposable.Dispose();
+        }
 
         ScanStatusText.Text = $"{_seenDevices.Count} devices";
         ScanButton.IsEnabled = true;
@@ -808,9 +1218,7 @@ public partial class MainWindow : Window
 
     private void OnFollowSelectedTrackingChanged(object sender, RoutedEventArgs e)
     {
-        if (_updatingTrackingUi || FollowSelectedTrackingCheckBox == null ||
-            HrChartHost == null || RrChartHost == null || EcgChartHost == null ||
-            AccXChartHost == null || AccYChartHost == null || AccZChartHost == null)
+        if (_updatingTrackingUi || FollowSelectedTrackingCheckBox == null)
             return;
 
         _trackingFollowsSelection = FollowSelectedTrackingCheckBox.IsChecked == true;
@@ -837,8 +1245,7 @@ public partial class MainWindow : Window
         if (_trackedAddresses.Count == 0)
             _trackedAddresses.Add(address);
 
-        RebuildLiveCharts();
-        UpdateTrackedDevicesSummary();
+        RebuildTelemetryCharts();
         PopulateTrackedDevicesPanel();
     }
 
@@ -962,6 +1369,7 @@ public partial class MainWindow : Window
         {
             PopulateTrackedDevicesPanel();
             UpdateTrackedDevicesSummary();
+            UpdateBreathingPanel(_selectedAddress);
             return;
         }
 
@@ -992,6 +1400,8 @@ public partial class MainWindow : Window
         DiagLogList.Items.Clear();
         _seenDevices.Clear();
         _chartStates.Clear();
+        ClearBreathingStates();
+        ClearBreathingDynamicsStates();
         _trackedAddresses.Clear();
 
         var previewDevices = new[]
@@ -1060,6 +1470,9 @@ public partial class MainWindow : Window
         PopulatePreviewCharts(previewDevices[0].Item1, offset: 0.0, connectedScale: 1.0);
         PopulatePreviewCharts(previewDevices[1].Item1, offset: 0.9, connectedScale: 0.82);
         PopulatePreviewCharts(previewDevices[2].Item1, offset: 1.6, connectedScale: 0.58);
+        SeedPreviewBreathingState(previewDevices);
+        SeedPreviewCoherenceState(previewDevices);
+        SeedPreviewBreathingDynamicsState(previewDevices);
         RebuildTelemetryCharts();
         PopulateTrackedDevicesPanel();
         UpdateDetailPanel(_selectedAddress);
