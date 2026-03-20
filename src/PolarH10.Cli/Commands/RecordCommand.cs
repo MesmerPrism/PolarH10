@@ -74,8 +74,15 @@ internal static class RecordCommand
                     await session.RequestSettingsAsync(PolarGattIds.MeasurementTypeEcg, cts.Token);
                     await Task.Delay(1500, cts.Token);
                     await session.StartEcgAsync(ct: cts.Token);
-                    await Task.Delay(2000, cts.Token);
-                    await session.StartAccAsync(ct: cts.Token);
+                    if (!session.HasSyntheticBreathingTelemetry)
+                    {
+                        await Task.Delay(2000, cts.Token);
+                        await session.StartAccAsync(ct: cts.Token);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Synthetic breathing telemetry is active; recording HR/RR + ECG without PMD ACC.");
+                    }
                 }
                 else
                 {

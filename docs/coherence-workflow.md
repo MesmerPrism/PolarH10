@@ -34,6 +34,15 @@ for the headline readout and summary charts:
 The paper defines the spectral calculation above, but it does not define the
 operator-side runtime controls exposed by this app.
 
+Real-vs-synthetic alignment note:
+
+- on a physical H10, the RR intervals feeding coherence come from the strap's
+  device-side beat timing, which is derived from ECG
+- on the sibling `SyntheticBio` transport, the coherence tracker still solves
+  from RR, but the transport now also emits synthetic PMD ECG frames that stay
+  synchronized with that RR schedule so the waveform view does not drift away
+  from the interval view during synthetic sessions
+
 ## What The Window Exposes
 
 - headline `Coherence` value plus `Confidence`

@@ -67,8 +67,10 @@ internal static class MonitorCommand
             if (wantAcc)
             {
                 session.AccFrameReceived += f => Console.WriteLine($"ACC: {f.Samples.Length} samples  ts={f.SensorTimestampNs}");
-                if (session.IsPmdReady)
+                if (session.IsPmdReady && !session.HasSyntheticBreathingTelemetry)
                     await session.StartAccAsync(ct: cts.Token);
+                else if (session.IsPmdReady && session.HasSyntheticBreathingTelemetry)
+                    Console.WriteLine("ACC requested, but the synthetic transport uses injected breathing telemetry instead of PMD ACC emulation.");
                 else
                     Console.WriteLine("ACC requested, but PMD is not available on the selected transport.");
             }

@@ -22,6 +22,7 @@ public sealed class PolarH10Session : IAsyncDisposable
 
     public bool IsConnected => _connection?.IsConnected ?? false;
     public bool IsPmdReady { get; private set; }
+    public bool HasSyntheticBreathingTelemetry => _syntheticBreathingSource is not null;
 
     public event Action<HrRrSample>? HrRrReceived;
     public event Action<PolarEcgFrame>? EcgFrameReceived;

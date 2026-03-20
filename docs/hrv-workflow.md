@@ -39,6 +39,15 @@ The app uses the paper in these specific ways:
 The tracker keeps the pNN threshold fixed at `50 ms`, and the `SD1` line is the
 standard `RMSSD / sqrt(2)` relationship noted by the paper.
 
+Real-vs-synthetic alignment note:
+
+- on a physical H10, the RR intervals feeding the HRV tab come from the
+  strap's own beat timing, which is derived from ECG inside the device
+- on the sibling `SyntheticBio` transport, the HRV solve remains RR-based, but
+  the transport now also emits synthetic PMD ECG frames that stay synchronized
+  with that RR schedule so operator tests can compare the waveform and the RR
+  telemetry against the same synthetic beat sequence
+
 ## What The Tab Exposes
 
 - headline `RMSSD` value from the rolling RR window

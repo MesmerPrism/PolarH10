@@ -119,8 +119,11 @@ public sealed class PolarMultiDeviceCoordinator : IAsyncDisposable
         await ctx.Session.RequestSettingsAsync(PolarGattIds.MeasurementTypeEcg, ct);
         await Task.Delay(500, ct);
         await ctx.Session.StartEcgAsync(ct: ct);
-        await Task.Delay(500, ct);
-        await ctx.Session.StartAccAsync(ct: ct);
+        if (!ctx.Session.HasSyntheticBreathingTelemetry)
+        {
+            await Task.Delay(500, ct);
+            await ctx.Session.StartAccAsync(ct: ct);
+        }
 
         ctx.Status = DeviceConnectionStatus.Streaming;
         ctx.RaiseStatusChanged();

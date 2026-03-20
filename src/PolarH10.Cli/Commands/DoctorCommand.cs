@@ -44,6 +44,8 @@ internal static class DoctorCommand
             Console.WriteLine($"[doctor] OK  PMD ready: {session.IsPmdReady}");
             if (!session.IsPmdReady)
                 Console.WriteLine("[doctor] INFO  PMD unavailable on this transport; skipping ECG/ACC checks.");
+            else if (session.HasSyntheticBreathingTelemetry)
+                Console.WriteLine("[doctor] INFO  Synthetic breathing telemetry is active; ECG is validated through PMD, ACC remains intentionally bypassed on this transport.");
 
             bool gotHr = false;
             session.HrRrReceived += _ => gotHr = true;
@@ -77,14 +79,21 @@ internal static class DoctorCommand
                 }
                 catch (Exception ex) { Console.WriteLine($"[doctor] FAIL  ECG: {ex.Message}"); }
 
-                Console.WriteLine("[doctor] Starting ACC stream...");
-                try
+                if (session.HasSyntheticBreathingTelemetry)
                 {
-                    await session.StartAccAsync(ct: cts.Token);
-                    await Task.Delay(2000, cts.Token);
-                    Console.WriteLine($"[doctor] {(gotAcc ? "OK" : "WARN")}  ACC frames received: {gotAcc}");
+                    Console.WriteLine("[doctor] INFO  Skipping ACC PMD check on the synthetic breathing transport.");
                 }
-                catch (Exception ex) { Console.WriteLine($"[doctor] FAIL  ACC: {ex.Message}"); }
+                else
+                {
+                    Console.WriteLine("[doctor] Starting ACC stream...");
+                    try
+                    {
+                        await session.StartAccAsync(ct: cts.Token);
+                        await Task.Delay(2000, cts.Token);
+                        Console.WriteLine($"[doctor] {(gotAcc ? "OK" : "WARN")}  ACC frames received: {gotAcc}");
+                    }
+                    catch (Exception ex) { Console.WriteLine($"[doctor] FAIL  ACC: {ex.Message}"); }
+                }
             }
 
             // Check HR

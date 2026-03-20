@@ -50,6 +50,14 @@ Because both derived modules have a warmup phase:
 
 That is expected behavior, not an automatic failure.
 
+## Why Can Coherence Or HRV Exist Even Before I Inspect ECG In Detail?
+
+Because both modules solve from accepted RR intervals rather than directly from
+ECG morphology.
+
+- on a physical H10, those RR intervals are device-derived from the strap's ECG beat timing
+- on the sibling `SyntheticBio` harness, the RR stream is now paired with synthetic PMD ECG on the same beat schedule, but the coherence and HRV solves themselves still use RR
+
 ## What Should I Read First If I Only Want One Working Session?
 
 Start with:

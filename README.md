@@ -68,6 +68,12 @@ The HRV workflow follows the short-term time-domain guidance summarized by
 Shaffer and Ginsberg, *An Overview of Heart Rate Variability Metrics and Norms*
 (2017), using RMSSD as the headline value from a rolling accepted RR window.
 
+In a real H10 session, that RR stream comes from the strap's own beat timing,
+which is device-derived from ECG. The sibling `SyntheticBio` harness now mirrors
+that operator path by emitting synthetic PMD ECG frames that stay synchronized
+with the same synthetic RR schedule, while synthetic breathing still arrives on
+its dedicated telemetry path instead of PMD ACC.
+
 Read next:
 
 - [App Overview](docs/app-overview.md)

@@ -44,6 +44,10 @@ nav_order: 90
    integrate a `0.030 Hz` peak window, and compare it against total power in
    `0.0033-0.4 Hz`.
 
+   Real-session note: the app consumes RR intervals from the Heart Rate
+   Measurement characteristic, while the physical H10 derives those beat
+   intervals from ECG timing inside the strap.
+
 ## Short-Term HRV Source
 
 1. **Shaffer, F.; Ginsberg, J. P.** "An Overview of Heart Rate Variability
@@ -61,6 +65,11 @@ nav_order: 90
    The repository intentionally treats these values as short-term RR-derived
    telemetry, not as a substitute for `24 h` norms or full clinical artifact
    correction.
+
+   Synthetic-session note: the sibling `SyntheticBio` harness now emits PMD ECG
+   frames that stay synchronized with the same synthetic RR schedule used for
+   coherence and HRV warmup, so synthetic operator tests keep the waveform and
+   interval views aligned even though breathing still bypasses PMD ACC.
 
 ## Breathing Dynamics Sources
 

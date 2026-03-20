@@ -88,6 +88,13 @@ internal static class StreamCommand
         }
         else
         {
+            if (session.HasSyntheticBreathingTelemetry)
+            {
+                Console.Error.WriteLine("The synthetic transport exposes breathing telemetry directly and does not emulate PMD ACC.");
+                await session.DisposeAsync();
+                return;
+            }
+
             session.AccFrameReceived += f =>
             {
                 foreach (var s in f.Samples)

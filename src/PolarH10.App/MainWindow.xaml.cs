@@ -1198,7 +1198,10 @@ public partial class MainWindow : Window
                 try
                 {
                     await _coordinator.StartStreamingAsync(address);
-                    AddLiveLog($"[{DisplayName(address)}] Streaming ECG + ACC");
+                    AddLiveLog(
+                        ctx.Session.HasSyntheticBreathingTelemetry
+                            ? $"[{DisplayName(address)}] Streaming ECG + synthetic breathing telemetry"
+                            : $"[{DisplayName(address)}] Streaming ECG + ACC");
                 }
                 catch (Exception ex)
                 {

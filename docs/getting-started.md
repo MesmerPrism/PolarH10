@@ -98,6 +98,12 @@ Use the `HRV` tab once heart rate and RR intervals are already updating.
 
 For the full operator checklist, see [HRV Workflow](hrv-workflow.md).
 
+If you are testing through the sibling `SyntheticBio` harness, the synthetic
+transport now exposes PMD ECG alongside the HRS RR stream. Coherence and HRV
+still solve from RR, but the synthetic ECG pane should now track the same beat
+schedule instead of staying blank. Synthetic breathing remains a direct
+telemetry feed rather than PMD ACC emulation.
+
 ## Canonical workspace desktop build
 
 If you want a stable repo-local executable instead of `dotnet run`, build the
