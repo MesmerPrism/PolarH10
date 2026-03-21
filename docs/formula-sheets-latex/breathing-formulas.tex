@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Breathing From ACC Formula Sheet}\\[0.5em]
+{\large PolarH10 repository-specific breathing-volume approximation}
+\end{center}
+
+\section*{Provenance}
+
+This breathing-volume model is repository-specific code ported from the existing
+Unity runtime. It is not presented as a published external method reference.
+
+\begin{itemize}[leftmargin=1.5em]
+\item This ACC breathing-volume model has not yet been externally validated.
+\item A validation study is actively being worked on.
+\end{itemize}
+
+\section*{Data path}
+
+\begin{itemize}[leftmargin=1.5em]
+\item input stream: PMD accelerometer samples from the Polar H10
+\item preprocessing: exponential moving average on the raw ACC signal
+\item calibration: estimate a center point and a principal breathing axis from a calibration window
+\item projection: map filtered ACC onto the chosen breathing axis
+\item bounds: derive lower and upper projection bounds from calibration quantiles
+\item output: convert the projected signal into a $0..1$ breathing-volume estimate
+\end{itemize}
+
+\section*{Core approximation}
+
+Filtered ACC sample:
+
+\[
+a_f(t) = (1 - \alpha)a_f(t-1) + \alpha a_{raw}(t)
+\]
+
+Calibration center:
+
+\[
+c = \frac{1}{N}\sum_{i=1}^{N} a_f(i)
+\]
+
+Principal-axis projection:
+
+\[
+p(t) = \langle a_f(t) - c, u \rangle
+\]
+
+where $u$ is the dominant calibration axis estimated from the calibration-window
+covariance.
+
+If the optional XZ model is available, the tracker also keeps a 2-D projection
+in the chest plane:
+
+\[
+p_{xz}(t) = \langle (x(t), z(t)) - c_{xz}, u_{xz} \rangle
+\]
+
+Lower and upper projection bounds come from calibration quantiles:
+
+\[
+b_{min} = Q_{lower}(p), \qquad b_{max} = Q_{upper}(p)
+\]
+
+The runtime then applies the configured edge-ease and optional adaptive-bounds
+updates before mapping the projection to volume:
+
+\[
+v(t) = \operatorname{clamp}\left(\frac{p(t) - b_{min}}{b_{max} - b_{min}}, 0, 1\right)
+\]
+
+The final base volume uses either the 3-D axis model or the XZ model, depending
+on the tracker settings. The displayed output may then be inverted if the
+configured inhale/exhale direction is flipped.
+
+\section*{State classification}
+
+The tracker derives \texttt{Inhaling}, \texttt{Exhaling}, and \texttt{Pausing}
+from the first difference of the output volume:
+
+\[
+\Delta v(t) = v(t) - v(t-1)
+\]
+
+\begin{itemize}[leftmargin=1.5em]
+\item \texttt{Inhaling} when $\Delta v$ exceeds the configured positive threshold
+\item \texttt{Exhaling} when $\Delta v$ is below the negative threshold
+\item \texttt{Pausing} otherwise
+\end{itemize}
+
+\section*{Alignment status}
+
+There is no external paper claim here. The correct interpretation is:
+
+\begin{itemize}[leftmargin=1.5em]
+\item this sheet documents what the app computes
+\item the model is intended as a practical ACC-only breathing approximation
+\item external validation is still pending
+\end{itemize}
+
+\section*{References}
+
+\begin{itemize}[leftmargin=1.5em]
+\item \url{https://mesmerprism.github.io/PolarH10/reference/breathing-workflow.html}
+\item \url{https://mesmerprism.github.io/PolarH10/reference/references.html}
+\end{itemize}
+
+\end{document}

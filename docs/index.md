@@ -66,6 +66,7 @@ dotnet run --project src/PolarH10.Cli -- scan
 - [HRV Workflow](hrv-workflow.md)
 - [Breathing Workflow](breathing-workflow.md)
 - [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
+- [Formula Sheets](formula-sheets.md)
 
 ### Use the CLI
 
@@ -91,6 +92,7 @@ dotnet run --project src/PolarH10.Cli -- scan
 ## When You Need More Detail
 
 - [WPF UI Preview](ui-preview.md)
+- [Formula Sheets](formula-sheets.md)
 - [Output Formats](output-formats.md)
 - [Platform Guides](platform-guides/index.md)
 - [ECG Frame Format](protocol/ecg-format.md)

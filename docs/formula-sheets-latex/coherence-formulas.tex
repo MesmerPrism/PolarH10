@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Coherence Formula Sheet}\\[0.5em]
+{\large PolarH10 RR-derived coherence}
+\end{center}
+
+\section*{Data path}
+
+\begin{itemize}[leftmargin=1.5em]
+\item Input stream: accepted RR intervals from the Heart Rate Measurement characteristic.
+\item Physical H10: those RR intervals are device-derived from ECG beat timing inside the strap.
+\item Synthetic transport: the coherence solve still uses RR, while synthetic PMD ECG is emitted separately so the waveform view stays aligned to the same beat schedule.
+\end{itemize}
+
+\section*{Fixed spectral model}
+
+The app keeps the paper-defined constants fixed:
+
+\begin{itemize}[leftmargin=1.5em]
+\item peak search band: $0.04$--$0.26$ Hz
+\item peak integration window: $0.030$ Hz centered on the dominant peak
+\item total-power band: $0.0033$--$0.4$ Hz
+\end{itemize}
+
+\[
+f_{peak} = \arg\max_{f \in [0.04, 0.26]} PSD(f)
+\]
+
+\[
+P_{peak} = \int_{f_{peak} - 0.015}^{f_{peak} + 0.015} PSD(f)\,df
+\]
+
+\[
+P_{total} = \int_{0.0033}^{0.4} PSD(f)\,df
+\]
+
+\[
+\text{paper coherence ratio} =
+\left(\frac{P_{peak}}{P_{total} - P_{peak}}\right)^2
+\]
+
+\section*{UI-facing normalized score}
+
+The app also publishes a bounded score for the headline readout and summary charts:
+
+\[
+\text{normalized coherence}_{0..1} =
+\operatorname{clamp}\left(\frac{P_{peak}}{P_{total}}, 0, 1\right)
+\]
+
+This normalized score is an application-level presentation choice. It is not the
+McCraty paper ratio itself.
+
+\section*{Runtime choices around the paper formula}
+
+The cited source fixes the spectral constants above, but it does not define the
+operator-side runtime details used by this app. The current implementation uses:
+
+\begin{itemize}[leftmargin=1.5em]
+\item a rolling RR window
+\item cubic-spline resampling of the RR tachogram
+\item a 128-point Hann-windowed spectrum solve
+\item a smoothed headline $0..1$ display value
+\item a separate confidence score based on RR count and window coverage
+\end{itemize}
+
+\section*{Alignment status}
+
+The implementation is aligned to the cited reference at the formula level for
+the peak search band, peak-window width, total-band limits, and paper coherence
+ratio. The display normalization, smoothing, and confidence telemetry are
+explicit application-level additions.
+
+\section*{References}
+
+\begin{itemize}[leftmargin=1.5em]
+\item McCraty, Atkinson, Tomasino, and Bradley, \emph{The Coherent Heart} (2006).
+\item \url{https://mesmerprism.github.io/PolarH10/reference/coherence-workflow.html}
+\item \url{https://mesmerprism.github.io/PolarH10/reference/references.html}
+\end{itemize}
+
+\end{document}

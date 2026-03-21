@@ -9,6 +9,14 @@ nav_order: 90
 
 # References
 
+## Formula Sheet Downloads
+
+- [Formula Sheets](formula-sheets.md)
+- [Coherence Formula Sheet](coherence-formulas.md)
+- [HRV Formula Sheet](hrv-formulas.md)
+- [Breathing From ACC Formula Sheet](breathing-formulas.md)
+- [Breathing Dynamics Formula Sheet](breathing-dynamics-formulas.md)
+
 ## Primary Sources
 
 1. **Polar BLE SDK** (MIT License)
@@ -121,6 +129,20 @@ The app's default entropy settings are explicit and operator-visible:
 
 Those defaults are intended to stay aligned with the NeuroKit2 path cited by
 the paper while making the runtime behavior reproducible inside this repository.
+
+The current runtime also suppresses undefined entropy solves instead of
+inventing a finite fallback value, and its PSD slope path now follows the
+NeuroKit2-style detrend plus low-frequency log-log fit more closely.
+
+## Breathing From ACC Provenance Note
+
+The ACC breathing-volume tracker in this repository is repo-specific code. It is
+documented as an approximation rather than a validated published method.
+
+Current status:
+
+- it has not yet been externally validated
+- a validation study is actively being worked on
 
 ## Bluetooth SIG Specifications
 

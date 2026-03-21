@@ -1,0 +1,182 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Breathing Dynamics Formula Sheet}\\[0.5em]
+{\large PolarH10 breath interval and amplitude entropy features}
+\end{center}
+
+\section*{Data path}
+
+\begin{itemize}[leftmargin=1.5em]
+\item input waveform: calibrated \texttt{VolumeBase01} from the Breathing tracker
+\item event extraction: alternating peaks and troughs from that calibrated waveform
+\item derived series:
+  \begin{itemize}[leftmargin=1.5em]
+  \item interval series: spacing between same-polarity extrema
+  \item amplitude series: absolute peak-trough excursion
+  \end{itemize}
+\end{itemize}
+
+This is the main adaptation relative to the cited paper: the paper uses a
+respiration-belt signal, while this app uses the repository's calibrated ACC
+breathing waveform.
+
+\section*{Derived breath series}
+
+For accepted extrema times $t_k$ and values $x_k$:
+
+\[
+\text{interval}_j = t_j - t_{j-1}
+\]
+
+where the two extrema belong to the same polarity family, for example peak to
+peak or trough to trough.
+
+\[
+\text{amplitude}_j = |x_j - x_{j-1}|
+\]
+
+where the two extrema are alternating peak and trough partners in a completed
+breath excursion.
+
+\section*{Basic statistics}
+
+For either derived series $s_1 \ldots s_n$:
+
+\[
+\mu = \frac{1}{n}\sum_{i=1}^{n}s_i
+\]
+
+\[
+SD = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(s_i - \mu)^2}
+\]
+
+\[
+CV = \frac{SD}{|\mu|}
+\]
+
+\section*{ACW50}
+
+The autocorrelation window is the first lag where the normalized
+autocorrelation falls below $0.5$:
+
+\[
+ACW50 = \min \left\{ \ell \ge 1 : \rho(\ell) < 0.5 \right\}
+\]
+
+\section*{PSD slope}
+
+The implementation now follows the cited NeuroKit2 path more closely:
+
+\begin{itemize}[leftmargin=1.5em]
+\item linearly detrend the series
+\item standardize it with population SD
+\item compute a one-sided FFT power spectrum
+\item keep the lower-frequency quartile of the spectrum
+\item fit the slope in log-log space
+\end{itemize}
+
+\[
+\text{PSD slope} =
+\operatorname{slope}\left(\log_{10}(f), \log_{10}(PSD(f))\right)
+\]
+
+\section*{Lempel-Ziv complexity}
+
+The series is binarized around its mean:
+
+\[
+b_i =
+\begin{cases}
+1 & s_i \ge \mu \\
+0 & s_i < \mu
+\end{cases}
+\]
+
+The Lempel-Ziv counter then scans the binary string left-to-right and adds a new
+phrase whenever it encounters a substring not yet present in the discovered
+pattern set. The app publishes a normalized form:
+
+\[
+LZC_{norm} = \frac{c(n)}{n / \log_2(n)}
+\]
+
+\section*{Sample entropy}
+
+Default settings:
+
+\begin{itemize}[leftmargin=1.5em]
+\item $m = 2$
+\item delay $= 1$
+\item $r = 0.2 \cdot SD$
+\end{itemize}
+
+\[
+SampEn(m, r, N) = -\ln\left(\frac{A}{B}\right)
+\]
+
+where $B$ counts matching embedded vectors of length $m$, $A$ counts matching
+embedded vectors of length $m + 1$, and matching uses the Chebyshev-distance
+tolerance $r$.
+
+If the conditional probability is undefined, the app now suppresses the
+headline instead of inventing a finite fallback value.
+
+\section*{Multiscale entropy}
+
+Default settings:
+
+\begin{itemize}[leftmargin=1.5em]
+\item $m = 3$
+\item delay $= 1$
+\item $r = 0.2 \cdot SD$ of the original series
+\item scales $1..5$
+\item published summary: area under the entropy-by-scale curve divided by the count of usable scales
+\end{itemize}
+
+For each scale $\tau$, the series is coarse-grained by averaging
+non-overlapping blocks:
+
+\[
+y_j^{(\tau)} = \frac{1}{\tau}\sum_{i=(j-1)\tau + 1}^{j\tau} s_i
+\]
+
+Sample entropy is then computed on each coarse-grained series with the same
+base tolerance. The reported MSE summary is:
+
+\[
+MSE_{AUC} = \frac{\operatorname{trapz}(SampEn_{\tau})}{K}
+\]
+
+where $K$ is the number of usable finite scales kept for the summary.
+
+\section*{Alignment status}
+
+This implementation is aligned to the cited method family for interval and
+amplitude series extraction from extrema; mean, SD, CV, ACW50, PSD slope, LZC,
+SampEn, and MSE; NeuroKit2-style SampEn and MSE defaults; NeuroKit2-style
+handling of undefined entropy values; and NeuroKit2-style PSD slope
+preprocessing and low-frequency fit region.
+
+The remaining explicit adaptation is the waveform source: the paper uses
+respiration-belt input, while this repository uses the calibrated ACC breathing
+waveform from \texttt{PolarBreathingTracker}.
+
+\section*{References}
+
+\begin{itemize}[leftmargin=1.5em]
+\item Goheen et al., ``It's About Time: Breathing Dynamics Modulate Emotion and Cognition'' (2025).
+\item \url{https://doi.org/10.1111/psyp.70149}
+\item \url{https://mesmerprism.github.io/PolarH10/reference/breathing-dynamics-workflow.html}
+\item \url{https://mesmerprism.github.io/PolarH10/reference/references.html}
+\end{itemize}
+
+\end{document}

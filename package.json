@@ -8,6 +8,7 @@
     "diagram:watch": "chokidar \"docs/diagrams/*.mmd\" \"docs/diagrams/manifest.json\" -c \"npm run diagram:render:all && npm run diagram:sync:readme\"",
     "diagram:serve": "browser-sync start --server docs --files \"docs/diagrams/*.svg,docs/diagrams/*.html\" --startPath \"diagrams/viewer.html\"",
     "diagram:dev": "concurrently \"npm:diagram:watch\" \"npm:diagram:serve\"",
+    "formula-sheets:pdf": "node ./tools/diagrams/invoke-powershell.mjs ../site/render-formula-sheets.ps1",
     "app:workspace:build": "node ./tools/diagrams/invoke-powershell.mjs ../app/Build-Workspace-App.ps1",
     "ui:preview:capture": "node ./tools/diagrams/invoke-powershell.mjs ../site/capture-wpf-preview.ps1",
     "pages:build:site": "node ./tools/site/build-pages.mjs",

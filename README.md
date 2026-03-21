@@ -74,6 +74,9 @@ that operator path by emitting synthetic PMD ECG frames that stay synchronized
 with the same synthetic RR schedule, while synthetic breathing still arrives on
 its dedicated telemetry path instead of PMD ACC.
 
+The ACC breathing-volume tracker is repository-specific, not yet externally
+validated, and is currently being prepared for a dedicated validation study.
+
 Read next:
 
 - [App Overview](docs/app-overview.md)
@@ -83,6 +86,7 @@ Read next:
 - [HRV Workflow](docs/hrv-workflow.md)
 - [Breathing Workflow](docs/breathing-workflow.md)
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
+- [Formula Sheets](docs/formula-sheets.md)
 
 If you want the canonical repo-local desktop build that the Pages preview
 pipeline and sibling `SyntheticBio` launcher both use, build it into
@@ -161,6 +165,7 @@ control-point commands, frame layouts, or code architecture.
 - [HRV Workflow](docs/hrv-workflow.md)
 - [Breathing Workflow](docs/breathing-workflow.md)
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
+- [Formula Sheets](docs/formula-sheets.md)
 - [Output Formats](docs/output-formats.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [FAQ](docs/faq.md)
@@ -181,6 +186,7 @@ The repository includes a custom GitHub Pages workflow that:
 
 ```powershell
 npm install
+npm run formula-sheets:pdf
 npm run pages:build
 npm run pages:serve
 npm run pages:dev

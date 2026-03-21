@@ -139,8 +139,10 @@ public sealed class PolarBreathingDynamicsTracker
         int stabilizationCount = Math.Min(_intervalBreaths.Count, _amplitudeBreaths.Count);
         bool intervalBasicReady = _intervalBreaths.Count >= Settings.MinimumBreathsForBasicStats;
         bool amplitudeBasicReady = _amplitudeBreaths.Count >= Settings.MinimumBreathsForBasicStats;
-        bool intervalEntropyReady = _intervalBreaths.Count >= Settings.MinimumBreathsForEntropy;
-        bool amplitudeEntropyReady = _amplitudeBreaths.Count >= Settings.MinimumBreathsForEntropy;
+        bool intervalEntropyReady = _intervalBreaths.Count >= Settings.MinimumBreathsForEntropy &&
+            HasFiniteEntropyMetrics(_intervalFeatures);
+        bool amplitudeEntropyReady = _amplitudeBreaths.Count >= Settings.MinimumBreathsForEntropy &&
+            HasFiniteEntropyMetrics(_amplitudeFeatures);
 
         return new PolarBreathingDynamicsTelemetry(
             IsTransportConnected: _isTransportConnected,
@@ -360,6 +362,10 @@ public sealed class PolarBreathingDynamicsTracker
             values.RemoveAt(0);
     }
 
+    private static bool HasFiniteEntropyMetrics(PolarBreathingFeatureSet features)
+        => float.IsFinite(features.SampleEntropy) &&
+           float.IsFinite(features.MultiscaleEntropy);
+
     private double ResolveSampleTimeSeconds(DateTimeOffset? sampleAtUtc)
     {
         if (_timebaseKind == TimebaseKind.Uninitialized)
@@ -516,29 +522,50 @@ public sealed class PolarBreathingDynamicsTracker
             if (count < 8)
                 return 0f;
 
-            List<double> logFrequencies = new(count / 2);
-            List<double> logPowers = new(count / 2);
-            for (int k = 1; k <= count / 2; k++)
+            double[] detrended = DetrendLinearly(samples);
+            double squaredSum = 0d;
+            for (int i = 0; i < detrended.Length; i++)
+                squaredSum += detrended[i] * detrended[i];
+
+            double standardDeviation = Math.Sqrt(squaredSum / count);
+            if (standardDeviation <= 1e-9d)
+                return 0f;
+
+            for (int i = 0; i < detrended.Length; i++)
+                detrended[i] /= standardDeviation;
+
+            int bins = (count / 2) + 1;
+            double[] frequencies = new double[bins];
+            double[] powers = new double[bins];
+            const double sampleRateHz = 1000d;
+            for (int k = 0; k < bins; k++)
             {
                 double real = 0d;
                 double imaginary = 0d;
                 for (int n = 0; n < count; n++)
                 {
                     double angle = -2d * Math.PI * k * n / count;
-                    real += samples[n] * Math.Cos(angle);
-                    imaginary += samples[n] * Math.Sin(angle);
+                    real += detrended[n] * Math.Cos(angle);
+                    imaginary += detrended[n] * Math.Sin(angle);
                 }
 
-                double power = (real * real) + (imaginary * imaginary);
-                if (power <= 0d)
+                frequencies[k] = k * sampleRateHz / count;
+                powers[k] = (real * real) + (imaginary * imaginary);
+            }
+
+            double maxFrequency = frequencies[^1];
+            double cutoffFrequency = maxFrequency * 0.25d;
+            List<double> logFrequencies = new(count / 2);
+            List<double> logPowers = new(count / 2);
+            for (int i = 1; i < frequencies.Length; i++)
+            {
+                double frequency = frequencies[i];
+                double power = powers[i];
+                if (frequency <= 0d || frequency >= cutoffFrequency || power <= 0d)
                     continue;
 
-                double frequency = k / (double)count;
-                if (frequency <= 0d)
-                    continue;
-
-                logFrequencies.Add(Math.Log(frequency));
-                logPowers.Add(Math.Log(power));
+                logFrequencies.Add(Math.Log10(frequency));
+                logPowers.Add(Math.Log10(power));
             }
 
             if (logFrequencies.Count < 3)
@@ -621,7 +648,8 @@ public sealed class PolarBreathingDynamicsTracker
             IReadOnlyList<float> samples,
             int dimension,
             int delay,
-            float toleranceSdFactor)
+            float toleranceSdFactor,
+            float? absoluteTolerance = null)
         {
             int requiredCount = (dimension + 1) * delay + 1;
             if (samples.Count < requiredCount)
@@ -631,13 +659,16 @@ public sealed class PolarBreathingDynamicsTracker
             if (standardDeviation <= 1e-6f)
                 return 0f;
 
-            float tolerance = standardDeviation * Math.Max(0.01f, toleranceSdFactor);
+            float tolerance = absoluteTolerance ?? (standardDeviation * Math.Max(0.01f, toleranceSdFactor));
+            if (!float.IsFinite(tolerance) || tolerance <= 0f)
+                return float.NaN;
+
             int b = CountMatches(samples, dimension, delay, tolerance);
             int a = CountMatches(samples, dimension + 1, delay, tolerance);
             if (b <= 0)
-                return 0f;
+                return float.NaN;
             if (a <= 0)
-                return (float)Math.Log(b + 1d);
+                return float.PositiveInfinity;
 
             return (float)(-Math.Log(a / (double)b));
         }
@@ -679,20 +710,31 @@ public sealed class PolarBreathingDynamicsTracker
             if (samples.Count < Math.Max(4, maxScale))
                 return 0f;
 
+            float absoluteTolerance = ComputeAbsoluteTolerance(samples, toleranceSdFactor);
+            if (!float.IsFinite(absoluteTolerance) || absoluteTolerance <= 0f)
+                return 0f;
+
             List<float> entropyByScale = new(maxScale);
-            int usableScaleCount = 0;
             for (int scale = 1; scale <= Math.Max(1, maxScale); scale++)
             {
                 float[] coarse = CoarseGrain(samples, scale);
                 if (coarse.Length < ((dimension + 1) * delay) + 1)
                     continue;
 
-                entropyByScale.Add(ComputeSampleEntropy(coarse, dimension, delay, toleranceSdFactor));
-                usableScaleCount++;
+                float entropy = ComputeSampleEntropy(
+                    coarse,
+                    dimension,
+                    delay,
+                    toleranceSdFactor,
+                    absoluteTolerance);
+                if (!float.IsFinite(entropy) || entropy == 0f)
+                    continue;
+
+                entropyByScale.Add(entropy);
             }
 
             if (entropyByScale.Count == 0)
-                return 0f;
+                return float.NaN;
             if (entropyByScale.Count == 1)
                 return entropyByScale[0];
 
@@ -700,7 +742,7 @@ public sealed class PolarBreathingDynamicsTracker
             for (int i = 1; i < entropyByScale.Count; i++)
                 area += (entropyByScale[i - 1] + entropyByScale[i]) * 0.5d;
 
-            return usableScaleCount > 0 ? (float)(area / usableScaleCount) : 0f;
+            return (float)(area / entropyByScale.Count);
         }
 
         private static float[] CoarseGrain(IReadOnlyList<float> samples, int scale)
@@ -717,6 +759,38 @@ public sealed class PolarBreathingDynamicsTracker
             }
 
             return coarse;
+        }
+
+        private static float ComputeAbsoluteTolerance(IReadOnlyList<float> samples, float toleranceSdFactor)
+        {
+            float standardDeviation = ComputeStandardDeviation(samples, ComputeMean(samples));
+            if (standardDeviation <= 1e-6f)
+                return 0f;
+
+            return standardDeviation * Math.Max(0.01f, toleranceSdFactor);
+        }
+
+        private static double[] DetrendLinearly(IReadOnlyList<float> samples)
+        {
+            int count = samples.Count;
+            double meanX = (count - 1) * 0.5d;
+            double meanY = samples.Average(static value => (double)value);
+            double numerator = 0d;
+            double denominator = 0d;
+            for (int i = 0; i < count; i++)
+            {
+                double dx = i - meanX;
+                numerator += dx * (samples[i] - meanY);
+                denominator += dx * dx;
+            }
+
+            double slope = denominator > 0d ? numerator / denominator : 0d;
+            double intercept = meanY - (slope * meanX);
+            double[] detrended = new double[count];
+            for (int i = 0; i < count; i++)
+                detrended[i] = samples[i] - ((slope * i) + intercept);
+
+            return detrended;
         }
     }
 }

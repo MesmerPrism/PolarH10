@@ -10,6 +10,7 @@ const docsRoot = path.join(repoRoot, 'docs');
 const siteRoot = path.join(repoRoot, 'site');
 const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
+const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
 const assetVersion = '20260320-pages-13';
@@ -51,6 +52,7 @@ async function main() {
 
   await fs.rm(siteRoot, { recursive: true, force: true });
   await fs.mkdir(referenceRoot, { recursive: true });
+  await fs.mkdir(referenceMarkdownRoot, { recursive: true });
   await copyDir(assetsSource, path.join(siteRoot, 'assets'));
   await copyDir(diagramsSource, path.join(siteRoot, 'diagrams'));
   await fs.writeFile(path.join(siteRoot, '.nojekyll'), '', 'utf8');
@@ -66,6 +68,9 @@ async function main() {
     const outPath = path.join(siteRoot, doc.outRel);
     await fs.mkdir(path.dirname(outPath), { recursive: true });
     await fs.writeFile(outPath, renderDocPage(doc, docs), 'utf8');
+    const downloadMarkdownPath = path.join(referenceMarkdownRoot, doc.sourceRel);
+    await fs.mkdir(path.dirname(downloadMarkdownPath), { recursive: true });
+    await fs.writeFile(downloadMarkdownPath, doc.downloadMarkdown, 'utf8');
   }
 
   await fs.writeFile(path.join(siteRoot, 'index.html'), renderHomePage(), 'utf8');
@@ -105,6 +110,7 @@ async function loadDocs() {
       navLabel,
       navGroup,
       navOrder,
+      downloadMarkdown: buildDownloadMarkdown(body, heading, title),
       renderBody: markdown.trimStart(),
       updatedAt: stat.mtime.toISOString()
     });
@@ -304,6 +310,10 @@ ${renderHead({
         <a class="path-card tone-violet" href="reference/breathing-dynamics-workflow.html">
           <h3>Breathing Dynamics Workflow</h3>
           <p>Use the dedicated interval and amplitude entropy window once breathing calibration is already stable.</p>
+        </a>
+        <a class="path-card tone-signal" href="reference/formula-sheets.html">
+          <h3>Formula Sheets</h3>
+          <p>Download the Markdown and PDF method sheets for coherence, HRV, breathing from ACC, and breathing-dynamics entropy.</p>
         </a>
         <a class="path-card tone-violet" href="reference/output-formats.html">
           <h3>Output Formats</h3>
@@ -712,6 +722,15 @@ function stripLeadingH1(markdown) {
     heading: match[1].trim(),
     markdown: trimmed.slice(match[0].length).replace(/^\s+/, '')
   };
+}
+
+function buildDownloadMarkdown(body, heading, title) {
+  const trimmedBody = body.replace(/^\uFEFF/, '').trimStart();
+  if (heading) {
+    return trimmedBody;
+  }
+
+  return `# ${title}\n\n${trimmedBody}`;
 }
 
 function inferNavGroup(sourceRel) {

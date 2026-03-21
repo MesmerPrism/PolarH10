@@ -14,6 +14,16 @@ approximation. It exposes the tracker state, live telemetry, calibration
 commands, and tuning parameters that were ported from the existing Unity-side
 runtime.
 
+This tracker is repository-specific code, not a cited external method paper.
+It has not yet been externally validated, and a validation study is actively
+being worked on.
+
+<p>
+  <a class="button primary" href="breathing-formulas.md">Open formula sheet</a>
+  <a class="button" href="assets/reference-markdown/breathing-formulas.md">Download Markdown</a>
+  <a class="button" href="assets/formula-sheets/breathing-formulas.pdf">Download PDF</a>
+</p>
+
 ## What The Page Exposes
 
 - live output volume plus the current inhale/exhale/pause state
@@ -98,4 +108,5 @@ Then launch:
 
 - [App Overview](app-overview.md)
 - [Getting Started on Windows](getting-started.md)
+- [Formula Sheets](formula-sheets.md)
 - [Platform Guides](platform-guides/index.md)

@@ -36,6 +36,17 @@ Use the window's `Method references` panel or the shared [References](references
 page if you need the paper DOI, the linked paper-code repo, or the NeuroKit2
 source pages.
 
+The runtime now also suppresses undefined entropy solves instead of inventing a
+finite fallback value, so the app stays closer to the NeuroKit2 behavior cited
+by the paper when short or overly regular series fail the conditional-match
+step.
+
+<p>
+  <a class="button primary" href="breathing-dynamics-formulas.md">Open formula sheet</a>
+  <a class="button" href="assets/reference-markdown/breathing-dynamics-formulas.md">Download Markdown</a>
+  <a class="button" href="assets/formula-sheets/breathing-dynamics-formulas.pdf">Download PDF</a>
+</p>
+
 ## What The Window Exposes
 
 - headline `Interval entropy` and `Amplitude entropy` tiles
@@ -96,4 +107,5 @@ source pages.
 - [Coherence Workflow](coherence-workflow.md)
 - [App Overview](app-overview.md)
 - [Getting Started on Windows](getting-started.md)
+- [Formula Sheets](formula-sheets.md)
 - [References](references.md)

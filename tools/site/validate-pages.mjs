@@ -103,6 +103,15 @@ async function validateHref(filePath, href) {
     return null;
   }
 
+  const normalizedRawPath = rawPath.replace(/\\/g, '/');
+  if (normalizedRawPath.startsWith('assets/reference-markdown/')) {
+    const sourceRel = normalizedRawPath.slice('assets/reference-markdown/'.length);
+    const sourcePath = path.join(docsRoot, sourceRel);
+    if (await exists(sourcePath)) {
+      return null;
+    }
+  }
+
   const resolved = path.resolve(path.dirname(filePath), rawPath);
   if (await exists(resolved)) {
     return null;

@@ -80,6 +80,8 @@ approximation.
 - tune thresholds, windows, and adaptive-bounds behavior from the same page
 - inspect tracker telemetry before deciding whether a calibration or tuning
   change is actually needed
+- this tracker is repo-specific, not yet externally validated, and is currently
+  being prepared for a dedicated validation study
 
 ### Coherence
 
@@ -163,6 +165,7 @@ Use the CLI when you need:
 - [Coherence Workflow](coherence-workflow.md)
 - [HRV Workflow](hrv-workflow.md)
 - [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
+- [Formula Sheets](formula-sheets.md)
 - [References](references.md)
 - [WPF UI Preview](ui-preview.md)
 - [CLI Reference](cli.md)

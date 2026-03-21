@@ -48,6 +48,12 @@ Real-vs-synthetic alignment note:
   with that RR schedule so operator tests can compare the waveform and the RR
   telemetry against the same synthetic beat sequence
 
+<p>
+  <a class="button primary" href="hrv-formulas.md">Open formula sheet</a>
+  <a class="button" href="assets/reference-markdown/hrv-formulas.md">Download Markdown</a>
+  <a class="button" href="assets/formula-sheets/hrv-formulas.pdf">Download PDF</a>
+</p>
+
 ## What The Tab Exposes
 
 - headline `RMSSD` value from the rolling RR window
@@ -118,5 +124,6 @@ The following HRV choices stay fixed in the app:
 - [Getting Started on Windows](getting-started.md)
 - [App Overview](app-overview.md)
 - [Coherence Workflow](coherence-workflow.md)
+- [Formula Sheets](formula-sheets.md)
 - [Troubleshooting](troubleshooting.md)
 - [References](references.md)

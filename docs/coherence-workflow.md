@@ -43,6 +43,12 @@ Real-vs-synthetic alignment note:
   synchronized with that RR schedule so the waveform view does not drift away
   from the interval view during synthetic sessions
 
+<p>
+  <a class="button primary" href="coherence-formulas.md">Open formula sheet</a>
+  <a class="button" href="assets/reference-markdown/coherence-formulas.md">Download Markdown</a>
+  <a class="button" href="assets/formula-sheets/coherence-formulas.pdf">Download PDF</a>
+</p>
+
 ## What The Window Exposes
 
 - headline `Coherence` value plus `Confidence`
@@ -101,5 +107,6 @@ The following coherence constants are intentionally not user-tunable in the app:
 - [App Overview](app-overview.md)
 - [HRV Workflow](hrv-workflow.md)
 - [Breathing Dynamics Workflow](breathing-dynamics-workflow.md)
+- [Formula Sheets](formula-sheets.md)
 - [Troubleshooting](troubleshooting.md)
 - [References](references.md)

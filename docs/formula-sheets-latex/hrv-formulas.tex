@@ -1,0 +1,89 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\begin{document}
+
+\begin{center}
+{\LARGE HRV Formula Sheet}\\[0.5em]
+{\large PolarH10 short-term RR-derived HRV}
+\end{center}
+
+\section*{Data path}
+
+\begin{itemize}[leftmargin=1.5em]
+\item Input stream: accepted RR intervals from live BLE heart-rate measurement packets.
+\item Physical H10: RR intervals are derived inside the strap from ECG beat timing.
+\item Synthetic transport: RR remains the source for the HRV solve, while synthetic PMD ECG is emitted on the same synthetic beat schedule for operator review.
+\end{itemize}
+
+\section*{Rolling short-term window}
+
+The app uses a rolling RR window with a default length of $300$ s. That default
+tracks the conventional short-term setting discussed by Shaffer and Ginsberg.
+The first solve is intentionally delayed until the rolling window is nearly full
+enough to avoid publishing an early headline value from a partial capture.
+
+\section*{Time-domain formulas}
+
+For accepted RR intervals $NN_1 \ldots NN_n$:
+
+\[
+\overline{NN} = \frac{1}{n}\sum_{i=1}^{n} NN_i
+\]
+
+\[
+\overline{HR} = \frac{60000}{\overline{NN}}
+\]
+
+\[
+SDNN = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(NN_i - \overline{NN})^2}
+\]
+
+\[
+RMSSD = \sqrt{\frac{1}{n-1}\sum_{i=2}^{n}(NN_i - NN_{i-1})^2}
+\]
+
+\[
+\ln RMSSD = \ln(RMSSD)
+\]
+
+\[
+pNN50 = 100 \times
+\frac{\#\left\{|NN_i - NN_{i-1}| > 50\,ms\right\}}{n-1}
+\]
+
+\[
+SD1 = \frac{RMSSD}{\sqrt{2}}
+\]
+
+\section*{Alignment status}
+
+The implementation is aligned to the cited short-term HRV guidance for RMSSD,
+SDNN, pNN50 with a fixed $50$ ms threshold, SD1, mean NN, mean HR, and
+$\ln RMSSD$.
+
+The app does not claim to reproduce 24 h norms, clinical artifact adjudication,
+or full Holter-style NN editing. It is therefore documented as short-term
+RR-derived telemetry rather than a clinical HRV workstation.
+
+\section*{Reference note}
+
+Implementation review for this update was checked against the local PDF file:
+
+\verb|C:\Users\tillh\Downloads\fpubh-05-00258.pdf|
+
+\section*{References}
+
+\begin{itemize}[leftmargin=1.5em]
+\item Shaffer and Ginsberg, ``An Overview of Heart Rate Variability Metrics and Norms'' (2017).
+\item \url{https://doi.org/10.3389/fpubh.2017.00258}
+\item \url{https://mesmerprism.github.io/PolarH10/reference/hrv-workflow.html}
+\item \url{https://mesmerprism.github.io/PolarH10/reference/references.html}
+\end{itemize}
+
+\end{document}
