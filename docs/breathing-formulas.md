@@ -34,6 +34,14 @@ Important status note:
 - bounds: derive lower and upper projection bounds from calibration quantiles
 - output: convert the projected signal into a `0..1` breathing-volume estimate
 
+In the notation below, `a_raw(t)` is the raw accelerometer vector at time `t`,
+`a_f(t)` is the filtered vector, `alpha` is the smoothing factor, `c` is the
+calibration center, `u` is the dominant breathing axis, `p(t)` is the scalar
+projection onto that axis, and `Q_lower` / `Q_upper` are the calibration
+quantile operators used to define a practical operating range. The tracker
+works in accelerometer coordinates internally and only turns the signal into a
+single breathing scalar after the projection step.
+
 ## Core Approximation
 
 Filtered ACC sample:
@@ -42,11 +50,17 @@ Filtered ACC sample:
 a_f(t) = (1 - \alpha)a_f(t-1) + \alpha a_{raw}(t)
 ```
 
+This smooths the raw accelerometer stream so the later breathing estimate is
+less sensitive to frame-level jitter.
+
 Calibration center:
 
 ```latex
 c = \frac{1}{N}\sum_{i=1}^{N} a_f(i)
 ```
+
+This is the average filtered posture during calibration and acts as the
+reference point for later motion.
 
 Principal-axis projection:
 
@@ -57,6 +71,9 @@ p(t) = \langle a_f(t) - c, u \rangle
 Where `u` is the dominant calibration axis estimated from the calibration-window
 covariance.
 
+This projection turns 3-D chest motion into one signed scalar that should rise
+and fall mainly along the learned breathing direction.
+
 If the optional `XZ` model is available, the tracker also keeps a 2-D projection
 in the chest plane:
 
@@ -64,11 +81,17 @@ in the chest plane:
 p_{xz}(t) = \langle (x(t), z(t)) - c_{xz}, u_{xz} \rangle
 ```
 
+This is the same idea as `p(t)`, but constrained to the chest plane for the
+optional `XZ` model.
+
 Lower and upper projection bounds come from calibration quantiles:
 
 ```latex
 b_{min} = Q_{lower}(p), \qquad b_{max} = Q_{upper}(p)
 ```
+
+These bounds define the expected low and high ends of the breathing excursion
+without trusting a single noisy minimum or maximum sample.
 
 The runtime then applies the configured edge-ease and optional adaptive-bounds
 updates before mapping the projection to volume:
@@ -76,6 +99,10 @@ updates before mapping the projection to volume:
 ```latex
 v(t) = \operatorname{clamp}\left(\frac{p(t) - b_{min}}{b_{max} - b_{min}}, 0, 1\right)
 ```
+
+This maps the projected motion into a normalized `0..1` breathing volume, where
+values near `0` sit near the lower calibration bound and values near `1` sit
+near the upper calibration bound.
 
 The final base volume uses either the 3-D axis model or the `XZ` model,
 depending on the tracker settings. The displayed output may then be inverted if
@@ -89,6 +116,10 @@ difference of the output volume:
 ```latex
 \Delta v(t) = v(t) - v(t-1)
 ```
+
+Positive `Delta v` means the estimated volume is rising, negative `Delta v`
+means it is falling, and values near zero mean the tracker sees little movement
+in either direction.
 
 - `Inhaling` when `Delta v` exceeds the configured positive threshold
 - `Exhaling` when `Delta v` is below the negative threshold

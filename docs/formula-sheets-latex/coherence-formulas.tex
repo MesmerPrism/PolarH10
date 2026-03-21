@@ -31,22 +31,42 @@ The app keeps the paper-defined constants fixed:
 \item total-power band: $0.0033$--$0.4$ Hz
 \end{itemize}
 
+These formulas operate on the RR-derived tachogram after the irregular
+beat-interval stream has been resampled into a continuous time series. In the
+notation below, $f$ is frequency in hertz, $PSD(f)$ is the power spectral
+density at that frequency, $f_{peak}$ is the strongest oscillation in the
+allowed coherence band, $P_{peak}$ is the power concentrated around that
+oscillation, and $P_{total}$ is the broader band power used as the paper's
+reference total.
+
 \[
 f_{peak} = \arg\max_{f \in [0.04, 0.26]} PSD(f)
 \]
+
+This step finds the dominant rhythm inside the coherence search band instead of
+across the entire spectrum.
 
 \[
 P_{peak} = \int_{f_{peak} - 0.015}^{f_{peak} + 0.015} PSD(f)\,df
 \]
 
+This integrates a narrow window around the dominant peak so the metric rewards
+concentrated narrowband power rather than diffuse nearby energy.
+
 \[
 P_{total} = \int_{0.0033}^{0.4} PSD(f)\,df
 \]
+
+This is the total reference power across the wider HRV band used by the cited
+method.
 
 \[
 \text{paper coherence ratio} =
 \left(\frac{P_{peak}}{P_{total} - P_{peak}}\right)^2
 \]
+
+This ratio rises when one narrow resonance-like peak dominates the spectrum and
+falls when power is spread across the rest of the band.
 
 \section*{UI-facing normalized score}
 
@@ -56,6 +76,9 @@ The app also publishes a bounded score for the headline readout and summary char
 \text{normalized coherence}_{0..1} =
 \operatorname{clamp}\left(\frac{P_{peak}}{P_{total}}, 0, 1\right)
 \]
+
+Here the app is simply reporting the fraction of tracked power that sits in the
+dominant peak window, then clamping that fraction to a display-friendly range.
 
 This normalized score is an application-level presentation choice. It is not the
 McCraty paper ratio itself.
@@ -72,6 +95,10 @@ operator-side runtime details used by this app. The current implementation uses:
 \item a smoothed headline $0..1$ display value
 \item a separate confidence score based on RR count and window coverage
 \end{itemize}
+
+Those runtime choices describe how the app gets from incoming RR intervals to
+$PSD(f)$ and to a stable operator readout. They affect warmup, smoothness, and
+confidence behavior, but not the core paper ratio formula shown above.
 
 \section*{Alignment status}
 

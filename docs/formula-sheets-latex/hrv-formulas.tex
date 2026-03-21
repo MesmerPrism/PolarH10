@@ -32,34 +32,59 @@ enough to avoid publishing an early headline value from a partial capture.
 
 For accepted RR intervals $NN_1 \ldots NN_n$:
 
+Here $NN_i$ means the $i$-th accepted beat interval in milliseconds, $n$ is the
+number of accepted intervals in the current rolling window, and an overline
+means a window average. These formulas are applied to the accepted short-term
+series the tracker keeps for the HRV solve, not to every raw packet value.
+
 \[
 \overline{NN} = \frac{1}{n}\sum_{i=1}^{n} NN_i
 \]
+
+This is the average accepted beat interval over the current short-term window.
 
 \[
 \overline{HR} = \frac{60000}{\overline{NN}}
 \]
 
+This converts the mean interval into beats per minute using $60000$ ms $= 1$
+minute.
+
 \[
 SDNN = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(NN_i - \overline{NN})^2}
 \]
+
+$SDNN$ measures how widely the accepted intervals are spread across the whole
+window.
 
 \[
 RMSSD = \sqrt{\frac{1}{n-1}\sum_{i=2}^{n}(NN_i - NN_{i-1})^2}
 \]
 
+$RMSSD$ focuses on beat-to-beat change by differencing neighboring intervals
+before averaging.
+
 \[
 \ln RMSSD = \ln(RMSSD)
 \]
+
+$\ln RMSSD$ is the natural-log form of $RMSSD$; it compresses the scale and is
+often easier to compare across sessions.
 
 \[
 pNN50 = 100 \times
 \frac{\#\left\{|NN_i - NN_{i-1}| > 50\,ms\right\}}{n-1}
 \]
 
+$pNN50$ is the percentage of adjacent interval pairs whose absolute difference
+exceeds $50$ ms.
+
 \[
 SD1 = \frac{RMSSD}{\sqrt{2}}
 \]
+
+$SD1$ is the short-axis Poincare equivalent of short-term variability and is
+shown because many readers know HRV through that geometric view.
 
 \section*{Alignment status}
 
