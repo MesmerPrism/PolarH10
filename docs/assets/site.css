@@ -66,13 +66,10 @@ body::before {
   background:
     linear-gradient(
       180deg,
-      transparent 0 24px,
-      var(--blue) 24px 33px,
-      var(--green) 33px 42px,
-      var(--yellow) 42px 51px,
-      var(--orange) 51px 60px,
-      var(--red) 60px 69px,
-      transparent 69px 100%
+      rgba(37, 138, 203, 0.82) 0 8px,
+      rgba(37, 138, 203, 0.22) 8px 24px,
+      rgba(37, 138, 203, 0.05) 24px 64px,
+      transparent 64px 100%
     );
   opacity: 0.96;
   z-index: 0;
@@ -785,6 +782,32 @@ button:focus-visible {
   color: inherit;
 }
 
+.formula-block {
+  margin: 0 0 1rem;
+  padding: 18px 22px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-2);
+  box-shadow: var(--shadow-soft);
+}
+
+.formula-block .katex-display {
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+}
+
+.formula-block .katex-display > .katex {
+  display: block;
+  text-align: center;
+}
+
+.formula-block .katex {
+  font-size: 1.08em;
+}
+
 .prose table {
   width: 100%;
   border-collapse: collapse;
@@ -1156,13 +1179,10 @@ button:focus-visible {
     background:
       linear-gradient(
         180deg,
-        transparent 0 16px,
-        var(--blue) 16px 23px,
-        var(--green) 23px 30px,
-        var(--yellow) 30px 37px,
-        var(--orange) 37px 44px,
-        var(--red) 44px 51px,
-        transparent 51px 100%
+        rgba(37, 138, 203, 0.82) 0 7px,
+        rgba(37, 138, 203, 0.24) 7px 18px,
+        rgba(37, 138, 203, 0.06) 18px 48px,
+        transparent 48px 100%
       );
   }
 

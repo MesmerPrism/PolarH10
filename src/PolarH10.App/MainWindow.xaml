@@ -121,26 +121,15 @@
 
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="10" />
+            <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Rectangle Grid.Column="0" Fill="{StaticResource FocusBlueBrush}" />
-            <Rectangle Grid.Column="1" Fill="{StaticResource TelemetryGreenBrush}" />
-            <Rectangle Grid.Column="2" Fill="{StaticResource HazardYellowBrush}" />
-            <Rectangle Grid.Column="3" Fill="{StaticResource SafetyOrangeBrush}" />
-            <Rectangle Grid.Column="4" Fill="{StaticResource SignalRedBrush}" />
-        </Grid>
+        <Border Grid.Row="0"
+                Background="{StaticResource FocusBlueBrush}"
+                Opacity="0.94" />
 
         <Border x:Name="LaunchNoticeBanner"
                 Grid.Row="1"

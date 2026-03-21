@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import katex from 'katex';
 import { marked } from 'marked';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,7 +14,8 @@ const assetsSource = path.join(docsRoot, 'assets');
 const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
-const assetVersion = '20260320-pages-13';
+const katexDistSource = path.join(repoRoot, 'node_modules', 'katex', 'dist');
+const assetVersion = '20260321-pages-14';
 
 const siteConfig = {
   repoUrl: 'https://github.com/MesmerPrism/PolarH10',
@@ -54,6 +56,7 @@ async function main() {
   await fs.mkdir(referenceRoot, { recursive: true });
   await fs.mkdir(referenceMarkdownRoot, { recursive: true });
   await copyDir(assetsSource, path.join(siteRoot, 'assets'));
+  await copyDir(katexDistSource, path.join(siteRoot, 'assets', 'vendor', 'katex'));
   await copyDir(diagramsSource, path.join(siteRoot, 'diagrams'));
   await fs.writeFile(path.join(siteRoot, '.nojekyll'), '', 'utf8');
   await fs.writeFile(
@@ -100,6 +103,7 @@ async function loadDocs() {
       ? null
       : normalizeString(data.nav_group) ?? inferNavGroup(sourceRel);
     const navOrder = toNumber(data.nav_order) ?? inferNavOrder(sourceRel);
+    const hasMath = containsMath(markdown);
 
     docs.push({
       sourceRel,
@@ -110,6 +114,7 @@ async function loadDocs() {
       navLabel,
       navGroup,
       navOrder,
+      hasMath,
       downloadMarkdown: buildDownloadMarkdown(body, heading, title),
       renderBody: markdown.trimStart(),
       updatedAt: stat.mtime.toISOString()
@@ -185,6 +190,7 @@ ${renderHead({
   currentDir,
   canonicalPath: doc.outRel,
   includeSearch: true,
+  includeMathStyles: doc.hasMath,
   updatedAt: doc.updatedAt
 })}
 </head>
@@ -399,7 +405,7 @@ ${renderHead({
 </html>`;
 }
 
-function renderHead({ title, description, currentDir, canonicalPath, includeSearch = false, updatedAt = null, noIndex = false }) {
+function renderHead({ title, description, currentDir, canonicalPath, includeSearch = false, includeMathStyles = false, updatedAt = null, noIndex = false }) {
   const asset = createAssetHelper(currentDir);
   const canonicalUrl = absoluteUrl(canonicalPath);
   const socialImage = absoluteUrl(siteConfig.socialImage);
@@ -426,6 +432,7 @@ function renderHead({ title, description, currentDir, canonicalPath, includeSear
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(socialImage)}" />
   <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
+  ${includeMathStyles ? `<link rel="stylesheet" href="${asset('assets/vendor/katex/katex.min.css')}?v=${assetVersion}" />` : ''}
   ${includeSearch ? `<link rel="stylesheet" href="${asset('pagefind/pagefind-ui.css')}" />` : ''}`;
 }
 
@@ -597,6 +604,7 @@ Sitemap: ${absoluteUrl('sitemap.xml')}
 
 function renderMarkdown(markdown, sourceRel) {
   const renderer = new marked.Renderer();
+  const defaultCode = renderer.code.bind(renderer);
   renderer.link = ({ href, title, text }) => {
     const safeHref = href ? rewriteHref(href, sourceRel) : '#';
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
@@ -608,12 +616,22 @@ function renderMarkdown(markdown, sourceRel) {
     const alt = text ? escapeHtml(text) : '';
     return `<img src="${escapeHtml(safeHref)}" alt="${alt}"${titleAttr} />`;
   };
+  renderer.code = (token) => {
+    const lang = normalizeString(token.lang)?.toLowerCase();
+    if (lang === 'latex') {
+      return renderLatexBlock(token.text, sourceRel);
+    }
 
-  return marked.parse(markdown, {
+    return defaultCode(token);
+  };
+
+  const html = marked.parse(markdown, {
     gfm: true,
     breaks: false,
     renderer
   });
+
+  return rewriteRelativeHtmlAttributes(html, sourceRel);
 }
 
 function rewriteHref(href, sourceRel) {
@@ -626,16 +644,44 @@ function rewriteHref(href, sourceRel) {
   const sourceDir = path.posix.dirname(sourceRel);
   const resolved = path.posix.normalize(path.posix.join(sourceDir, rawPath));
 
+  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/')) {
+    return relativeHref(`reference/${sourceDir}`, resolved) + hash;
+  }
+
   if (resolved.endsWith('.md')) {
     const target = `reference/${resolved.replace(/\.md$/i, '.html')}`;
     return relativeHref(`reference/${sourceDir}`, target) + hash;
   }
 
-  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/')) {
-    return relativeHref(`reference/${sourceDir}`, resolved) + hash;
+  return href + hash;
+}
+
+function rewriteRelativeHtmlAttributes(html, sourceRel) {
+  return html.replace(/(\b(?:href|src))=(["'])([^"']+)\2/gi, (match, attribute, quote, value) => {
+    const rewritten = rewriteHref(value, sourceRel);
+    return `${attribute}=${quote}${escapeHtml(rewritten)}${quote}`;
+  });
+}
+
+function renderLatexBlock(formula, sourceRel) {
+  const normalized = formula.trim();
+  if (!normalized) {
+    return '';
   }
 
-  return href + hash;
+  try {
+    const rendered = katex.renderToString(normalized, {
+      displayMode: true,
+      output: 'htmlAndMathml',
+      throwOnError: true,
+      strict: 'error',
+      trust: false
+    });
+
+    return `<div class="formula-block" data-formula-block>${rendered}</div>`;
+  } catch (error) {
+    throw new Error(`Failed to render LaTeX block in ${sourceRel}: ${error.message}`);
+  }
 }
 
 function createAssetHelper(currentDir) {
@@ -688,6 +734,10 @@ function parseFrontmatter(raw) {
     data,
     body: raw.slice(match[0].length)
   };
+}
+
+function containsMath(markdown) {
+  return /```latex\b/i.test(markdown);
 }
 
 function parseFrontmatterValue(rawValue) {

@@ -24,6 +24,9 @@ async function main() {
   const issues = [];
   const docFiles = await collectMarkdownFiles(docsRoot);
   const markdownFiles = [readmePath, ...docFiles];
+  const builtFiles = await exists(siteRoot)
+    ? await collectBuiltTextFiles(siteRoot)
+    : [];
 
   for (const filePath of markdownFiles) {
     const raw = await fs.readFile(filePath, 'utf8');
@@ -32,12 +35,23 @@ async function main() {
     }
   }
 
-  if (await exists(siteRoot)) {
-    const builtFiles = await collectBuiltTextFiles(siteRoot);
-    for (const filePath of builtFiles) {
-      const raw = await fs.readFile(filePath, 'utf8');
-      if (placeholderPattern.test(raw)) {
-        issues.push(`${relativeRepoPath(filePath)} contains a placeholder value like <your-...>.`);
+  for (const filePath of builtFiles) {
+    const raw = await fs.readFile(filePath, 'utf8');
+    if (placeholderPattern.test(raw)) {
+      issues.push(`${relativeRepoPath(filePath)} contains a placeholder value like <your-...>.`);
+    }
+
+    if (filePath.toLowerCase().endsWith('.html')) {
+      if (/language-latex/i.test(raw)) {
+        issues.push(`${relativeRepoPath(filePath)} still contains raw LaTeX code blocks.`);
+      }
+
+      const targets = extractHtmlTargets(raw);
+      for (const target of targets) {
+        const error = await validateBuiltTarget(filePath, target);
+        if (error) {
+          issues.push(error);
+        }
       }
     }
   }
@@ -136,6 +150,16 @@ function extractMarkdownHrefs(markdown) {
   return hrefs;
 }
 
+function extractHtmlTargets(html) {
+  const targets = [];
+  const attributePattern = /\b(?:href|src)=["']([^"']+)["']/gi;
+  let match;
+  while ((match = attributePattern.exec(html)) !== null) {
+    targets.push(match[1]);
+  }
+  return targets;
+}
+
 function relativeRepoPath(filePath) {
   return path.relative(repoRoot, filePath).replace(/\\/g, '/');
 }
@@ -195,4 +219,27 @@ async function exists(targetPath) {
   } catch {
     return false;
   }
+}
+
+async function validateBuiltTarget(filePath, href) {
+  if (/^(https?:|mailto:|tel:|#|data:)/i.test(href)) {
+    return null;
+  }
+
+  const [rawPath] = href.split(/[?#]/, 1);
+  if (!rawPath) {
+    return null;
+  }
+
+  const normalizedRawPath = rawPath.replace(/\\/g, '/');
+  if (normalizedRawPath.includes('/pagefind/') || normalizedRawPath.startsWith('pagefind/')) {
+    return null;
+  }
+
+  const resolved = path.resolve(path.dirname(filePath), rawPath);
+  if (await exists(resolved)) {
+    return null;
+  }
+
+  return `${relativeRepoPath(filePath)} references missing built-site target ${href}.`;
 }
