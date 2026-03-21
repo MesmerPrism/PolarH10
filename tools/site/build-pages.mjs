@@ -15,7 +15,7 @@ const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown'
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
 const katexDistSource = path.join(repoRoot, 'node_modules', 'katex', 'dist');
-const assetVersion = '20260321-pages-16';
+const assetVersion = '20260321-pages-18';
 const searchPagePath = 'reference/search.html';
 
 const siteConfig = {
@@ -156,13 +156,7 @@ async function finalizeDiagramViewerPage(diagramManifest) {
   });
 
   const withHead = raw.replace(/<head>[\s\S]*?<\/head>/i, `<head>\n${head}\n</head>`);
-  const withSearchNav = withHead.replace(
-    /<a href="\.\.\/reference\/index\.html">Docs<\/a>\s*<a class="active" href="viewer\.html">Diagrams<\/a>/i,
-    `<a href="../reference/index.html">Docs</a>
-        <a href="../reference/search.html">Search</a>
-        <a class="active" href="viewer.html">Diagrams</a>`
-  );
-  const withSearchableShell = withSearchNav.replace(
+  const withSearchableShell = withHead.replace(
     /<section class="panel viewer-shell">/i,
     '<section class="panel viewer-shell" data-pagefind-body>'
   ).replace(
@@ -197,7 +191,7 @@ function toBuiltDocHrefFromDiagram(relativeDocPath) {
 function renderDocPage(doc, docs) {
   const currentDir = path.posix.dirname(doc.outRel);
   const asset = createAssetHelper(currentDir);
-  const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset(searchPagePath), asset('diagrams/viewer.html'));
+  const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset('diagrams/viewer.html'));
   const sidebar = renderSidebar(doc, docs);
   const articleHtml = renderMarkdown(doc.renderBody, doc.sourceRel);
 
@@ -209,7 +203,6 @@ ${renderHead({
   description: doc.description,
   currentDir,
   canonicalPath: doc.outRel,
-  includeSearch: true,
   includeMathStyles: doc.hasMath,
   updatedAt: doc.updatedAt
 })}
@@ -217,7 +210,7 @@ ${renderHead({
 <body class="doc-page">
   ${renderArt()}
   <div class="site-shell">
-    ${renderHeader(topNav, asset('index.html'))}
+    ${renderHeader(topNav, asset('index.html'), asset(searchPagePath))}
     <div class="page-layout">
       <aside class="panel sidebar" data-pagefind-ignore>
         ${sidebar}
@@ -233,14 +226,13 @@ ${renderHead({
     </div>
     ${renderFooter()}
   </div>
-  ${renderSearchBoot(asset)}
+  ${renderHeaderBoot()}
 </body>
 </html>`;
 }
 
 function renderHomePage() {
-  const asset = createAssetHelper('.');
-  const topNav = renderTopNav('home', 'index.html', 'reference/index.html', searchPagePath, 'diagrams/viewer.html');
+  const topNav = renderTopNav('home', 'index.html', 'reference/index.html', 'diagrams/viewer.html');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -249,25 +241,13 @@ ${renderHead({
   title: siteConfig.homeTitle,
   description: siteConfig.sharedPromise,
   currentDir: '.',
-  canonicalPath: 'index.html',
-  includeSearch: true
+  canonicalPath: 'index.html'
 })}
 </head>
 <body>
   ${renderArt()}
   <div class="site-shell">
-    ${renderHeader(topNav, 'index.html')}
-    <section class="section panel section-panel search-section" data-pagefind-ignore>
-      <div class="page-marker">Site Search</div>
-      <h2 class="section-heading">Search across guides, formulas, protocol notes, and diagrams.</h2>
-      <p class="section-subtitle">Type a term like <code>coherence</code>, <code>RMSSD</code>, <code>ECG</code>, <code>ACC</code>, <code>doctor</code>, or <code>entropy</code> and open the page that explains it.</p>
-      ${renderSearchPanel({
-        title: 'Search the published site',
-        description: 'Look up commands, metrics, formats, workflows, and diagram topics without stepping through the nav tree.',
-        standalone: true
-      })}
-    </section>
-
+    ${renderHeader(topNav, 'index.html', searchPagePath)}
     <main data-pagefind-body>
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
@@ -402,7 +382,7 @@ ${renderHead({
 
     ${renderFooter()}
   </div>
-  ${renderSearchBoot(asset)}
+  ${renderHeaderBoot()}
 </body>
 </html>`;
 }
@@ -410,7 +390,7 @@ ${renderHead({
 function renderSearchPage() {
   const currentDir = 'reference';
   const asset = createAssetHelper(currentDir);
-  const topNav = renderTopNav('search', asset('index.html'), asset('reference/index.html'), asset(searchPagePath), asset('diagrams/viewer.html'));
+  const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset('diagrams/viewer.html'));
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -426,16 +406,16 @@ ${renderHead({
 <body class="doc-page">
   ${renderArt()}
   <div class="site-shell">
-    ${renderHeader(topNav, asset('index.html'))}
+    ${renderHeader(topNav, asset('index.html'), asset(searchPagePath))}
     <section class="panel section-panel search-section">
-      <div class="page-marker">Search the published site</div>
+      <div class="page-marker">Search results</div>
       <h1 class="page-title">Find where a term is documented.</h1>
-      <p class="page-intro">Search the public Pages build for commands, formulas, telemetry terms, protocol notes, troubleshooting steps, and diagram topics. Results take you to the page where that topic is explained.</p>
+      <p class="page-intro">Use the header search to jump here from anywhere on the site. This page keeps the full result list, excerpts, and follow-on refinement tools in one place.</p>
       ${renderSearchPanel({
-        title: 'Search all published pages',
-        description: 'Try terms like coherence, RMSSD, entropy, ECG, ACC, doctor, PMD, or replay.',
+        title: 'Results',
+        description: 'Use the header search to change the query. The list below updates to the pages that best match it.',
         standalone: true,
-        autofocus: true,
+        resultsOnly: true,
         queryParam: 'q'
       })}
     </section>
@@ -460,13 +440,14 @@ ${renderHead({
 
     ${renderFooter()}
   </div>
+  ${renderHeaderBoot()}
   ${renderSearchBoot(asset)}
 </body>
 </html>`;
 }
 
 function render404Page() {
-  const topNav = renderTopNav('', 'index.html', 'reference/index.html', searchPagePath, 'diagrams/viewer.html');
+  const topNav = renderTopNav('', 'index.html', 'reference/index.html', 'diagrams/viewer.html');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -482,7 +463,7 @@ ${renderHead({
 <body>
   ${renderArt()}
   <div class="site-shell">
-    ${renderHeader(topNav, 'index.html')}
+    ${renderHeader(topNav, 'index.html', 'reference/search.html')}
     <section class="panel section-panel four-oh-four">
       <div>
         <h1>404</h1>
@@ -495,6 +476,7 @@ ${renderHead({
     </section>
     ${renderFooter()}
   </div>
+  ${renderHeaderBoot()}
 </body>
 </html>`;
 }
@@ -540,11 +522,7 @@ function renderSidebar(currentDoc, docs) {
     return `<section><h2 class="category-heading">${escapeHtml(group.title)}</h2>${items}</section>`;
   }).join('');
 
-  return `${renderSearchPanel({
-    title: 'Search docs',
-    description: 'Find commands, formulas, telemetry terms, protocol notes, and diagram topics without digging through the repo tree.'
-  })}
-  ${groups}`;
+  return groups;
 }
 
 function buildNavGroups(currentDoc, docs) {
@@ -587,11 +565,10 @@ function buildNavGroups(currentDoc, docs) {
   return groups;
 }
 
-function renderTopNav(activeKey, homeHref, docsHref, searchHref, diagramsHref) {
+function renderTopNav(activeKey, homeHref, docsHref, diagramsHref) {
   const items = [
     { key: 'home', label: 'Home', href: homeHref },
     { key: 'reference', label: 'Docs', href: docsHref },
-    { key: 'search', label: 'Search', href: searchHref },
     { key: 'diagrams', label: 'Diagrams', href: diagramsHref },
     { key: 'repo', label: 'GitHub', href: siteConfig.repoUrl }
   ];
@@ -602,13 +579,20 @@ function renderTopNav(activeKey, homeHref, docsHref, searchHref, diagramsHref) {
   }).join('');
 }
 
-function renderHeader(topNav, homeHref) {
+function renderHeader(topNav, homeHref, searchHref) {
   return `<header class="site-header" data-pagefind-ignore>
     <a class="brand" href="${homeHref}">
       <span class="brand-mark" aria-hidden="true"></span>
       <span class="brand-copy"><strong>${siteConfig.siteName}</strong><span>Unofficial Open-Source Toolkit</span></span>
     </a>
-    <nav class="top-nav" aria-label="Primary">${topNav}</nav>
+    <div class="header-tools">
+      <form class="header-search" action="${searchHref}" method="get" role="search" data-header-search-form>
+        <label class="sr-only" for="site-search-input">Search the site</label>
+        <input id="site-search-input" class="header-search-input" data-header-search-input type="search" name="q" placeholder="Search site" autocomplete="off" />
+        <button class="header-search-button" type="submit">Find</button>
+      </form>
+      <nav class="top-nav" aria-label="Primary">${topNav}</nav>
+    </div>
   </header>`;
 }
 
@@ -629,8 +613,12 @@ function renderArt() {
   </div>`;
 }
 
-function renderSearchPanel({ title, description, standalone = false, autofocus = false, queryParam = '' }) {
-  const className = standalone ? 'search-panel search-panel-standalone' : 'search-panel';
+function renderSearchPanel({ title, description, standalone = false, autofocus = false, resultsOnly = false, queryParam = '' }) {
+  const className = [
+    'search-panel',
+    standalone ? 'search-panel-standalone' : '',
+    resultsOnly ? 'search-panel-results-only' : ''
+  ].filter(Boolean).join(' ');
   const attrs = [];
   if (autofocus) {
     attrs.push('data-search-autofocus="true"');
@@ -646,6 +634,44 @@ function renderSearchPanel({ title, description, standalone = false, autofocus =
   </section>`;
 }
 
+function renderHeaderBoot() {
+  return `<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const headerInput = document.querySelector('[data-header-search-input]');
+    if (!headerInput) {
+      return;
+    }
+
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery && !headerInput.value) {
+      headerInput.value = initialQuery;
+    }
+
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
+      const isEditable = Boolean(target && (target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select'));
+      if (isEditable) {
+        return;
+      }
+
+      const key = event.key ? event.key.toLowerCase() : '';
+      const slashShortcut = event.key === '/';
+      const paletteShortcut = key === 'k' && (event.ctrlKey || event.metaKey);
+      if (!slashShortcut && !paletteShortcut) {
+        return;
+      }
+
+      event.preventDefault();
+      headerInput.focus({ preventScroll: true });
+      if (headerInput.value) {
+        headerInput.select();
+      }
+    });
+  });
+</script>`;
+}
+
 function renderSearchBoot(asset) {
   const jsHref = asset('pagefind/pagefind-ui.js');
 
@@ -653,6 +679,8 @@ function renderSearchBoot(asset) {
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     const mount = document.getElementById('pagefind-search');
+    const headerForm = document.querySelector('[data-header-search-form]');
+    const headerInput = document.querySelector('[data-header-search-input]');
     if (!mount || typeof window.PagefindUI !== 'function') {
       return;
     }
@@ -681,39 +709,57 @@ function renderSearchBoot(asset) {
         if (initialQuery) {
           input.value = initialQuery;
           input.dispatchEvent(new Event('input', { bubbles: true }));
+          if (headerInput) {
+            headerInput.value = initialQuery;
+          }
         }
       }
 
-      if (mount.dataset.searchAutofocus === 'true' || initialQuery) {
+      if (mount.dataset.searchAutofocus === 'true') {
         input.focus({ preventScroll: true });
       }
     });
 
-    document.addEventListener('keydown', (event) => {
-      const input = getInput();
-      if (!input) {
+    const syncUrl = (value) => {
+      if (!queryKey) {
         return;
       }
 
+      const nextUrl = new URL(window.location.href);
+      if (value) {
+        nextUrl.searchParams.set(queryKey, value);
+      } else {
+        nextUrl.searchParams.delete(queryKey);
+      }
+
+      history.replaceState(null, '', nextUrl);
+    };
+
+    if (headerForm && headerInput) {
+      headerForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = getInput();
+        const nextQuery = headerInput.value.trim();
+        if (!input) {
+          return;
+        }
+
+        input.value = nextQuery;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        syncUrl(nextQuery);
+      });
+    }
+
+    mount.addEventListener('input', (event) => {
       const target = event.target;
-      const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
-      const isEditable = Boolean(target && (target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select'));
-      if (isEditable) {
+      if (!target || !target.classList || !target.classList.contains('pagefind-ui__search-input')) {
         return;
       }
 
-      const key = event.key ? event.key.toLowerCase() : '';
-      const slashShortcut = event.key === '/';
-      const paletteShortcut = key === 'k' && (event.ctrlKey || event.metaKey);
-      if (!slashShortcut && !paletteShortcut) {
-        return;
+      if (headerInput && headerInput.value !== target.value) {
+        headerInput.value = target.value;
       }
-
-      event.preventDefault();
-      input.focus({ preventScroll: true });
-      if (input.value) {
-        input.select();
-      }
+      syncUrl(target.value.trim());
     });
   });
 </script>`;

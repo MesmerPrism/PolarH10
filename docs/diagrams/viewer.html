@@ -20,13 +20,19 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-copy"><strong>PolarH10</strong><span>Unofficial Open-Source Toolkit</span></span>
       </a>
-      <nav class="top-nav" aria-label="Primary">
-        <a href="../index.html">Home</a>
-        <a href="../reference/index.html">Docs</a>
-        <a href="../reference/search.html">Search</a>
-        <a class="active" href="viewer.html">Diagrams</a>
-        <a href="https://github.com/MesmerPrism/PolarH10">GitHub</a>
-      </nav>
+      <div class="header-tools">
+        <form class="header-search" action="../reference/search.html" method="get" role="search" data-header-search-form>
+          <label class="sr-only" for="site-search-input">Search the site</label>
+          <input id="site-search-input" class="header-search-input" data-header-search-input type="search" name="q" placeholder="Search site" autocomplete="off" />
+          <button class="header-search-button" type="submit">Find</button>
+        </form>
+        <nav class="top-nav" aria-label="Primary">
+          <a href="../index.html">Home</a>
+          <a href="../reference/index.html">Docs</a>
+          <a class="active" href="viewer.html">Diagrams</a>
+          <a href="https://github.com/MesmerPrism/PolarH10">GitHub</a>
+        </nav>
+      </div>
     </header>
 
     <section class="panel viewer-shell" data-pagefind-body>
@@ -90,6 +96,36 @@
     import Panzoom from 'https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.6.1/+esm';
 
     (async () => {
+      const headerInput = document.querySelector('[data-header-search-input]');
+      if (headerInput) {
+        const initialQuery = new URLSearchParams(window.location.search).get('q');
+        if (initialQuery && !headerInput.value) {
+          headerInput.value = initialQuery;
+        }
+
+        document.addEventListener('keydown', (event) => {
+          const target = event.target;
+          const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
+          const isEditable = Boolean(target && (target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select'));
+          if (isEditable) {
+            return;
+          }
+
+          const key = event.key ? event.key.toLowerCase() : '';
+          const slashShortcut = event.key === '/';
+          const paletteShortcut = key === 'k' && (event.ctrlKey || event.metaKey);
+          if (!slashShortcut && !paletteShortcut) {
+            return;
+          }
+
+          event.preventDefault();
+          headerInput.focus({ preventScroll: true });
+          if (headerInput.value) {
+            headerInput.select();
+          }
+        });
+      }
+
       const navList = document.getElementById('nav-list');
       const viewer = document.getElementById('viewer');
       const srcPanel = document.getElementById('source-panel');
