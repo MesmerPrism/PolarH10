@@ -15,7 +15,8 @@ const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown'
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
 const katexDistSource = path.join(repoRoot, 'node_modules', 'katex', 'dist');
-const assetVersion = '20260321-pages-15';
+const assetVersion = '20260321-pages-16';
+const searchPagePath = 'reference/search.html';
 
 const siteConfig = {
   repoUrl: 'https://github.com/MesmerPrism/PolarH10',
@@ -30,7 +31,9 @@ const siteConfig = {
   themeColor: '#f3eee6',
   navGroups: ['Start Here', 'Task Guides', 'Troubleshooting', 'Internals'],
   diagramViewerLabel: 'Diagram Viewer',
-  diagramViewerDescription: 'Browse onboarding, runtime, and architecture Mermaid diagrams.'
+  diagramViewerDescription: 'Browse onboarding, runtime, and architecture Mermaid diagrams.',
+  searchTitle: 'Search the PolarH10 reference',
+  searchDescription: 'Find the page that explains a term, metric, command, file format, workflow, or diagram topic across the published GitHub Pages site.'
 };
 
 const specialNavItems = [
@@ -64,7 +67,7 @@ async function main() {
     JSON.stringify(transformDiagramManifestForSite(diagramManifest), null, 2),
     'utf8'
   );
-  await finalizeDiagramViewerPage();
+  await finalizeDiagramViewerPage(diagramManifest);
 
   for (const doc of docs) {
     const html = renderMarkdown(doc.renderBody, doc.sourceRel);
@@ -77,6 +80,7 @@ async function main() {
   }
 
   await fs.writeFile(path.join(siteRoot, 'index.html'), renderHomePage(), 'utf8');
+  await fs.writeFile(path.join(referenceRoot, 'search.html'), renderSearchPage(), 'utf8');
   await fs.writeFile(path.join(siteRoot, '404.html'), render404Page(), 'utf8');
   await fs.writeFile(path.join(siteRoot, 'site.webmanifest'), JSON.stringify(renderWebManifest(), null, 2), 'utf8');
   await fs.writeFile(path.join(siteRoot, 'sitemap.xml'), renderSitemap(docs), 'utf8');
@@ -141,7 +145,7 @@ async function loadDiagramManifest() {
   return JSON.parse(raw);
 }
 
-async function finalizeDiagramViewerPage() {
+async function finalizeDiagramViewerPage(diagramManifest) {
   const viewerPath = path.join(siteRoot, 'diagrams', 'viewer.html');
   const raw = await fs.readFile(viewerPath, 'utf8');
   const head = renderHead({
@@ -151,8 +155,24 @@ async function finalizeDiagramViewerPage() {
     canonicalPath: 'diagrams/viewer.html'
   });
 
-  const next = raw.replace(/<head>[\s\S]*?<\/head>/i, `<head>\n${head}\n</head>`);
-  await fs.writeFile(viewerPath, next, 'utf8');
+  const withHead = raw.replace(/<head>[\s\S]*?<\/head>/i, `<head>\n${head}\n</head>`);
+  const withSearchNav = withHead.replace(
+    /<a href="\.\.\/reference\/index\.html">Docs<\/a>\s*<a class="active" href="viewer\.html">Diagrams<\/a>/i,
+    `<a href="../reference/index.html">Docs</a>
+        <a href="../reference/search.html">Search</a>
+        <a class="active" href="viewer.html">Diagrams</a>`
+  );
+  const withSearchableShell = withSearchNav.replace(
+    /<section class="panel viewer-shell">/i,
+    '<section class="panel viewer-shell" data-pagefind-body>'
+  ).replace(
+    /<h1 class="page-title">/i,
+    '<h1 class="page-title" data-pagefind-meta="title">'
+  ).replace(
+    /<div id="nav-list"><\/div>/i,
+    `<div id="nav-list">${renderStaticDiagramNav(diagramManifest)}</div>`
+  );
+  await fs.writeFile(viewerPath, withSearchableShell, 'utf8');
 }
 
 function transformDiagramManifestForSite(manifest) {
@@ -177,7 +197,7 @@ function toBuiltDocHrefFromDiagram(relativeDocPath) {
 function renderDocPage(doc, docs) {
   const currentDir = path.posix.dirname(doc.outRel);
   const asset = createAssetHelper(currentDir);
-  const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset('diagrams/viewer.html'));
+  const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset(searchPagePath), asset('diagrams/viewer.html'));
   const sidebar = renderSidebar(doc, docs);
   const articleHtml = renderMarkdown(doc.renderBody, doc.sourceRel);
 
@@ -219,7 +239,8 @@ ${renderHead({
 }
 
 function renderHomePage() {
-  const topNav = renderTopNav('home', 'index.html', 'reference/index.html', 'diagrams/viewer.html');
+  const asset = createAssetHelper('.');
+  const topNav = renderTopNav('home', 'index.html', 'reference/index.html', searchPagePath, 'diagrams/viewer.html');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -228,13 +249,26 @@ ${renderHead({
   title: siteConfig.homeTitle,
   description: siteConfig.sharedPromise,
   currentDir: '.',
-  canonicalPath: 'index.html'
+  canonicalPath: 'index.html',
+  includeSearch: true
 })}
 </head>
 <body>
   ${renderArt()}
   <div class="site-shell">
     ${renderHeader(topNav, 'index.html')}
+    <section class="section panel section-panel search-section" data-pagefind-ignore>
+      <div class="page-marker">Site Search</div>
+      <h2 class="section-heading">Search across guides, formulas, protocol notes, and diagrams.</h2>
+      <p class="section-subtitle">Type a term like <code>coherence</code>, <code>RMSSD</code>, <code>ECG</code>, <code>ACC</code>, <code>doctor</code>, or <code>entropy</code> and open the page that explains it.</p>
+      ${renderSearchPanel({
+        title: 'Search the published site',
+        description: 'Look up commands, metrics, formats, workflows, and diagram topics without stepping through the nav tree.',
+        standalone: true
+      })}
+    </section>
+
+    <main data-pagefind-body>
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
         <div class="page-marker">Windows-first Polar H10 toolkit</div>
@@ -364,15 +398,75 @@ ${renderHead({
         </a>
       </div>
     </section>
+    </main>
 
     ${renderFooter()}
   </div>
+  ${renderSearchBoot(asset)}
+</body>
+</html>`;
+}
+
+function renderSearchPage() {
+  const currentDir = 'reference';
+  const asset = createAssetHelper(currentDir);
+  const topNav = renderTopNav('search', asset('index.html'), asset('reference/index.html'), asset(searchPagePath), asset('diagrams/viewer.html'));
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+${renderHead({
+  title: `${siteConfig.searchTitle} | ${siteConfig.referenceTitle}`,
+  description: siteConfig.searchDescription,
+  currentDir,
+  canonicalPath: searchPagePath,
+  includeSearch: true
+})}
+</head>
+<body class="doc-page">
+  ${renderArt()}
+  <div class="site-shell">
+    ${renderHeader(topNav, asset('index.html'))}
+    <section class="panel section-panel search-section">
+      <div class="page-marker">Search the published site</div>
+      <h1 class="page-title">Find where a term is documented.</h1>
+      <p class="page-intro">Search the public Pages build for commands, formulas, telemetry terms, protocol notes, troubleshooting steps, and diagram topics. Results take you to the page where that topic is explained.</p>
+      ${renderSearchPanel({
+        title: 'Search all published pages',
+        description: 'Try terms like coherence, RMSSD, entropy, ECG, ACC, doctor, PMD, or replay.',
+        standalone: true,
+        autofocus: true,
+        queryParam: 'q'
+      })}
+    </section>
+
+    <section class="section panel section-panel">
+      <h2 class="section-heading">What Search Covers</h2>
+      <div class="card-grid">
+        <a class="path-card tone-cool" href="index.html">
+          <h3>Onboarding and workflows</h3>
+          <p>Getting started, first recording, coherence, HRV, breathing, troubleshooting, and output-format guides.</p>
+        </a>
+        <a class="path-card tone-signal" href="formula-sheets.html">
+          <h3>Formula sheets</h3>
+          <p>Searchable explanations for coherence, HRV, breathing from ACC, and breathing-dynamics metrics.</p>
+        </a>
+        <a class="path-card tone-violet" href="../diagrams/viewer.html">
+          <h3>Diagram topics</h3>
+          <p>Manifest-backed onboarding, runtime, and architecture diagrams are discoverable through the same site search.</p>
+        </a>
+      </div>
+    </section>
+
+    ${renderFooter()}
+  </div>
+  ${renderSearchBoot(asset)}
 </body>
 </html>`;
 }
 
 function render404Page() {
-  const topNav = renderTopNav('', 'index.html', 'reference/index.html', 'diagrams/viewer.html');
+  const topNav = renderTopNav('', 'index.html', 'reference/index.html', searchPagePath, 'diagrams/viewer.html');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -395,7 +489,7 @@ ${renderHead({
         <p>The page you are looking for does not exist or has been moved.</p>
         <div class="action-row" style="justify-content:center">
           <a class="button primary" href="index.html">Back to Home</a>
-          <a class="button" href="reference/index.html">Browse Docs</a>
+          <a class="button" href="reference/search.html">Search the Site</a>
         </div>
       </div>
     </section>
@@ -446,11 +540,10 @@ function renderSidebar(currentDoc, docs) {
     return `<section><h2 class="category-heading">${escapeHtml(group.title)}</h2>${items}</section>`;
   }).join('');
 
-  return `<section class="search-panel">
-    <h2>Search docs</h2>
-    <p>Find commands, file formats, and protocol notes without digging through the repo tree.</p>
-    <div id="pagefind-search"></div>
-  </section>
+  return `${renderSearchPanel({
+    title: 'Search docs',
+    description: 'Find commands, formulas, telemetry terms, protocol notes, and diagram topics without digging through the repo tree.'
+  })}
   ${groups}`;
 }
 
@@ -494,10 +587,11 @@ function buildNavGroups(currentDoc, docs) {
   return groups;
 }
 
-function renderTopNav(activeKey, homeHref, docsHref, diagramsHref) {
+function renderTopNav(activeKey, homeHref, docsHref, searchHref, diagramsHref) {
   const items = [
     { key: 'home', label: 'Home', href: homeHref },
     { key: 'reference', label: 'Docs', href: docsHref },
+    { key: 'search', label: 'Search', href: searchHref },
     { key: 'diagrams', label: 'Diagrams', href: diagramsHref },
     { key: 'repo', label: 'GitHub', href: siteConfig.repoUrl }
   ];
@@ -535,6 +629,23 @@ function renderArt() {
   </div>`;
 }
 
+function renderSearchPanel({ title, description, standalone = false, autofocus = false, queryParam = '' }) {
+  const className = standalone ? 'search-panel search-panel-standalone' : 'search-panel';
+  const attrs = [];
+  if (autofocus) {
+    attrs.push('data-search-autofocus="true"');
+  }
+  if (queryParam) {
+    attrs.push(`data-search-query-param="${escapeHtml(queryParam)}"`);
+  }
+
+  return `<section class="${className}">
+    <h2>${escapeHtml(title)}</h2>
+    <p>${escapeHtml(description)}</p>
+    <div id="pagefind-search"${attrs.length ? ` ${attrs.join(' ')}` : ''}></div>
+  </section>`;
+}
+
 function renderSearchBoot(asset) {
   const jsHref = asset('pagefind/pagefind-ui.js');
 
@@ -552,6 +663,57 @@ function renderSearchBoot(asset) {
       resetStyles: false,
       excerptLength: 18,
       showSubResults: true
+    });
+
+    const getInput = () => mount.querySelector('.pagefind-ui__search-input');
+    const queryKey = mount.dataset.searchQueryParam;
+    let initialQuery = '';
+
+    requestAnimationFrame(() => {
+      const input = getInput();
+      if (!input) {
+        return;
+      }
+
+      if (queryKey) {
+        const value = new URLSearchParams(window.location.search).get(queryKey);
+        initialQuery = value ? value.trim() : '';
+        if (initialQuery) {
+          input.value = initialQuery;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+
+      if (mount.dataset.searchAutofocus === 'true' || initialQuery) {
+        input.focus({ preventScroll: true });
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const input = getInput();
+      if (!input) {
+        return;
+      }
+
+      const target = event.target;
+      const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
+      const isEditable = Boolean(target && (target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select'));
+      if (isEditable) {
+        return;
+      }
+
+      const key = event.key ? event.key.toLowerCase() : '';
+      const slashShortcut = event.key === '/';
+      const paletteShortcut = key === 'k' && (event.ctrlKey || event.metaKey);
+      if (!slashShortcut && !paletteShortcut) {
+        return;
+      }
+
+      event.preventDefault();
+      input.focus({ preventScroll: true });
+      if (input.value) {
+        input.select();
+      }
     });
   });
 </script>`;
@@ -579,6 +741,7 @@ function renderSitemap(docs) {
   const pages = [
     { path: 'index.html', lastmod: new Date().toISOString() },
     { path: 'reference/index.html', lastmod: docs.find((doc) => doc.sourceRel === 'index.md')?.updatedAt ?? new Date().toISOString() },
+    { path: searchPagePath, lastmod: new Date().toISOString() },
     { path: 'diagrams/viewer.html', lastmod: new Date().toISOString() },
     ...docs.map((doc) => ({ path: doc.outRel, lastmod: doc.updatedAt }))
   ];
@@ -661,6 +824,29 @@ function rewriteRelativeHtmlAttributes(html, sourceRel) {
     const rewritten = rewriteHref(value, sourceRel);
     return `${attribute}=${quote}${escapeHtml(rewritten)}${quote}`;
   });
+}
+
+function renderStaticDiagramNav(manifest) {
+  const groups = new Map();
+
+  for (const diagram of manifest.diagrams) {
+    const category = normalizeString(diagram.category) ?? 'other';
+    if (!groups.has(category)) {
+      groups.set(category, []);
+    }
+    groups.get(category).push(diagram);
+  }
+
+  return [...groups.entries()].map(([category, diagrams]) => {
+    const items = diagrams.map((diagram) => `<a class="nav-item" href="#${escapeHtml(diagram.id)}"><strong>${escapeHtml(diagram.title)}</strong><span>${escapeHtml(diagram.description ?? 'Manifest-driven Mermaid diagram entry.')}</span></a>`).join('');
+    return `<section><div class="category-label">${escapeHtml(startCase(category))}</div>${items}</section>`;
+  }).join('');
+}
+
+function startCase(value) {
+  return value
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function renderLatexBlock(formula, sourceRel) {

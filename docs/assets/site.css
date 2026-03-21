@@ -234,6 +234,10 @@ button:focus-visible {
   margin-top: 18px;
 }
 
+.viewer-nav section + section {
+  margin-top: 18px;
+}
+
 .hero-aside,
 .sidebar,
 .viewer-nav {
@@ -671,6 +675,15 @@ button:focus-visible {
 
 .search-panel p {
   margin: 0 0 12px;
+}
+
+.search-panel-standalone {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.search-section {
+  margin-top: 20px;
 }
 
 #pagefind-search {
