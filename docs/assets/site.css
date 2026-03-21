@@ -66,10 +66,13 @@ body::before {
   background:
     linear-gradient(
       180deg,
-      rgba(37, 138, 203, 0.82) 0 8px,
-      rgba(37, 138, 203, 0.22) 8px 24px,
-      rgba(37, 138, 203, 0.05) 24px 64px,
-      transparent 64px 100%
+      transparent 0 24px,
+      var(--blue) 24px 33px,
+      var(--green) 33px 42px,
+      var(--yellow) 42px 51px,
+      var(--orange) 51px 60px,
+      var(--red) 60px 69px,
+      transparent 69px 100%
     );
   opacity: 0.96;
   z-index: 0;

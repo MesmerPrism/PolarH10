@@ -15,7 +15,7 @@ const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown'
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
 const katexDistSource = path.join(repoRoot, 'node_modules', 'katex', 'dist');
-const assetVersion = '20260321-pages-14';
+const assetVersion = '20260321-pages-15';
 
 const siteConfig = {
   repoUrl: 'https://github.com/MesmerPrism/PolarH10',
