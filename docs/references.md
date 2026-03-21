@@ -67,9 +67,6 @@ nav_order: 90
    keeps `SDNN`, `pNN50`, `SD1`, `mean NN`, `mean HR`, and `lnRMSSD` visible as
    supporting telemetry.
 
-   Implementation reference used during this update:
-   `C:\Users\tillh\Downloads\fpubh-05-00258.pdf`
-
    The repository intentionally treats these values as short-term RR-derived
    telemetry, not as a substitute for `24 h` norms or full clinical artifact
    correction.

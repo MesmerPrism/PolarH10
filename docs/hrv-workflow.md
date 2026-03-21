@@ -22,9 +22,6 @@ This workflow follows the short-term HRV guidance summarized by:
   Metrics and Norms." *Frontiers in Public Health* 5:258, 2017.
   <https://doi.org/10.3389/fpubh.2017.00258>
 
-The implementation work for this repository was reviewed against the local PDF
-reference file `C:\Users\tillh\Downloads\fpubh-05-00258.pdf`.
-
 The app uses the paper in these specific ways:
 
 - the default short-term HRV window is `300 s` because five minutes is the

@@ -81,14 +81,9 @@ The app does not claim to reproduce:
 It is therefore documented as short-term RR-derived telemetry rather than a
 clinical HRV workstation.
 
-## Reference Note
-
-Implementation review for this update was checked against the local PDF file:
-
-`C:\Users\tillh\Downloads\fpubh-05-00258.pdf`
-
 ## References
 
 - [HRV Workflow](hrv-workflow.md)
 - [References](references.md)
-- Shaffer and Ginsberg, "An Overview of Heart Rate Variability Metrics and Norms" (2017)
+- Shaffer and Ginsberg, "An Overview of Heart Rate Variability Metrics and Norms" (2017).
+  [DOI: 10.3389/fpubh.2017.00258](https://doi.org/10.3389/fpubh.2017.00258)

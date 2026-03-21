@@ -467,8 +467,6 @@ flowchart LR
 - Shaffer, F., and Ginsberg, J.P., "An Overview of Heart Rate Variability Metrics
   and Norms," *Frontiers in Public Health*, vol. 5, 2017.
   [DOI: 10.3389/fpubh.2017.00258](https://doi.org/10.3389/fpubh.2017.00258)
-  Implementation reference PDF used for this update:
-  `C:\Users\tillh\Downloads\fpubh-05-00258.pdf`
 - Goheen, D. P. et al., "It's About Time: Breathing Dynamics Modulate Emotion and
   Cognition," *Psychophysiology*, 2025.
   [DOI: 10.1111/psyp.70149](https://doi.org/10.1111/psyp.70149)
