@@ -94,6 +94,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        OutputFolderBox.Text = GetDefaultOutputFolder(Environment.ProcessPath);
         PolarAppRuntimeStatusStore.Write(_transportSettings);
         ApplyLaunchStamp();
         InitializeEmbeddedDetailTabs();
@@ -346,6 +347,31 @@ public partial class MainWindow : Window
         }
 
         return false;
+    }
+
+    private static string GetDefaultOutputFolder(string? processPath)
+    {
+        string? currentDirectory = null;
+        if (!string.IsNullOrWhiteSpace(processPath))
+        {
+            try
+            {
+                currentDirectory = Path.GetDirectoryName(Path.GetFullPath(processPath));
+            }
+            catch
+            {
+                currentDirectory = null;
+            }
+        }
+
+        string? repoRoot = FindRepoRoot(currentDirectory);
+        if (!string.IsNullOrWhiteSpace(repoRoot))
+            return Path.Combine(repoRoot, "session");
+
+        return Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            "PolarH10",
+            "Sessions");
     }
 
     private void ApplyLaunchStamp()

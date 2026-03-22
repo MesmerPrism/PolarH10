@@ -57,6 +57,8 @@ node_modules/
 
 ## Local preview and publish scratch
 /artifacts/
+/src/PolarH10.App.Package/AppPackages/
+/src/PolarH10.App.Package/*.pfx
 
 ## Local captures and third-party reference files
 session/

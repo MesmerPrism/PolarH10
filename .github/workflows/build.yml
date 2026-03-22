@@ -17,6 +17,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -34,6 +37,15 @@ jobs:
 
       - name: Test
         run: dotnet test PolarH10.sln --no-build --configuration Release --verbosity normal
+
+      - name: Build unsigned Windows package
+        run: powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 -Unsigned -Version 0.0.0.0
+
+      - name: Upload unsigned Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: PolarH10-msix-unsigned
+          path: artifacts/windows-installer
 
       - name: Install site dependencies
         run: npm ci

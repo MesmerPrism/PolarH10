@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest"
+  IgnorableNamespaces="uap rescap m2">
+
+  <Identity
+    Name="MesmerPrism.PolarH10"
+    Publisher="CN=MesmerPrism"
+    Version="0.1.0.0" />
+
+  <Properties>
+    <DisplayName>PolarH10</DisplayName>
+    <PublisherDisplayName>Mesmer Prism</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+        DisplayName="PolarH10"
+        Description="Windows-first telemetry toolkit for the Polar H10."
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <m2:DeviceCapability Name="bluetooth.genericAttributeProfile">
+      <m2:Device Id="any">
+        <m2:Function Type="name:heartRate" />
+        <m2:Function Type="serviceId:fb005c80-02e7-f387-1cad-8acd2d8df0c8" />
+      </m2:Device>
+    </m2:DeviceCapability>
+  </Capabilities>
+</Package>
+

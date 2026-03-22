@@ -1,0 +1,181 @@
+name: Release Windows Research Preview
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semantic version without the leading v (example: 0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      PACKAGE_ID: MesmerPrism.PolarH10
+      PACKAGE_DISPLAY_NAME: PolarH10
+      PACKAGE_PUBLISHER_DISPLAY_NAME: Mesmer Prism
+      PACKAGE_FILE_NAME: PolarH10.msix
+      APPINSTALLER_FILE_NAME: PolarH10.appinstaller
+      CERTIFICATE_FILE_NAME: PolarH10.cer
+      APPINSTALLER_URI: https://github.com/${{ github.repository }}/releases/latest/download/PolarH10.appinstaller
+      MAIN_PACKAGE_URI: https://github.com/${{ github.repository }}/releases/latest/download/PolarH10.msix
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Resolve release version
+        id: version
+        shell: pwsh
+        run: |
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $tagName = 'v${{ inputs.version }}'
+            $semVer = '${{ inputs.version }}'
+          }
+          else {
+            $tagName = '${{ github.ref_name }}'
+            if ($tagName -match '^v(?<SemVer>\d+\.\d+\.\d+)$') {
+              $semVer = $Matches.SemVer
+            }
+            else {
+              throw "Expected a tag like v0.1.0, got $tagName"
+            }
+          }
+
+          if ($semVer -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Version must look like 0.1.0, got $semVer"
+          }
+
+          $packageVersion = "$semVer.0"
+          "tag_name=$tagName" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "package_version=$packageVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Validate signing configuration
+        shell: pwsh
+        env:
+          WINDOWS_PACKAGE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_PACKAGE_CERTIFICATE_BASE64 }}
+          WINDOWS_PACKAGE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_PACKAGE_CERTIFICATE_PASSWORD }}
+          WINDOWS_PACKAGE_PUBLISHER: ${{ secrets.WINDOWS_PACKAGE_PUBLISHER }}
+        run: |
+          $missing = @()
+          foreach ($name in 'WINDOWS_PACKAGE_CERTIFICATE_BASE64', 'WINDOWS_PACKAGE_CERTIFICATE_PASSWORD', 'WINDOWS_PACKAGE_PUBLISHER') {
+            if ([string]::IsNullOrWhiteSpace((Get-Item "env:$name").Value)) {
+              $missing += $name
+            }
+          }
+
+          if ($missing.Count -gt 0) {
+            throw "Missing required release secret(s): $($missing -join ', ')"
+          }
+
+      - name: Restore
+        run: dotnet restore PolarH10.sln
+
+      - name: Build
+        run: dotnet build PolarH10.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test PolarH10.sln --no-build --configuration Release --verbosity normal
+
+      - name: Decode signing certificate
+        id: certificate
+        shell: pwsh
+        env:
+          WINDOWS_PACKAGE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_PACKAGE_CERTIFICATE_BASE64 }}
+        run: |
+          $certificatePath = Join-Path $env:RUNNER_TEMP 'PolarH10-signing.pfx'
+          $certificateBytes = [Convert]::FromBase64String($env:WINDOWS_PACKAGE_CERTIFICATE_BASE64)
+          [IO.File]::WriteAllBytes($certificatePath, $certificateBytes)
+          "path=$certificatePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Build signed Windows preview package
+        shell: pwsh
+        env:
+          WINDOWS_PACKAGE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_PACKAGE_CERTIFICATE_PASSWORD }}
+          WINDOWS_PACKAGE_PUBLISHER: ${{ secrets.WINDOWS_PACKAGE_PUBLISHER }}
+          WINDOWS_PACKAGE_TIMESTAMP_URL: ${{ vars.WINDOWS_PACKAGE_TIMESTAMP_URL }}
+        run: |
+          $args = @(
+            '-Configuration', 'Release',
+            '-Version', '${{ steps.version.outputs.package_version }}',
+            '-PackageId', $env:PACKAGE_ID,
+            '-Publisher', $env:WINDOWS_PACKAGE_PUBLISHER,
+            '-DisplayName', $env:PACKAGE_DISPLAY_NAME,
+            '-PublisherDisplayName', $env:PACKAGE_PUBLISHER_DISPLAY_NAME,
+            '-PackageFileName', $env:PACKAGE_FILE_NAME,
+            '-AppInstallerFileName', $env:APPINSTALLER_FILE_NAME,
+            '-CertificateFileName', $env:CERTIFICATE_FILE_NAME,
+            '-AppInstallerUri', $env:APPINSTALLER_URI,
+            '-MainPackageUri', $env:MAIN_PACKAGE_URI,
+            '-PackageCertificatePath', '${{ steps.certificate.outputs.path }}',
+            '-PackageCertificatePassword', $env:WINDOWS_PACKAGE_CERTIFICATE_PASSWORD
+          )
+
+          if (-not [string]::IsNullOrWhiteSpace($env:WINDOWS_PACKAGE_TIMESTAMP_URL)) {
+            $args += @('-PackageCertificateTimestampUrl', $env:WINDOWS_PACKAGE_TIMESTAMP_URL)
+          }
+
+          & powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 @args
+
+      - name: Write SHA256 sums
+        shell: pwsh
+        run: |
+          $files = @(
+            Join-Path $PWD 'artifacts\windows-installer\PolarH10.msix',
+            Join-Path $PWD 'artifacts\windows-installer\PolarH10.appinstaller',
+            Join-Path $PWD 'artifacts\windows-installer\PolarH10.cer'
+          )
+
+          Get-FileHash -Path $files -Algorithm SHA256 |
+            ForEach-Object { '{0} *{1}' -f $_.Hash.ToLowerInvariant(), [IO.Path]::GetFileName($_.Path) } |
+            Set-Content -Path (Join-Path $PWD 'artifacts\windows-installer\SHA256SUMS.txt') -Encoding utf8
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PolarH10-windows-release
+          path: artifacts/windows-installer
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tagName = '${{ steps.version.outputs.tag_name }}'
+          $releaseTitle = "PolarH10 Research Preview ${{ steps.version.outputs.package_version }}"
+          $assets = @(
+            'artifacts\windows-installer\PolarH10.msix',
+            'artifacts\windows-installer\PolarH10.appinstaller',
+            'artifacts\windows-installer\PolarH10.cer',
+            'artifacts\windows-installer\SHA256SUMS.txt'
+          )
+
+          gh release view $tagName *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tagName $assets --clobber
+          }
+          else {
+            gh release create $tagName $assets --title $releaseTitle --generate-notes --latest --target $env:GITHUB_SHA
+          }
+
+      - name: Remove signing certificate
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path '${{ steps.certificate.outputs.path }}') {
+            Remove-Item -Force '${{ steps.certificate.outputs.path }}'
+          }

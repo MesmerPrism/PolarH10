@@ -16,6 +16,8 @@ nav_order: 30
 - A Polar H10 chest strap
 - Bluetooth Low Energy (BLE) adapter
 
+If you are not changing code and a public Research Preview release exists, use [Download & Install](download.md) instead of the source-build path below.
+
 ## Build from source
 
 ```powershell

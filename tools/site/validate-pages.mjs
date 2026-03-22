@@ -117,7 +117,7 @@ async function main() {
 }
 
 async function validateHref(filePath, href) {
-  if (/^(https?:|mailto:|tel:|#)/i.test(href)) {
+  if (/^(https?:|mailto:|tel:|ms-appinstaller:|#)/i.test(href)) {
     return null;
   }
 
@@ -378,7 +378,7 @@ async function exists(targetPath) {
 }
 
 async function validateBuiltTarget(filePath, href) {
-  if (/^(https?:|mailto:|tel:|#|data:)/i.test(href)) {
+  if (/^(https?:|mailto:|tel:|ms-appinstaller:|#|data:)/i.test(href)) {
     return null;
   }
 

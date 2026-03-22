@@ -9,6 +9,9 @@ scan, doctor, record, replay, and protocol inspection.
 
 Start with [Docs Home](docs/index.md) or the live
 [Pages site](https://mesmerprism.github.io/PolarH10/).
+If a public research preview release exists, install it from
+[Download & Install](https://mesmerprism.github.io/PolarH10/reference/download.html).
+The current installer channel is a self-signed Research Preview, so first-time install requires trusting the published `PolarH10.cer` certificate.
 
 ## What It Gives You
 
@@ -40,6 +43,12 @@ Start with [Docs Home](docs/index.md) or the live
 - .NET 8.0 SDK
 - Bluetooth LE adapter
 - Polar H10 chest strap (firmware 3.x+)
+
+### Install the packaged app
+
+If you want the Windows installer instead of a source build, use the
+published [Download & Install](https://mesmerprism.github.io/PolarH10/reference/download.html)
+page.
 
 ### Clone, build, and test
 
@@ -214,6 +223,49 @@ npm run formula-sheets:pdf
 npm run pages:build
 npm run pages:serve
 npm run pages:dev
+```
+
+## Windows installer pipeline
+
+The public Windows installer flow is driven by the MSIX packaging project under
+`src/PolarH10.App.Package` and the release workflow in
+`.github/workflows/release-windows.yml`.
+
+The no-budget path is a **Research Preview** channel signed by a stable self-signed
+certificate that you generate once and keep in GitHub Actions secrets.
+
+Generate that certificate locally with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\New-Preview-SigningCertificate.ps1
+```
+
+That writes a `.pfx`, a public `PolarH10.cer`, and a Base64 text file under
+`artifacts\preview-signing\`.
+
+Then configure these repository secrets:
+
+- `WINDOWS_PACKAGE_CERTIFICATE_BASE64`
+- `WINDOWS_PACKAGE_CERTIFICATE_PASSWORD`
+- `WINDOWS_PACKAGE_PUBLISHER`
+
+Optional repository variable:
+
+- `WINDOWS_PACKAGE_TIMESTAMP_URL`
+
+Then create and push a tag like `v0.1.0`. The release workflow builds and tests
+the solution, packages the WPF app as `PolarH10.msix`, generates
+`PolarH10.appinstaller`, exports `PolarH10.cer`, writes `SHA256SUMS.txt`, and
+uploads them to the GitHub release.
+
+Users must import `PolarH10.cer` into `Local Machine > Trusted People` before
+the first preview install on a given machine. After that, App Installer can use
+the published `.appinstaller` file for install and update checks.
+
+For a local unsigned packaging check, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 -Unsigned
 ```
 
 ## Diagram Toolchain

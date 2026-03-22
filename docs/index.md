@@ -21,6 +21,8 @@ sessions from a WPF app or CLI.
 - Bluetooth LE adapter
 - Polar H10 chest strap
 
+If you want the packaged desktop app instead of building from source, start with [Download & Install](download.md). The current installer channel is a self-signed Research Preview.
+
 ```powershell
 git clone https://github.com/MesmerPrism/PolarH10.git
 cd PolarH10
@@ -59,6 +61,7 @@ dotnet run --project src/PolarH10.Cli -- scan
 
 ### Use the WPF app
 
+- [Download & Install](download.md)
 - [App Overview](app-overview.md)
 - [Getting Started on Windows](getting-started.md)
 - [First Recording](first-recording.md)
