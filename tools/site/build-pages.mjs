@@ -409,8 +409,7 @@ ${renderHead({
   title: `${siteConfig.searchTitle} | ${siteConfig.referenceTitle}`,
   description: siteConfig.searchDescription,
   currentDir,
-  canonicalPath: searchPagePath,
-  includeSearch: true
+  canonicalPath: searchPagePath
 })}
 </head>
 <body class="doc-page">
@@ -491,7 +490,7 @@ ${renderHead({
 </html>`;
 }
 
-function renderHead({ title, description, currentDir, canonicalPath, includeSearch = false, includeMathStyles = false, updatedAt = null, noIndex = false }) {
+function renderHead({ title, description, currentDir, canonicalPath, includeMathStyles = false, updatedAt = null, noIndex = false }) {
   const asset = createAssetHelper(currentDir);
   const canonicalUrl = absoluteUrl(canonicalPath);
   const socialImage = absoluteUrl(siteConfig.socialImage);
@@ -518,8 +517,7 @@ function renderHead({ title, description, currentDir, canonicalPath, includeSear
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(socialImage)}" />
   <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
-  ${includeMathStyles ? `<link rel="stylesheet" href="${asset('assets/vendor/katex/katex.min.css')}?v=${assetVersion}" />` : ''}
-  ${includeSearch ? `<link rel="stylesheet" href="${asset(`${pagefindBundleDir}/pagefind-ui.css`)}" />` : ''}`;
+  ${includeMathStyles ? `<link rel="stylesheet" href="${asset('assets/vendor/katex/katex.min.css')}?v=${assetVersion}" />` : ''}`;
 }
 
 function renderSidebar(currentDoc, docs) {
@@ -685,11 +683,12 @@ function renderHeaderBoot() {
 }
 
 function renderSearchBoot(asset) {
-  const jsHref = asset(`${pagefindBundleDir}/pagefind-ui.js`);
+  const jsHref = asset(`${pagefindBundleDir}/pagefind.js`);
   const bundlePath = `${asset(pagefindBundleDir)}/`;
 
-  return `<script src="${jsHref}"></script>
-<script>
+  return `<script type="module">
+  import { options as configurePagefind, search as runSearch } from ${JSON.stringify(jsHref)};
+
   window.addEventListener('DOMContentLoaded', () => {
     const mount = document.getElementById('pagefind-search');
     const status = document.querySelector('[data-search-status]');
@@ -719,37 +718,10 @@ function renderSearchBoot(asset) {
       return;
     }
 
-    showStatus('Loading search index…');
-
-    if (typeof window.PagefindUI !== 'function') {
-      showStatus('Search could not start. If you are using Brave Shields, a script blocker, or disabled JavaScript for this site, allow scripts and reload.', 'error');
-      return;
-    }
-
-    try {
-      new window.PagefindUI({
-        element: '#pagefind-search',
-        bundlePath: ${JSON.stringify(bundlePath)},
-        showImages: false,
-        resetStyles: false,
-        excerptLength: 18,
-        showSubResults: true
-      });
-    } catch (error) {
-      console.error(error);
-      showStatus('Search failed to initialize. If you are using Brave Shields, a script blocker, or disabled JavaScript for this site, allow scripts and reload.', 'error');
-      return;
-    }
-
-    const getInput = () => mount.querySelector('.pagefind-ui__search-input');
     const queryKey = mount.dataset.searchQueryParam;
-    let observer = null;
-    let ready = false;
-    const readyTimeout = window.setTimeout(() => {
-      if (!ready) {
-        showStatus('Search is still unavailable in this browser. If you are using Brave Shields, a script blocker, or disabled JavaScript for this site, allow scripts and reload.', 'error');
-      }
-    }, 3000);
+    const maxResults = 20;
+    let configured = false;
+    let activeRequest = 0;
 
     const syncHeader = (value) => {
       if (headerInput && headerInput.value !== value) {
@@ -772,76 +744,215 @@ function renderSearchBoot(asset) {
       history.replaceState(null, '', nextUrl);
     };
 
-    const applyQuery = (input, value) => {
-      input.value = value;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
+    const make = (tagName, className, text = '') => {
+      const element = document.createElement(tagName);
+      if (className) {
+        element.className = className;
+      }
+      if (text) {
+        element.textContent = text;
+      }
+      return element;
     };
 
-    const bindInputWhenReady = (callback) => {
-      const input = getInput();
-      if (input) {
-        callback(input);
+    const pluralize = (count, singular, plural = singular + 's') => count === 1 ? singular : plural;
+
+    const replaceMount = (...nodes) => {
+      mount.replaceChildren(...nodes.filter(Boolean));
+    };
+
+    const renderIdleState = () => {
+      replaceMount(
+        make('p', 'search-results-note', 'Use the header search to run a query. Try doctor, RR, protocol.jsonl, or PMD.')
+      );
+    };
+
+    const renderNoResults = (query) => {
+      replaceMount(
+        make('p', 'search-results-summary', 'No results for "' + query + '".'),
+        make('p', 'search-results-note', 'Try a broader term, a protocol field name, or a shorter acronym.')
+      );
+    };
+
+    const appendExcerpt = (parent, className, html) => {
+      if (!html) {
         return;
       }
 
-      if (observer) {
-        observer.disconnect();
+      const excerpt = make('p', className);
+      excerpt.innerHTML = html;
+      parent.append(excerpt);
+    };
+
+    const buildSubResults = (fragmentUrl, subResults) => {
+      const items = Array.isArray(subResults)
+        ? subResults.filter((item) => item && item.url && item.title && item.url !== fragmentUrl).slice(0, 3)
+        : [];
+
+      if (!items.length) {
+        return null;
       }
 
-      observer = new MutationObserver(() => {
-        const nextInput = getInput();
-        if (!nextInput) {
+      const section = make('div', 'search-result-subsection');
+      section.append(make('p', 'search-result-subheading', 'Within this page'));
+      const list = make('ul', 'search-result-sublist');
+
+      for (const item of items) {
+        const entry = make('li', 'search-subresult');
+        const link = make('a', 'search-subresult-link', item.title);
+        link.href = item.url;
+        entry.append(link);
+        appendExcerpt(entry, 'search-subresult-excerpt', item.excerpt);
+        list.append(entry);
+      }
+
+      section.append(list);
+      return section;
+    };
+
+    const renderResults = (query, searchResult, fragments) => {
+      const totalResults = searchResult?.results?.length ?? 0;
+      const resultsShown = fragments.length;
+      const wrapper = make('div', 'search-results');
+      const summary = make(
+        'p',
+        'search-results-summary',
+        totalResults > resultsShown
+          ? 'Showing the first ' + resultsShown + ' of ' + totalResults + ' ' + pluralize(totalResults, 'result') + ' for "' + query + '".'
+          : totalResults + ' ' + pluralize(totalResults, 'result') + ' for "' + query + '".'
+      );
+      const list = make('ol', 'search-results-list');
+
+      for (const fragment of fragments) {
+        const item = make('li', 'search-result');
+        const heading = make('h3', 'search-result-title');
+        const link = make('a', 'search-result-link', fragment?.meta?.title || fragment?.url || 'Untitled result');
+        link.href = fragment?.url || '#';
+        heading.append(link);
+        item.append(heading);
+        appendExcerpt(item, 'search-result-excerpt', fragment?.excerpt);
+
+        const subSection = buildSubResults(fragment?.url, fragment?.sub_results);
+        if (subSection) {
+          item.append(subSection);
+        }
+
+        list.append(item);
+      }
+
+      wrapper.append(summary);
+      wrapper.append(list);
+      replaceMount(wrapper);
+    };
+
+    const ensureConfigured = async () => {
+      if (configured) {
+        return;
+      }
+
+      showStatus('Loading search index…');
+      await configurePagefind({
+        basePath: ${JSON.stringify(bundlePath)},
+        excerptLength: 18
+      });
+      configured = true;
+    };
+
+    const runQuery = async (rawValue, { updateUrl = false } = {}) => {
+      const query = rawValue.trim();
+      const requestId = ++activeRequest;
+      syncHeader(query);
+
+      if (updateUrl) {
+        syncUrl(query);
+      }
+
+      if (!query) {
+        clearStatus();
+        renderIdleState();
+        return;
+      }
+
+      try {
+        await ensureConfigured();
+        showStatus('Searching for "' + query + '"…');
+        const searchResult = await runSearch(query);
+        if (requestId !== activeRequest) {
           return;
         }
 
-        observer.disconnect();
-        observer = null;
-        callback(nextInput);
-      });
-      observer.observe(mount, { childList: true, subtree: true });
-    };
-
-    bindInputWhenReady((input) => {
-      ready = true;
-      window.clearTimeout(readyTimeout);
-      clearStatus();
-
-      if (queryKey) {
-        const initialQuery = new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? '';
-        if (initialQuery) {
-          applyQuery(input, initialQuery);
+        const matches = searchResult?.results ?? [];
+        if (!matches.length) {
+          clearStatus();
+          renderNoResults(query);
+          return;
         }
-        syncHeader(initialQuery);
-      }
 
-      if (mount.dataset.searchAutofocus === 'true') {
-        input.focus({ preventScroll: true });
+        const fragments = (await Promise.all(
+          matches.slice(0, maxResults).map(async (result) => {
+            try {
+              return await result.data();
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          })
+        )).filter(Boolean);
+
+        if (requestId !== activeRequest) {
+          return;
+        }
+
+        if (!fragments.length) {
+          showStatus('Search found matches but could not load their excerpts. Reload the page and try again.', 'error');
+          replaceMount();
+          return;
+        }
+
+        clearStatus();
+        renderResults(query, searchResult, fragments);
+      } catch (error) {
+        console.error(error);
+        showStatus('Search failed to load results. Reload the page and, if you are using Brave Shields or an extension blocker, allow scripts for this site.', 'error');
+        replaceMount();
       }
-    });
+    };
 
     if (headerForm && headerInput) {
       headerForm.addEventListener('submit', (event) => {
-        const input = getInput();
-        const nextQuery = headerInput.value.trim();
-        if (!input) {
+        event.preventDefault();
+        runQuery(headerInput.value, { updateUrl: true });
+      });
+
+      headerInput.addEventListener('search', () => {
+        if (headerInput.value) {
           return;
         }
 
-        event.preventDefault();
-        applyQuery(input, nextQuery);
-        syncUrl(nextQuery);
+        runQuery('', { updateUrl: true });
       });
     }
 
-    mount.addEventListener('input', (event) => {
-      const target = event.target;
-      if (!target || !target.classList || !target.classList.contains('pagefind-ui__search-input')) {
-        return;
-      }
-
-      syncHeader(target.value);
-      syncUrl(target.value.trim());
+    window.addEventListener('popstate', () => {
+      const query = queryKey
+        ? new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? ''
+        : '';
+      runQuery(query);
     });
+
+    const initialQuery = queryKey
+      ? new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? ''
+      : '';
+
+    if (initialQuery) {
+      runQuery(initialQuery);
+      return;
+    }
+
+    renderIdleState();
+    if (mount.dataset.searchAutofocus === 'true') {
+      headerInput?.focus({ preventScroll: true });
+    }
   });
 </script>`;
 }

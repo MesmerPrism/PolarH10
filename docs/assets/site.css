@@ -795,64 +795,84 @@ button:focus-visible {
 
 #pagefind-search {
   min-width: 0;
+  display: grid;
+  gap: 14px;
 }
 
-.pagefind-ui__search-input {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--ink);
-  font: inherit;
+.search-results {
+  display: grid;
+  gap: 14px;
 }
 
-.pagefind-ui__search-input:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-
-.pagefind-ui__drawer {
-  margin-top: 10px;
-}
-
-.pagefind-ui__search-clear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  top: calc(3px * var(--pagefind-ui-scale));
-  bottom: calc(3px * var(--pagefind-ui-scale));
-  height: auto;
-  padding: 0 calc(15px * var(--pagefind-ui-scale));
-  font-weight: 600;
-}
-
-.pagefind-ui__result {
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-}
-
-.pagefind-ui__result-link,
-.pagefind-ui__result-title {
-  color: var(--ink);
-}
-
-.pagefind-ui__result-excerpt,
-.pagefind-ui__message {
+.search-results-summary,
+.search-results-note {
+  margin: 0;
   color: var(--ink-muted);
 }
 
-.pagefind-ui__button {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.92);
+.search-results-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.search-result {
+  padding: 14px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search-result-title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.search-result-link,
+.search-subresult-link {
   color: var(--ink);
-  font: inherit;
-  cursor: pointer;
+  text-decoration: none;
+}
+
+.search-result-link:hover,
+.search-result-link:focus-visible,
+.search-subresult-link:hover,
+.search-subresult-link:focus-visible {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.search-result-excerpt,
+.search-subresult-excerpt {
+  margin: 8px 0 0;
+  color: var(--ink-muted);
+}
+
+.search-result-excerpt mark,
+.search-subresult-excerpt mark {
+  padding: 0 0.1em;
+  background: #fff3b3;
+  color: var(--ink);
+}
+
+.search-result-subsection {
+  margin-top: 12px;
+}
+
+.search-result-subheading {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.search-result-sublist {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.search-subresult + .search-subresult {
+  margin-top: 8px;
 }
 
 .prose {
