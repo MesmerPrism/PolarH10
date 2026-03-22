@@ -24,16 +24,10 @@ paper-defined ratio from the app-facing `0..1` values exposed in `PolarH10`.
 
 ![Coherence derivation](../assets/synthetic-showcase/coherence-derivation.png)
 
-## Suggested Caption
-
-*Accepted RR intervals from deterministic high- and low-coherence synthetic
-scenarios are converted to a resampled tachogram and power spectral density.
-Following the McCraty et al. spectral framing, the dominant peak is searched in
-`0.04-0.26 Hz`, integrated in a `0.030 Hz` window, and compared against total
-power in `0.0033-0.4 Hz`. The figure reports both the paper coherence ratio and
-the app-facing normalized/displayed `0..1` scores so the publication panel
-matches the software telemetry while keeping the methodological distinction
-explicit.*
+<aside class="caption-card" aria-labelledby="coherence-caption-title">
+  <div class="caption-card-title" id="coherence-caption-title">Suggested Caption</div>
+  <p>Accepted RR intervals from deterministic high- and low-coherence synthetic scenarios are converted to a resampled tachogram and power spectral density. Following the McCraty et al. spectral framing, the dominant peak is searched in <code>0.04-0.26 Hz</code>, integrated in a <code>0.030 Hz</code> window, and compared against total power in <code>0.0033-0.4 Hz</code>. The figure reports both the paper coherence ratio and the app-facing normalized/displayed <code>0..1</code> scores so the publication panel matches the software telemetry while keeping the methodological distinction explicit.</p>
+</aside>
 
 ## Source Files
 

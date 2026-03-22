@@ -26,16 +26,10 @@ ACC-derived breathing waveform rather than to a respiration belt signal.
 
 ![Breathing dynamics derivation](../assets/synthetic-showcase/dynamics-derivation.png)
 
-## Suggested Caption
-
-*A deterministic high- versus low-entropy breathing pair is shown from the
-normalized breathing waveform through accepted extrema, derived breath-interval
-and breath-amplitude series, and the downstream sample-entropy summary used by
-the app. The feature family follows Goheen et al. (2025), but the present
-implementation applies it to the calibrated ACC-derived breathing waveform
-available in `PolarH10`. Sample entropy is shown with the repository defaults
-`m = 2`, `delay = 1`, and `r = 0.2 * SD`, so the figure can be reproduced
-directly from `analysis.json`.*
+<aside class="caption-card" aria-labelledby="dynamics-caption-title">
+  <div class="caption-card-title" id="dynamics-caption-title">Suggested Caption</div>
+  <p>A deterministic high- versus low-entropy breathing pair is shown from the normalized breathing waveform through accepted extrema, derived breath-interval and breath-amplitude series, and the downstream sample-entropy summary used by the app. The feature family follows Goheen et al. (2025), but the present implementation applies it to the calibrated ACC-derived breathing waveform available in <code>PolarH10</code>. Sample entropy is shown with the repository defaults <code>m = 2</code>, <code>delay = 1</code>, and <code>r = 0.2 * SD</code>, so the figure can be reproduced directly from <code>analysis.json</code>.</p>
+</aside>
 
 ## Source Files
 

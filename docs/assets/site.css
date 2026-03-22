@@ -1072,6 +1072,38 @@ button:focus-visible {
   border-left: 4px solid var(--orange);
 }
 
+.caption-card {
+  margin: 1rem 0 1.35rem;
+  padding: 16px 18px 18px 20px;
+  border: 1px solid var(--line-strong);
+  border-left: 6px solid var(--orange);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(242, 143, 40, 0.08), rgba(246, 241, 233, 0.96)),
+    var(--paper);
+  box-shadow: var(--shadow-soft);
+}
+
+.caption-card-title {
+  display: block;
+  margin: 0 0 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.caption-card p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.caption-card code {
+  background: rgba(255, 255, 255, 0.72);
+}
+
 .footer {
   margin-top: 20px;
   padding: 14px 0 0;

@@ -25,15 +25,10 @@ telemetry rather than clinical `24 h` norms.
 
 ![HRV derivation](../assets/synthetic-showcase/hrv-derivation.png)
 
-## Suggested Caption
-
-*Accepted RR intervals from deterministic high- and low-HRV synthetic scenarios
-are converted to successive RR differences and summarized with the standard
-short-term time-domain metrics `RMSSD`, `SDNN`, `pNN50`, and `ln(RMSSD)`.
-Consistent with the short-term HRV framing reviewed by Shaffer and Ginsberg
-(2017), the figure is intended to document how differences in beat-to-beat
-variability propagate into the downstream metrics exposed by `PolarH10`, rather
-than to provide clinical normative interpretation.*
+<aside class="caption-card" aria-labelledby="hrv-caption-title">
+  <div class="caption-card-title" id="hrv-caption-title">Suggested Caption</div>
+  <p>Accepted RR intervals from deterministic high- and low-HRV synthetic scenarios are converted to successive RR differences and summarized with the standard short-term time-domain metrics <code>RMSSD</code>, <code>SDNN</code>, <code>pNN50</code>, and <code>ln(RMSSD)</code>. Consistent with the short-term HRV framing reviewed by Shaffer and Ginsberg (2017), the figure is intended to document how differences in beat-to-beat variability propagate into the downstream metrics exposed by <code>PolarH10</code>, rather than to provide clinical normative interpretation.</p>
+</aside>
 
 ## Source Files
 
