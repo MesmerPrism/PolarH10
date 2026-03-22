@@ -14,7 +14,18 @@
   <ItemGroup>
     <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
     <ProjectReference Include="..\PolarH10.Transport.Abstractions\PolarH10.Transport.Abstractions.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Runtime\PolarH10.Transport.Runtime.csproj" />
     <ProjectReference Include="..\PolarH10.Transport.Synthetic\PolarH10.Transport.Synthetic.csproj" />
-    <ProjectReference Include="..\PolarH10.Transport.Windows\PolarH10.Transport.Windows.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Windows\PolarH10.Transport.Windows.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <WindowsTransportTargetFramework>net8.0-windows10.0.19041.0</WindowsTransportTargetFramework>
+    <WindowsTransportAssemblyPath>$(MSBuildProjectDirectory)\..\PolarH10.Transport.Windows\bin\$(Configuration)\$(WindowsTransportTargetFramework)\PolarH10.Transport.Windows.dll</WindowsTransportAssemblyPath>
+  </PropertyGroup>
+
+  <Target Name="CopyWindowsTransportSidecar" AfterTargets="Build;Publish" Condition="Exists('$(WindowsTransportAssemblyPath)')">
+    <Copy SourceFiles="$(WindowsTransportAssemblyPath)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(WindowsTransportAssemblyPath)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" Condition="'$(PublishDir)' != ''" />
+  </Target>
 </Project>

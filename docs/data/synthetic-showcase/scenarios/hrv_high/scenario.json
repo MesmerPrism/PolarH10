@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "hrv_high",
+  "DisplayName": "HRV demo / high beat-to-beat variability",
+  "ExpectedBehavior": "RMSSD, SDNN, and pNN50 should stay materially above hrv_low because adjacent RR differences are larger.",
+  "Seed": 1201,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 890,
+    "RsaAmplitudeMs": 92,
+    "SlowModulationMs": 10,
+    "IrregularNoiseMs": 4,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 18,
+    "Amplitude01": 0.3,
+    "HarmonicAmplitude01": 0.026,
+    "JitterAmount01": 0.012,
+    "WobbleRateHz": 0.11,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

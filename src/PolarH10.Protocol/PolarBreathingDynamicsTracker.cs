@@ -45,6 +45,10 @@ public sealed class PolarBreathingDynamicsTracker
     private Extremum? _lastAcceptedTrough;
     private readonly List<float> _intervalBreaths = new(256);
     private readonly List<float> _amplitudeBreaths = new(256);
+    private readonly List<PolarBreathingWaveformPoint> _waveformSamples = new(4096);
+    private readonly List<PolarBreathingExtremumPoint> _acceptedExtremaHistory = new(256);
+    private readonly List<PolarBreathingDerivedPoint> _intervalSeriesHistory = new(256);
+    private readonly List<PolarBreathingDerivedPoint> _amplitudeSeriesHistory = new(256);
     private PolarBreathingFeatureSet _intervalFeatures = PolarBreathingFeatureSet.Empty;
     private PolarBreathingFeatureSet _amplitudeFeatures = PolarBreathingFeatureSet.Empty;
     private TimebaseKind _timebaseKind;
@@ -176,6 +180,15 @@ public sealed class PolarBreathingDynamicsTracker
             LastBreathDetectedAtUtc: LastBreathDetectedAtUtc);
     }
 
+    public PolarBreathingDynamicsDiagnostics GetDiagnostics()
+    {
+        return new PolarBreathingDynamicsDiagnostics(
+            WaveformSamples: _waveformSamples.ToArray(),
+            AcceptedExtrema: _acceptedExtremaHistory.ToArray(),
+            IntervalSeries: _intervalSeriesHistory.ToArray(),
+            AmplitudeSeries: _amplitudeSeriesHistory.ToArray());
+    }
+
     private void Advance(double now)
     {
         if (_lastAdvanceAt <= 0d)
@@ -185,6 +198,7 @@ public sealed class PolarBreathingDynamicsTracker
     private void ProcessCanonicalWaveformSample(float volumeBase01, double now)
     {
         float volume = Clamp01(volumeBase01);
+        AppendRollingWaveform(_waveformSamples, new PolarBreathingWaveformPoint(now, volume), 8192);
         if (!_hasLastVolumeSample)
         {
             _hasLastVolumeSample = true;
@@ -263,6 +277,7 @@ public sealed class PolarBreathingDynamicsTracker
             AcceptedExtremumCount = 1;
             _lastBreathAcceptedAt = timeSeconds;
             LastBreathDetectedAtUtc = ResolveEventTimeUtc(timeSeconds);
+            UpsertLastAcceptedExtremumHistory(candidate);
             return;
         }
 
@@ -278,6 +293,7 @@ public sealed class PolarBreathingDynamicsTracker
                     _lastAcceptedPeak = candidate;
                 else
                     _lastAcceptedTrough = candidate;
+                UpsertLastAcceptedExtremumHistory(candidate);
             }
             return;
         }
@@ -297,12 +313,26 @@ public sealed class PolarBreathingDynamicsTracker
         AcceptedExtremumCount++;
         _lastBreathAcceptedAt = candidate.TimeSeconds;
         LastBreathDetectedAtUtc = ResolveEventTimeUtc(candidate.TimeSeconds);
+        AppendRolling(
+            _amplitudeSeriesHistory,
+            new PolarBreathingDerivedPoint(
+                _amplitudeSeriesHistory.Count + 1,
+                candidate.TimeSeconds,
+                excursion01),
+            Settings.RetainedBreathCount);
 
         AppendRolling(_amplitudeBreaths, excursion01, Settings.RetainedBreathCount);
         if (previousSameKind is Extremum sameKind)
         {
             float intervalSeconds = (float)Math.Max(0d, candidate.TimeSeconds - sameKind.TimeSeconds);
             AppendRolling(_intervalBreaths, intervalSeconds, Settings.RetainedBreathCount);
+            AppendRolling(
+                _intervalSeriesHistory,
+                new PolarBreathingDerivedPoint(
+                    _intervalSeriesHistory.Count + 1,
+                    candidate.TimeSeconds,
+                    intervalSeconds),
+                Settings.RetainedBreathCount);
         }
 
         if (candidate.Kind == ExtremumKind.Peak)
@@ -310,6 +340,7 @@ public sealed class PolarBreathingDynamicsTracker
         else
             _lastAcceptedTrough = candidate;
 
+        _acceptedExtremaHistory.Add(ToExtremumPoint(candidate));
         RecomputeCachedFeatures();
     }
 
@@ -348,6 +379,10 @@ public sealed class PolarBreathingDynamicsTracker
         _lastAcceptedTrough = null;
         _intervalBreaths.Clear();
         _amplitudeBreaths.Clear();
+        _waveformSamples.Clear();
+        _acceptedExtremaHistory.Clear();
+        _intervalSeriesHistory.Clear();
+        _amplitudeSeriesHistory.Clear();
         _intervalFeatures = PolarBreathingFeatureSet.Empty;
         _amplitudeFeatures = PolarBreathingFeatureSet.Empty;
         AcceptedExtremumCount = 0;
@@ -361,6 +396,38 @@ public sealed class PolarBreathingDynamicsTracker
         if (values.Count > maxCount)
             values.RemoveAt(0);
     }
+
+    private static void AppendRolling<T>(List<T> values, T value, int maxCount)
+    {
+        values.Add(value);
+        if (values.Count > maxCount)
+            values.RemoveAt(0);
+    }
+
+    private static void AppendRollingWaveform(List<PolarBreathingWaveformPoint> values, PolarBreathingWaveformPoint value, int maxCount)
+    {
+        values.Add(value);
+        if (values.Count > maxCount)
+            values.RemoveAt(0);
+    }
+
+    private void UpsertLastAcceptedExtremumHistory(Extremum candidate)
+    {
+        PolarBreathingExtremumPoint point = ToExtremumPoint(candidate);
+        if (_acceptedExtremaHistory.Count == 0)
+        {
+            _acceptedExtremaHistory.Add(point);
+            return;
+        }
+
+        _acceptedExtremaHistory[^1] = point;
+    }
+
+    private static PolarBreathingExtremumPoint ToExtremumPoint(Extremum extremum)
+        => new(
+            Kind: extremum.Kind == ExtremumKind.Peak ? "Peak" : "Trough",
+            TimeSeconds: extremum.TimeSeconds,
+            Value01: extremum.Value01);
 
     private static bool HasFiniteEntropyMetrics(PolarBreathingFeatureSet features)
         => float.IsFinite(features.SampleEntropy) &&

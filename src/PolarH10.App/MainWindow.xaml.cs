@@ -94,6 +94,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        PolarAppRuntimeStatusStore.Write(_transportSettings);
         ApplyLaunchStamp();
         InitializeEmbeddedDetailTabs();
         InitializeCharts();
@@ -123,6 +124,27 @@ public partial class MainWindow : Window
         Loaded += OnLoaded;
     }
 
+    protected override async void OnClosed(EventArgs e)
+    {
+        if (_refreshTimer is not null)
+            _refreshTimer.Stop();
+
+        CloseDetachedDetailWindows();
+
+        try
+        {
+            await _coordinator.DisposeAsync();
+        }
+        catch
+        {
+            // Best effort shutdown cleanup only.
+        }
+
+        PolarAppRuntimeStatusStore.ClearOwnedStatus();
+        base.OnClosed(e);
+        Application.Current.Shutdown();
+    }
+
     private void InitializeEmbeddedDetailTabs()
     {
         EnsureRawTelemetryWindow();
@@ -136,6 +158,36 @@ public partial class MainWindow : Window
         object? content = window.Content;
         window.Content = null;
         return content;
+    }
+
+    private void CloseDetachedDetailWindows()
+    {
+        TryCloseWindow(_rawTelemetryWindow);
+        _rawTelemetryWindow = null;
+
+        TryCloseWindow(_coherenceWindow);
+        _coherenceWindow = null;
+
+        TryCloseWindow(_hrvWindow);
+        _hrvWindow = null;
+
+        TryCloseWindow(_breathingDynamicsWindow);
+        _breathingDynamicsWindow = null;
+    }
+
+    private static void TryCloseWindow(Window? window)
+    {
+        if (window is null)
+            return;
+
+        try
+        {
+            window.Close();
+        }
+        catch
+        {
+            // Ignore cleanup-only failures on shutdown.
+        }
     }
 
     private static LaunchStamp DetectLaunchStamp(string? processPath)

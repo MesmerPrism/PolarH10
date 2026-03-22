@@ -1,7 +1,7 @@
 using System.CommandLine;
 using PolarH10.Cli;
 using PolarH10.Protocol;
-using PolarH10.Transport.Windows;
+using PolarH10.Transport.Runtime;
 
 namespace PolarH10.Cli.Commands;
 
@@ -33,7 +33,14 @@ internal static class DoctorCommand
             Console.WriteLine($"[doctor] Connecting to {device}...");
             try
             {
-                await session.ConnectAsync(device, cts.Token);
+                try
+                {
+                    await session.ConnectAsync(device, cts.Token);
+                }
+                catch (Exception ex)
+                {
+                    throw CliTransportOptions.RewriteTransportException(transport, syntheticPipe, "device connection", ex);
+                }
                 Console.WriteLine("[doctor] OK  Connected");
             }
             catch (Exception ex)

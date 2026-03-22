@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "irregular_rr",
+  "DisplayName": "Irregular RR / AF-like",
+  "ExpectedBehavior": "Coherence should be materially lower than resonance.",
+  "Seed": 7001,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 890,
+    "RsaAmplitudeMs": 16,
+    "SlowModulationMs": 14,
+    "IrregularNoiseMs": 95,
+    "EctopyEveryNBeats": 7,
+    "EctopyDeltaMs": 220,
+    "CompensatoryDeltaMs": 140
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.24,
+    "HarmonicAmplitude01": 0.03,
+    "JitterAmount01": 0.18,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

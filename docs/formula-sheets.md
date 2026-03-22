@@ -61,6 +61,17 @@ Breath interval and amplitude features derived from the calibrated ACC waveform.
   <a class="button" href="assets/formula-sheets/breathing-dynamics-formulas.pdf">Download PDF</a>
 </p>
 
+## Synthetic Showcase
+
+Use the published showcase bundle when you need example figures and source files
+that connect raw synthetic input to the downstream telemetry shown in the formula
+sheets.
+
+- [Synthetic Showcase Overview](synthetic-showcase/index.md)
+- [Coherence Showcase](synthetic-showcase/coherence.md)
+- [HRV Showcase](synthetic-showcase/hrv.md)
+- [Breathing Dynamics Showcase](synthetic-showcase/dynamics.md)
+
 ## Alignment Summary
 
 - `Coherence`: the spectral peak search, peak-window integration, total-band
@@ -78,6 +89,7 @@ Breath interval and amplitude features derived from the calibrated ACC waveform.
 
 ## Related Pages
 
+- [Synthetic Showcase](synthetic-showcase/index.md)
 - [Coherence Workflow](coherence-workflow.md)
 - [HRV Workflow](hrv-workflow.md)
 - [Breathing Workflow](breathing-workflow.md)

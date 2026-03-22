@@ -1,0 +1,1006 @@
+{
+  "presetId": "showcase-v1",
+  "generatedAtUtc": "2026-03-22T14:20:51.0591595+00:00",
+  "durationSeconds": 360,
+  "generatorVersion": "1.0.0.0",
+  "trackerSettings": {
+    "coherence": {
+      "minimumIbiSamples": 12,
+      "coherenceWindowSeconds": 32,
+      "coherenceSmoothingSpeed": 0,
+      "staleTimeoutSeconds": 3
+    },
+    "hrv": {
+      "minimumRrSamples": 32,
+      "windowSeconds": 120,
+      "staleTimeoutSeconds": 6
+    },
+    "dynamics": {
+      "turningPointDeltaThreshold": 0.0025,
+      "minimumExtremumSpacingSeconds": 0.35,
+      "minimumCycleExcursion01": 0.08,
+      "retainedBreathCount": 180,
+      "minimumBreathsForBasicStats": 6,
+      "minimumBreathsForEntropy": 18,
+      "fullConfidenceBreathCount": 72,
+      "staleTimeoutSeconds": 4,
+      "sampleEntropyDimension": 2,
+      "sampleEntropyDelay": 1,
+      "sampleEntropyToleranceSdFactor": 0.2,
+      "multiscaleEntropyDimension": 3,
+      "multiscaleEntropyDelay": 1,
+      "multiscaleEntropyToleranceSdFactor": 0.2,
+      "multiscaleEntropyMaxScale": 5
+    }
+  },
+  "scenarioIds": [
+    "breathing_pause",
+    "coherence_high",
+    "coherence_low",
+    "entropy_high",
+    "entropy_low",
+    "entropy_rising",
+    "flat_breathing",
+    "hrv_high",
+    "hrv_low",
+    "irregular_rr",
+    "jittered_breathing",
+    "off_10bpm",
+    "off_12bpm",
+    "off_18bpm",
+    "off_24bpm",
+    "regular",
+    "resonance_010hz"
+  ],
+  "scenarios": [
+    {
+      "scenarioId": "breathing_pause",
+      "path": "data/synthetic-showcase/scenarios/breathing_pause",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/breathing_pause/analysis.json",
+          "sizeBytes": 461254,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.8370627Z",
+          "sha256": "9083e24e712186f66b93ccc356c4922dcbf783a1dd9ed70287db046ff842ff92"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/breathing_pause/ecg.csv",
+          "sizeBytes": 1096736,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.8516609Z",
+          "sha256": "a502917feca26978dbd587acfbc504a64ec526e5d653b5337da8b46a7710279e"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/breathing_pause/ground_truth.json",
+          "sizeBytes": 2321013,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.8039326Z",
+          "sha256": "46be427e8a3bacfe37d9c27fbe1a41abdcd1776e7cbfb983337183b665886292"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/breathing_pause/hr_rr.csv",
+          "sizeBytes": 18675,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.8425729Z",
+          "sha256": "5e83c1ad3e1ec903b9dfc59721133a9b9da0e270a6d9341cf958d616f3a16f7c"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/breathing_pause/scenario.json",
+          "sizeBytes": 859,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.7328744Z",
+          "sha256": "16fb51cbf7be3c62c24c68cc0da9524188fbb11ca708748117e246bd536ebfe0"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/breathing_pause/session.json",
+          "sizeBytes": 458,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.8561718Z",
+          "sha256": "9e82527a142f586cbaa7e6c236b3172036a4fb43fd84ea72d0cd392fcba01e0e"
+        }
+      ]
+    },
+    {
+      "scenarioId": "coherence_high",
+      "path": "data/synthetic-showcase/scenarios/coherence_high",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_high/analysis.json",
+          "sizeBytes": 486990,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.0242882Z",
+          "sha256": "07d150162f4b0ccaa27811adb3ca093a8d66296979c74d7835a1d5d95bf75c0b"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/coherence_high/ecg.csv",
+          "sizeBytes": 1096557,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.0324646Z",
+          "sha256": "74ff4874eb6ea9408e733b947725f438675afb864ab1380dceea8159299a35d5"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_high/ground_truth.json",
+          "sizeBytes": 2433714,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.0182146Z",
+          "sha256": "873f379dfb1576aabf0e3504076aef6bb45aa724782bb1b2706ec545574a6b2f"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/coherence_high/hr_rr.csv",
+          "sizeBytes": 18135,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.0248097Z",
+          "sha256": "219170d6f98f4e782410cc5832bd1c32d6d662711c661e8cd8b5c6c5084a6d0f"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_high/scenario.json",
+          "sizeBytes": 841,
+          "lastWriteTimeUtc": "2026-03-22T14:20:45.9935122Z",
+          "sha256": "d67afe8f67e1c283714def62d5fd4672a058fd749d1a0fb8b3f0cba3272e6261"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_high/session.json",
+          "sizeBytes": 459,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.0334603Z",
+          "sha256": "ca4481da3538fe1c1269ad335e53081b07dac4c89890b5a346c7c5579feeabbe"
+        }
+      ]
+    },
+    {
+      "scenarioId": "coherence_low",
+      "path": "data/synthetic-showcase/scenarios/coherence_low",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_low/analysis.json",
+          "sizeBytes": 530334,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.4041786Z",
+          "sha256": "2dab12a8bd6be8987a18ff6e67871f6d9ff20dcf641b7973ca4b5b9859579364"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/coherence_low/ecg.csv",
+          "sizeBytes": 1095807,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.4129160Z",
+          "sha256": "fb478bbf92b678e1dad3ce74061405510fdc42f744f2a98c7b1ad99509e9065f"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_low/ground_truth.json",
+          "sizeBytes": 2438746,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.3981605Z",
+          "sha256": "55d7cc19cff48172009c627581d8819dd85ed01ff761fb289ef29ce92a6f7659"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/coherence_low/hr_rr.csv",
+          "sizeBytes": 19591,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.4051807Z",
+          "sha256": "b414883b356f39758eaa6fa1293bbc93f59fbceb573b21d5c98077d436bb7842"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_low/scenario.json",
+          "sizeBytes": 861,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.3788377Z",
+          "sha256": "f91f67625f2c5df52cdd7ecee60c14005e09f568302e6e62a22f1d5d4fb0c328"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/coherence_low/session.json",
+          "sizeBytes": 459,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.4139137Z",
+          "sha256": "ff078e180b486523d8e8ad7c087259d645ee5fc4c124af3158c87e84a9ae7f91"
+        }
+      ]
+    },
+    {
+      "scenarioId": "entropy_high",
+      "path": "data/synthetic-showcase/scenarios/entropy_high",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_high/analysis.json",
+          "sizeBytes": 513056,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.6521772Z",
+          "sha256": "9656591671aef3a6f08e050e7d49dbb5ee76ca00e2e5c14a47553325d1b9da44"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/entropy_high/ecg.csv",
+          "sizeBytes": 1096837,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.6616722Z",
+          "sha256": "a42aa27efe2c0cb33f1bf419365bed635777cbd817729b97662e7a3cd3cd4c62"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_high/ground_truth.json",
+          "sizeBytes": 2437216,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.6431244Z",
+          "sha256": "7b3fa08b41d181f4bf91cacb71d3cc2945252aba3e15933e025ce85de14c1f1d"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/entropy_high/hr_rr.csv",
+          "sizeBytes": 18900,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.6531776Z",
+          "sha256": "848f411eb0535aed34ac4e9ff267dff5251bd735c58e3c5e57db4511080eacc7"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_high/scenario.json",
+          "sizeBytes": 885,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.6220822Z",
+          "sha256": "17e190a63c59aac238b19d761c5fc962756a3bab89d658373bfab63c72f943db"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_high/session.json",
+          "sizeBytes": 458,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.6631807Z",
+          "sha256": "952d8717abdffa2ae4cedd3b8d5dfc3ac526881ec12195d742037624334dc7c9"
+        }
+      ]
+    },
+    {
+      "scenarioId": "entropy_low",
+      "path": "data/synthetic-showcase/scenarios/entropy_low",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_low/analysis.json",
+          "sizeBytes": 512991,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.9605951Z",
+          "sha256": "f71e24b9c30a0a1291f03736ab47b6416c26c88a80e3aaed052e81d8f18c667a"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/entropy_low/ecg.csv",
+          "sizeBytes": 1096026,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.9716634Z",
+          "sha256": "1a963dc3dec52a0752a6a9894493ddb71ce8794cb85624af2e25ae32dfc6232e"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_low/ground_truth.json",
+          "sizeBytes": 2436190,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.9558244Z",
+          "sha256": "2b6523f62eaad7bb970f58987f2b48bccc3314550f07b79d5c9a53f1a798a88d"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/entropy_low/hr_rr.csv",
+          "sizeBytes": 18900,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.9615981Z",
+          "sha256": "62a8d008324f18cce6f4119d57ad2062fd6de636c7cd528e882dab4f4010852e"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_low/scenario.json",
+          "sizeBytes": 852,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.9363822Z",
+          "sha256": "d611f8edb012e5eeb0a51659f8aad65a4712fababe463729d6a1fb763b6246aa"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_low/session.json",
+          "sizeBytes": 460,
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.9726626Z",
+          "sha256": "c634156483b11b0bd76e0c04878ac04a951a99ea9a97f4dcbd5080f3e1d4169a"
+        }
+      ]
+    },
+    {
+      "scenarioId": "entropy_rising",
+      "path": "data/synthetic-showcase/scenarios/entropy_rising",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_rising/analysis.json",
+          "sizeBytes": 512945,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.2054528Z",
+          "sha256": "42dd1016ee4d518f880ce86fdfe5d06ffc87c5f39e035b227ae966aa6e5adb3c"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/entropy_rising/ecg.csv",
+          "sizeBytes": 1096887,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.2140923Z",
+          "sha256": "f4b05ea0766ee2da41bd6cd5f1e8a8844ad4f8c007bb7c388accb2733743ad55"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_rising/ground_truth.json",
+          "sizeBytes": 2434574,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.2014462Z",
+          "sha256": "2ce28377865acbd2c39128b054bd30a9ba73d22e230548a61592be8152c089ff"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/entropy_rising/hr_rr.csv",
+          "sizeBytes": 18945,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.2064535Z",
+          "sha256": "d656ee5b169817ed56b689a83e628b9b6fcfd85b87c91afc82df95761bba0a0f"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_rising/scenario.json",
+          "sizeBytes": 1326,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.1913870Z",
+          "sha256": "1ec8b80de134a290a174b31ffe871b4174de72dbf4a17d0574c7751c3828e426"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/entropy_rising/session.json",
+          "sizeBytes": 464,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.2150908Z",
+          "sha256": "e8f71f6cf12fcee1f1c6640f195cc0cd85adfa01cb095a5391cb6d48c93cb4ef"
+        }
+      ]
+    },
+    {
+      "scenarioId": "flat_breathing",
+      "path": "data/synthetic-showcase/scenarios/flat_breathing",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/flat_breathing/analysis.json",
+          "sizeBytes": 55066,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.3675877Z",
+          "sha256": "0dd66c7cf461442e9eec9373aec8ce39cfbbc36132db2c8922becea3ee2cf39a"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/flat_breathing/ecg.csv",
+          "sizeBytes": 1091350,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.3751270Z",
+          "sha256": "7f5c38502f18f56aedc5929b7919f2d3403d431bcad8398329cdde386833cbb5"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/flat_breathing/ground_truth.json",
+          "sizeBytes": 2435217,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.3660842Z",
+          "sha256": "2a4e867f511428a290cb1f28deb771c730762830abe43157f45c75c4db7efe05"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/flat_breathing/hr_rr.csv",
+          "sizeBytes": 19125,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.3681022Z",
+          "sha256": "0b4d30e8e11936004cadd1774220cf88cff42f60b4938f3eeea1277ebbfd2145"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/flat_breathing/scenario.json",
+          "sizeBytes": 809,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.3570406Z",
+          "sha256": "1704844fc85d0e8f0e6cd0ebb3d5923aeea8fc40c7ee6b9da0762b8ca6ac4d9e"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/flat_breathing/session.json",
+          "sizeBytes": 478,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.3751270Z",
+          "sha256": "775e9d913f440ceec08402a7a9dfdb2b48e071d155f5fbcd341d386c58e1fb8e"
+        }
+      ]
+    },
+    {
+      "scenarioId": "hrv_high",
+      "path": "data/synthetic-showcase/scenarios/hrv_high",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_high/analysis.json",
+          "sizeBytes": 528621,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.7328688Z",
+          "sha256": "be90a895edf1e84471cf987d3a3665ad1553a36a1fbbed482d04987bf118a1f0"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/hrv_high/ecg.csv",
+          "sizeBytes": 1097237,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.7427001Z",
+          "sha256": "23ea91ec56f21da086fb37808204fd8fb0e7fd1059132c140d1a93e485356b9e"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_high/ground_truth.json",
+          "sizeBytes": 2435326,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.7288544Z",
+          "sha256": "dd08141f1c432afd4066e214cc909cc9d99560a98e1d5e317cb3caa7439c28a5"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/hrv_high/hr_rr.csv",
+          "sizeBytes": 18315,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.7340585Z",
+          "sha256": "a01a455d989d8baf08bfc6ce58689291f8853579202c07531db0f7d92ed6b1c7"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_high/scenario.json",
+          "sizeBytes": 876,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.7156158Z",
+          "sha256": "51f527dd6f11b44f80e20b6c936adef794cc38237001c73ae4e674fe69d54549"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_high/session.json",
+          "sizeBytes": 462,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.7435134Z",
+          "sha256": "51831f0892a22aa366b1adbb9ac1e7f883302decf651ab079baf7d8db0865455"
+        }
+      ]
+    },
+    {
+      "scenarioId": "hrv_low",
+      "path": "data/synthetic-showcase/scenarios/hrv_low",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_low/analysis.json",
+          "sizeBytes": 513096,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.9326309Z",
+          "sha256": "788a4f8e68cd8f8bc346945ab79cd1561434017e9a19f10dd3f761239f135229"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/hrv_low/ecg.csv",
+          "sizeBytes": 1096019,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.9381673Z",
+          "sha256": "ca8a84b073937c0b33e2c0eff96b71d94ff7a7ce7dbec5674b44862a5074df57"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_low/ground_truth.json",
+          "sizeBytes": 2433505,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.9280946Z",
+          "sha256": "3438ed38bbf1b9e0a03d41ea7e78ffee7b8d265af4cb316c7c6868778657f4a2"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/hrv_low/hr_rr.csv",
+          "sizeBytes": 18900,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.9336350Z",
+          "sha256": "5b6099fd11b11f66ed82843553f09b688c64d848c9182d8c395902a3af689f28"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_low/scenario.json",
+          "sizeBytes": 882,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.9184962Z",
+          "sha256": "659a396c751319caf2ec607a5a805bca40cb18fa3e2d0d4c0b762f896d75d03e"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/hrv_low/session.json",
+          "sizeBytes": 459,
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.9381673Z",
+          "sha256": "32ca86d4d9bb3b12d439266a17cd61b5fe80d70f91aa0b6e701b49f4ba98de1a"
+        }
+      ]
+    },
+    {
+      "scenarioId": "irregular_rr",
+      "path": "data/synthetic-showcase/scenarios/irregular_rr",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/irregular_rr/analysis.json",
+          "sizeBytes": 512229,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.1115120Z",
+          "sha256": "775858efff35f672e9601c86f71a46a6f7dea255082114867cb48c7c0113cb6b"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/irregular_rr/ecg.csv",
+          "sizeBytes": 1095803,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.1172258Z",
+          "sha256": "f4d8a7e69bcedf8d583f87b3eb2d395c9a7a065b7a04ba8ba04b93e17ad52987"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/irregular_rr/ground_truth.json",
+          "sizeBytes": 2434927,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.1085019Z",
+          "sha256": "30f0e12e9ba1dfd480e11a899b5a6bc7858c55f88dd6642876a0c0e6cbf13ccf"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/irregular_rr/hr_rr.csv",
+          "sizeBytes": 18704,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.1115120Z",
+          "sha256": "8cd6cb67ca6111aef6557b45914b07e5c418f73c04a48895f14f50f4a4991d04"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/irregular_rr/scenario.json",
+          "sizeBytes": 811,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.0994469Z",
+          "sha256": "2bfeac8184a77d67a553ddd066939ea821f26cce9fe0225fbbcf7492a9150587"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/irregular_rr/session.json",
+          "sizeBytes": 448,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.1182280Z",
+          "sha256": "cb30622d5e1ea90ae2576962c800886424aea7a91f394969540c5030856aedb1"
+        }
+      ]
+    },
+    {
+      "scenarioId": "jittered_breathing",
+      "path": "data/synthetic-showcase/scenarios/jittered_breathing",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/jittered_breathing/analysis.json",
+          "sizeBytes": 512691,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.2939307Z",
+          "sha256": "1dc996c6cf0416bff44d2ed638710f88ed1dd7e3076c6f201dae3a5a760be837"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/jittered_breathing/ecg.csv",
+          "sizeBytes": 1096999,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.3007249Z",
+          "sha256": "a18ff46e5bfce930d34e92c48e52e546c829e01d0478f3c262c9daec9c7aea24"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/jittered_breathing/ground_truth.json",
+          "sizeBytes": 2435484,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.2919298Z",
+          "sha256": "e9219b59cb6aa796c0f949577c1ac195c2906fe2cede523d2f7b591d82dd4bf3"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/jittered_breathing/hr_rr.csv",
+          "sizeBytes": 18900,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.2950409Z",
+          "sha256": "65ac5ed90842044a111f4df8e10cc5ccf5ba971e2aab79b5f5a02e51d712f843"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/jittered_breathing/scenario.json",
+          "sizeBytes": 822,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.2828400Z",
+          "sha256": "fab3f46d2ef195e6fc46159e6903c57ff27d5e3a4b82b003d935bc12beab4a3b"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/jittered_breathing/session.json",
+          "sizeBytes": 450,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.3017243Z",
+          "sha256": "bf71127907a9d31b10ddad9acb69f884044ce4c7ce8b4c6deb6ac4b50a549579"
+        }
+      ]
+    },
+    {
+      "scenarioId": "off_10bpm",
+      "path": "data/synthetic-showcase/scenarios/off_10bpm",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/off_10bpm/analysis.json",
+          "sizeBytes": 503675,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.4389557Z",
+          "sha256": "ddd9d4152bd9fd6dbd0389aa1f089efd1c69145d93c9cf09c0cf85a1bea1014d"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/off_10bpm/ecg.csv",
+          "sizeBytes": 1096668,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.4465348Z",
+          "sha256": "6ec6c081ca42d7addac6659e24cbf3cf9b9faec2f1eccfc67f23cf3b652c1105"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/off_10bpm/ground_truth.json",
+          "sizeBytes": 2435275,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.4349171Z",
+          "sha256": "da128a08ff97080e78e1351dd452ca9cdf8648ebebb95bd8b42dc779271e167b"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/off_10bpm/hr_rr.csv",
+          "sizeBytes": 18495,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.4399647Z",
+          "sha256": "2d8c5cc893b91d81859029d6267321aebb1fde4d1e625cda85c1e5753fe7d045"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/off_10bpm/scenario.json",
+          "sizeBytes": 823,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.4205053Z",
+          "sha256": "a3c81a8448864d4289fd5a99a8a35db6dc24f0ea32a1de513134701044c8120d"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/off_10bpm/session.json",
+          "sizeBytes": 443,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.4480427Z",
+          "sha256": "36b1e66f595cc3e8c15e335cda529b2a95f00d9eb4f605177029e9ebce912f45"
+        }
+      ]
+    },
+    {
+      "scenarioId": "off_12bpm",
+      "path": "data/synthetic-showcase/scenarios/off_12bpm",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/off_12bpm/analysis.json",
+          "sizeBytes": 513043,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.6464571Z",
+          "sha256": "04a0a437150693b23941c07eca7369c93f1ceabf7233989d0321d71720219b54"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/off_12bpm/ecg.csv",
+          "sizeBytes": 1096485,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.6548367Z",
+          "sha256": "aed8a32f14eab166a120e4c474a24db089d1df527e8d79166349d5c6598b6129"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/off_12bpm/ground_truth.json",
+          "sizeBytes": 2436763,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.6424358Z",
+          "sha256": "f5792299e764578de518b6a7001a069a0cb50bff0afcecc75daade4f0cbaaa9e"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/off_12bpm/hr_rr.csv",
+          "sizeBytes": 18900,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.6474658Z",
+          "sha256": "cd5ce8104a55484f92410a2f9c7f7f62f681b98539ab7dc27b8ad7a5cc7381a5"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/off_12bpm/scenario.json",
+          "sizeBytes": 784,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.6315347Z",
+          "sha256": "4afc3ffec71073b0288183993b3c15fd144c580fede85c67438500f905deb5f8"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/off_12bpm/session.json",
+          "sizeBytes": 443,
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.6548367Z",
+          "sha256": "5ffd9a46c34671665bba96b2902bf8302b1cb558eb239a20f13fb8eb4f278c6e"
+        }
+      ]
+    },
+    {
+      "scenarioId": "off_18bpm",
+      "path": "data/synthetic-showcase/scenarios/off_18bpm",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/off_18bpm/analysis.json",
+          "sizeBytes": 530771,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.0558671Z",
+          "sha256": "7774f2a990e48a859631acf1eab52f212d2900b67ed62ede2a99e23fd215dc7d"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/off_18bpm/ecg.csv",
+          "sizeBytes": 1095931,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.0649228Z",
+          "sha256": "1511902d416c9520a3f4be62d6b6c5bb3943d32d8bdbb9700873f86f9d477a3f"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/off_18bpm/ground_truth.json",
+          "sizeBytes": 2434308,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.0523360Z",
+          "sha256": "fc4e697d1afaf227e7a45978b5f6ed7c5e41766a78976ef7ab5cbb9698f3e0e4"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/off_18bpm/hr_rr.csv",
+          "sizeBytes": 19350,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.0568676Z",
+          "sha256": "efc8e50c25718ae9cf9642da95a046631286b261dea2061c3034f1a79162bbca"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/off_18bpm/scenario.json",
+          "sizeBytes": 784,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.0404966Z",
+          "sha256": "343b60b9d9b0f606675580bbd9b0abe69d707902ed653a813f5d5968609335da"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/off_18bpm/session.json",
+          "sizeBytes": 443,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.0659229Z",
+          "sha256": "d08063c9d3efb4f162a288581a207f5d4d76ea0c3046bd744564bf59bc022fcc"
+        }
+      ]
+    },
+    {
+      "scenarioId": "off_24bpm",
+      "path": "data/synthetic-showcase/scenarios/off_24bpm",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/off_24bpm/analysis.json",
+          "sizeBytes": 539947,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.7102544Z",
+          "sha256": "6d50ef46bbbe1283ea3feb6dae13b948e3986441b06b8b285da06ca8340427b5"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/off_24bpm/ecg.csv",
+          "sizeBytes": 1094323,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.7182801Z",
+          "sha256": "118eba39cf37306b890fcb9db5808179521dd7d266ebf4231d6a1c3dec8ce317"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/off_24bpm/ground_truth.json",
+          "sizeBytes": 2434641,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.7067074Z",
+          "sha256": "60631de59b43411319d6cab6fa332647c062a6df2b423f4d7a456335b2156fb0"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/off_24bpm/hr_rr.csv",
+          "sizeBytes": 19845,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.7112644Z",
+          "sha256": "81d33743c0154244842ca4641ce3ad0307d90233370c01e647a47134e66f0476"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/off_24bpm/scenario.json",
+          "sizeBytes": 816,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.6951579Z",
+          "sha256": "a9205ddf7e734ae3e383e59cebc74d3cfe554b6052b3c69b6b7791a96848e594"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/off_24bpm/session.json",
+          "sizeBytes": 443,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.7192880Z",
+          "sha256": "597d53f7e7b384adad10da537557743062356ad7be5826c87064217c9f4d3bb5"
+        }
+      ]
+    },
+    {
+      "scenarioId": "regular",
+      "path": "data/synthetic-showcase/scenarios/regular",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/regular/analysis.json",
+          "sizeBytes": 513027,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.9214185Z",
+          "sha256": "1edeeca86304607412f650fa767a7728bc340e7857cfb1931bf1bbe88adb0f1f"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/regular/ecg.csv",
+          "sizeBytes": 1096850,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.9295808Z",
+          "sha256": "73b23863be0ae8830cba7d0018dd532d957e9d703ce10000849a0dad996a3acf"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/regular/ground_truth.json",
+          "sizeBytes": 2437096,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.9183756Z",
+          "sha256": "8e0294887a2e15871636e993f53ba7891cd7e215c257e677fea46a405647fc95"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/regular/hr_rr.csv",
+          "sizeBytes": 18900,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.9225768Z",
+          "sha256": "862f48847b630a30e49250767c01cc064b7a3ca1c208293fcdcf772db7d1d8de"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/regular/scenario.json",
+          "sizeBytes": 808,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.9072781Z",
+          "sha256": "4772d381443b779e70c731174074f31eebff30d58bd4479fa45eff19fd83c5f5"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/regular/session.json",
+          "sizeBytes": 460,
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.9295808Z",
+          "sha256": "fb9647450b86af01c5ef09e3fa15bcbf0723d7ecc8bf10f1e843ab983a50ad00"
+        }
+      ]
+    },
+    {
+      "scenarioId": "resonance_010hz",
+      "path": "data/synthetic-showcase/scenarios/resonance_010hz",
+      "files": [
+        {
+          "name": "analysis.json",
+          "path": "data/synthetic-showcase/scenarios/resonance_010hz/analysis.json",
+          "sizeBytes": 486995,
+          "lastWriteTimeUtc": "2026-03-22T14:20:50.0663939Z",
+          "sha256": "df8d4bad5f437c32bc5a87fc6059271df3666ebeb92fa5bc07a8ff6677df7e54"
+        },
+        {
+          "name": "ecg.csv",
+          "path": "data/synthetic-showcase/scenarios/resonance_010hz/ecg.csv",
+          "sizeBytes": 1096599,
+          "lastWriteTimeUtc": "2026-03-22T14:20:50.0734238Z",
+          "sha256": "12ef5cbba5e392eec9d2eaca4c5bf9a794c894bce4bc770a244074169b62dfea"
+        },
+        {
+          "name": "ground_truth.json",
+          "path": "data/synthetic-showcase/scenarios/resonance_010hz/ground_truth.json",
+          "sizeBytes": 2433776,
+          "lastWriteTimeUtc": "2026-03-22T14:20:50.0618773Z",
+          "sha256": "ac8774a13595c8ece60883fc059b206336fbcc678722a77375f1ada36730b5d2"
+        },
+        {
+          "name": "hr_rr.csv",
+          "path": "data/synthetic-showcase/scenarios/resonance_010hz/hr_rr.csv",
+          "sizeBytes": 18135,
+          "lastWriteTimeUtc": "2026-03-22T14:20:50.0663939Z",
+          "sha256": "70f1340b0c8bdfd208d23cf9fad3d7caf5b3d9f53ccad27bff1bef5b0a46f87a"
+        },
+        {
+          "name": "scenario.json",
+          "path": "data/synthetic-showcase/scenarios/resonance_010hz/scenario.json",
+          "sizeBytes": 823,
+          "lastWriteTimeUtc": "2026-03-22T14:20:50.0496118Z",
+          "sha256": "0c1af4f05f6604bddbee23922442ebc1464a6a61b5641681206b10c3cb9af5a2"
+        },
+        {
+          "name": "session.json",
+          "path": "data/synthetic-showcase/scenarios/resonance_010hz/session.json",
+          "sizeBytes": 456,
+          "lastWriteTimeUtc": "2026-03-22T14:20:50.0749302Z",
+          "sha256": "de384d6c69a673e410b62828ae6df49f3741f3de9b23d704d1e09ff2aef46d20"
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "coherence-appendix-png",
+      "role": "coherence-appendix",
+      "format": "png",
+      "title": "Coherence appendix figure (PNG)",
+      "path": "assets/synthetic-showcase/coherence-appendix.png",
+      "sizeBytes": 36695,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7755006Z",
+      "sha256": "7cafd2612e2166a52a548bf0e96da5581e82dc07348cdeb9a4c278f755064dd1"
+    },
+    {
+      "id": "coherence-appendix-svg",
+      "role": "coherence-appendix",
+      "format": "svg",
+      "title": "Coherence appendix figure (SVG)",
+      "path": "assets/synthetic-showcase/coherence-appendix.svg",
+      "sizeBytes": 6007,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7604358Z",
+      "sha256": "80dc19586975fdfe236c5e9817b9279cab052f93dcc929281b88caa0b56340e7"
+    },
+    {
+      "id": "coherence-derivation-png",
+      "role": "coherence-derivation",
+      "format": "png",
+      "title": "Coherence derivation figure (PNG)",
+      "path": "assets/synthetic-showcase/coherence-derivation.png",
+      "sizeBytes": 56228,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7028313Z",
+      "sha256": "cbfad37ce5385c86b219a35c91ddd75e005b021defd8c8c9a972f51781968fd5"
+    },
+    {
+      "id": "coherence-derivation-svg",
+      "role": "coherence-derivation",
+      "format": "svg",
+      "title": "Coherence derivation figure (SVG)",
+      "path": "assets/synthetic-showcase/coherence-derivation.svg",
+      "sizeBytes": 12518,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.6907603Z",
+      "sha256": "83a124455df10cdd8013fb399fad67ff0aebfee24c6ae2b7a3d10578c783b003"
+    },
+    {
+      "id": "dynamics-appendix-png",
+      "role": "dynamics-appendix",
+      "format": "png",
+      "title": "Dynamics appendix figure (PNG)",
+      "path": "assets/synthetic-showcase/dynamics-appendix.png",
+      "sizeBytes": 32095,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7931271Z",
+      "sha256": "995c782889e1f82ea15be8da755275639fa493830f8f23e0a9effe5f51379f14"
+    },
+    {
+      "id": "dynamics-appendix-svg",
+      "role": "dynamics-appendix",
+      "format": "svg",
+      "title": "Dynamics appendix figure (SVG)",
+      "path": "assets/synthetic-showcase/dynamics-appendix.svg",
+      "sizeBytes": 4767,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7830607Z",
+      "sha256": "489155bc164ec50b8ef0457d14695605c301d5c9a672589853df00234f0c30e3"
+    },
+    {
+      "id": "dynamics-derivation-png",
+      "role": "dynamics-derivation",
+      "format": "png",
+      "title": "Breathing-dynamics derivation figure (PNG)",
+      "path": "assets/synthetic-showcase/dynamics-derivation.png",
+      "sizeBytes": 64549,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7548786Z",
+      "sha256": "1e0b9080937ef9c13865161786175ecfa8de4841aa96ca9652b8f8dbd578937c"
+    },
+    {
+      "id": "dynamics-derivation-svg",
+      "role": "dynamics-derivation",
+      "format": "svg",
+      "title": "Breathing-dynamics derivation figure (SVG)",
+      "path": "assets/synthetic-showcase/dynamics-derivation.svg",
+      "sizeBytes": 30421,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7423114Z",
+      "sha256": "cf2f9b07e58db0b6cb516880da5e15b91e0b9ae1f43325e442107e65225c3d3a"
+    },
+    {
+      "id": "figure-pack-pdf",
+      "role": "supplementary-pack",
+      "format": "pdf",
+      "title": "Synthetic showcase supplementary figure pack (PDF)",
+      "path": "assets/synthetic-showcase/synthetic-showcase-figure-pack.pdf",
+      "sizeBytes": 648036,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.8919883Z",
+      "sha256": "e54f72fa10b01aa1e8510fff5fcd050b0f789b3614c97c34ab62bfb4fb8bf7e3"
+    },
+    {
+      "id": "hrv-derivation-png",
+      "role": "hrv-derivation",
+      "format": "png",
+      "title": "HRV derivation figure (PNG)",
+      "path": "assets/synthetic-showcase/hrv-derivation.png",
+      "sizeBytes": 53974,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7299944Z",
+      "sha256": "4deda9cb4bff056bee4d20cd811c3da9b7d4b538d6367de8ba5dbc9843e216ea"
+    },
+    {
+      "id": "hrv-derivation-svg",
+      "role": "hrv-derivation",
+      "format": "svg",
+      "title": "HRV derivation figure (SVG)",
+      "path": "assets/synthetic-showcase/hrv-derivation.svg",
+      "sizeBytes": 17892,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.7108983Z",
+      "sha256": "d634736a57855c8428e81d0a0f8945f11705bfd078df3b435fd6acc91976d2fb"
+    },
+    {
+      "id": "showcase-overview-png",
+      "role": "overview",
+      "format": "png",
+      "title": "Synthetic showcase matrix (PNG)",
+      "path": "assets/synthetic-showcase/showcase-overview.png",
+      "sizeBytes": 65543,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.6832173Z",
+      "sha256": "e5f8d8eb2531a5770f401e7fad25e9bac111941810f5aa9b6a87995d0aa1ec80"
+    },
+    {
+      "id": "showcase-overview-svg",
+      "role": "overview",
+      "format": "svg",
+      "title": "Synthetic showcase matrix (SVG)",
+      "path": "assets/synthetic-showcase/showcase-overview.svg",
+      "sizeBytes": 10182,
+      "lastWriteTimeUtc": "2026-03-22T14:20:50.5187046Z",
+      "sha256": "02e9c67e2aa7ae3ec4a95c0aeaea48d312ed9416c989d9fedd2c894d436d4113"
+    }
+  ],
+  "dataRootPath": "data/synthetic-showcase"
+}

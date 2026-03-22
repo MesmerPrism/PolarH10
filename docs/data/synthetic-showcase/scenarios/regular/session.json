@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "regular",
+  "DeviceName": "Regular breathing / stable sinus rhythm",
+  "StartedAtUtc": "2026-03-22T14:14:44.7194096+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:49.9306221+00:00",
+  "HrRrSampleCount": 419,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

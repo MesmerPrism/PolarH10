@@ -15,7 +15,7 @@
     "pages:validate": "node ./tools/site/validate-pages.mjs",
     "pages:index": "pagefind --site site && node ./tools/site/index-pages.mjs",
     "pages:build": "npm run pages:build:site && npm run pages:index && npm run pages:validate",
-    "pages:watch": "chokidar \"docs/**/*.md\" \"docs/assets/*\" \"docs/diagrams/*\" -c \"npm run diagram:render:all && npm run pages:build\"",
+    "pages:watch": "chokidar \"docs/**/*.md\" \"docs/assets/**/*\" \"docs/data/**/*\" \"docs/diagrams/*\" -c \"npm run diagram:render:all && npm run pages:build\"",
     "pages:serve": "browser-sync start --server site --files \"site/**/*\" --startPath \"index.html\"",
     "pages:dev": "concurrently \"npm:pages:watch\" \"npm:pages:serve\""
   },

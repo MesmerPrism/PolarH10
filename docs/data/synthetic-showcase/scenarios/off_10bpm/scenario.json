@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "off_10bpm",
+  "DisplayName": "Off-resonance 10 BPM",
+  "ExpectedBehavior": "Coherence lower than resonance with slower but off-target breathing.",
+  "Seed": 3000,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 880,
+    "RsaAmplitudeMs": 58,
+    "SlowModulationMs": 10,
+    "IrregularNoiseMs": 4,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 10,
+    "Amplitude01": 0.28,
+    "HarmonicAmplitude01": 0.028,
+    "JitterAmount01": 0.018,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

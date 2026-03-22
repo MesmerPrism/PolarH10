@@ -1,7 +1,7 @@
 using System.CommandLine;
 using PolarH10.Cli;
 using PolarH10.Protocol;
-using PolarH10.Transport.Windows;
+using PolarH10.Transport.Runtime;
 
 namespace PolarH10.Cli.Commands;
 
@@ -57,7 +57,21 @@ internal static class RecordCommand
             try
             {
                 Console.WriteLine($"Connecting to {device}...");
-                await session.ConnectAsync(device, cts.Token);
+                try
+                {
+                    await session.ConnectAsync(device, cts.Token);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(
+                        CliTransportOptions.RewriteTransportException(
+                            transport,
+                            syntheticPipe,
+                            "device connection",
+                            ex).Message);
+                    Environment.ExitCode = 1;
+                    return;
+                }
 
                 var identity = registry.RecordConnected(device);
                 recorder.DeviceName = identity.AdvertisedName ?? device;

@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "coherence_low",
+  "DeviceName": "Coherence demo / low and unstable",
+  "StartedAtUtc": "2026-03-22T14:14:41.0337276+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:46.413858+00:00",
+  "HrRrSampleCount": 434,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

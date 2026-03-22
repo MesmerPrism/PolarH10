@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "off_24bpm",
+  "DeviceName": "Off-resonance 24 BPM",
+  "StartedAtUtc": "2026-03-22T14:14:44.0662394+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:49.7189649+00:00",
+  "HrRrSampleCount": 440,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

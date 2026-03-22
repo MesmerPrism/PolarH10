@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "off_18bpm",
+  "DisplayName": "Off-resonance 18 BPM",
+  "ExpectedBehavior": "Coherence lower than resonance.",
+  "Seed": 3002,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 840,
+    "RsaAmplitudeMs": 24,
+    "SlowModulationMs": 8,
+    "IrregularNoiseMs": 5,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 18,
+    "Amplitude01": 0.23,
+    "HarmonicAmplitude01": 0.02,
+    "JitterAmount01": 0.025,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

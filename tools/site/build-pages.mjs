@@ -13,6 +13,7 @@ const docsRoot = path.join(repoRoot, 'docs');
 const siteRoot = path.join(repoRoot, 'site');
 const referenceRoot = path.join(siteRoot, 'reference');
 const assetsSource = path.join(docsRoot, 'assets');
+const dataSource = path.join(docsRoot, 'data');
 const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown');
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
@@ -60,6 +61,9 @@ async function main() {
   await fs.mkdir(referenceRoot, { recursive: true });
   await fs.mkdir(referenceMarkdownRoot, { recursive: true });
   await copyDir(assetsSource, path.join(siteRoot, 'assets'));
+  if (await exists(dataSource)) {
+    await copyDir(dataSource, path.join(siteRoot, 'data'));
+  }
   await copyDir(katexDistSource, path.join(siteRoot, 'assets', 'vendor', 'katex'));
   await copyDir(diagramsSource, path.join(siteRoot, 'diagrams'));
   await fs.writeFile(path.join(siteRoot, '.nojekyll'), '', 'utf8');
@@ -348,6 +352,56 @@ ${renderHead({
           <h3>Record and review</h3>
           <p>Write <code>session.json</code>, CSV sensor output, and <code>protocol.jsonl</code>, then replay or inspect the capture without hardware attached.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="section panel section-panel">
+      <h2 class="section-heading">Docs That Matter First</h2>
+      <div class="card-grid">
+        <a class="path-card tone-cool" href="reference/getting-started.html">
+          <h3>Getting Started</h3>
+          <p>Real clone URL, prerequisites, first build, and the safest path to a successful local run.</p>
+        </a>
+        <a class="path-card tone-cool" href="reference/first-recording.html">
+          <h3>First Recording</h3>
+          <p>The first end-to-end WPF and CLI session, including what to save and how to verify the result.</p>
+        </a>
+        <a class="path-card tone-cool" href="reference/coherence-workflow.html">
+          <h3>Coherence Workflow</h3>
+          <p>Use the RR-derived coherence window, understand the warmup phase, and read confidence instead of trusting a raw number too early.</p>
+        </a>
+        <a class="path-card tone-cool" href="reference/hrv-workflow.html">
+          <h3>HRV Workflow</h3>
+          <p>Use the short-term HRV tab, let the RR window fill, and read RMSSD with SDNN and pNN50 instead of assuming a five-minute solve is instant.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/breathing-dynamics-workflow.html">
+          <h3>Breathing Dynamics Workflow</h3>
+          <p>Use the dedicated interval and amplitude entropy window once breathing calibration is already stable.</p>
+        </a>
+        <a class="path-card tone-signal" href="reference/formula-sheets.html">
+          <h3>Formula Sheets</h3>
+          <p>Download the Markdown and PDF method sheets for coherence, HRV, breathing from ACC, and breathing-dynamics entropy.</p>
+        </a>
+        <a class="path-card tone-warm" href="reference/synthetic-showcase/index.html">
+          <h3>Synthetic Showcase</h3>
+          <p>Open the deterministic publication bundle that links raw synthetic RR and breathing traces to the coherence, HRV, and entropy figures published on the site.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/output-formats.html">
+          <h3>Output Formats</h3>
+          <p>What each capture file contains, how session folders are named, and when <code>run.json</code> appears.</p>
+        </a>
+        <a class="path-card tone-warm" href="reference/troubleshooting.html">
+          <h3>Troubleshooting</h3>
+          <p>Fix the common failure cases first: hidden devices, Windows BLE access issues, stale streams, and blocked app launch.</p>
+        </a>
+        <a class="path-card tone-signal" href="reference/cli.html">
+          <h3>CLI Guide</h3>
+          <p>Command-focused workflows for scanning, recording, replaying, and doctor-style validation.</p>
+        </a>
+        <a class="path-card tone-violet" href="reference/protocol/overview.html">
+          <h3>Protocol Internals</h3>
+          <p>PMD service layout, measurement formats, and lower-level notes once the operator path already makes sense.</p>
+        </a>
       </div>
     </section>
 
@@ -929,12 +983,12 @@ function renderSearchBoot(asset) {
       });
     }
 
-    window.addEventListener('popstate', () => {
-      const query = queryKey
-        ? new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? ''
-        : '';
-      runQuery(query);
-    });
+      window.addEventListener('popstate', () => {
+        const query = queryKey
+          ? new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? ''
+          : '';
+        runQuery(query);
+      });
 
     const initialQuery = queryKey
       ? new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? ''
@@ -1041,7 +1095,7 @@ function rewriteHref(href, sourceRel) {
   const sourceDir = path.posix.dirname(sourceRel);
   const resolved = path.posix.normalize(path.posix.join(sourceDir, rawPath));
 
-  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/')) {
+  if (resolved.startsWith('assets/') || resolved.startsWith('diagrams/') || resolved.startsWith('data/')) {
     return relativeHref(`reference/${sourceDir}`, resolved) + hash;
   }
 
@@ -1323,5 +1377,14 @@ async function copyDir(source, destination) {
     } else {
       await fs.copyFile(sourcePath, destinationPath);
     }
+  }
+}
+
+async function exists(targetPath) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
   }
 }

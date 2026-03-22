@@ -12,6 +12,7 @@ const repoRoot = rootFlagIndex >= 0 && argv[rootFlagIndex + 1]
   : path.resolve(__dirname, '..', '..');
 const docsRoot = path.join(repoRoot, 'docs');
 const diagramsRoot = path.join(docsRoot, 'diagrams');
+const showcaseManifestPath = path.join(docsRoot, 'data', 'synthetic-showcase', 'showcase-manifest.json');
 const siteRoot = path.join(repoRoot, 'site');
 const readmePath = path.join(repoRoot, 'README.md');
 const placeholderPattern = /<your-[^>]+>/i;
@@ -101,6 +102,8 @@ async function main() {
     }
   }
 
+  await validateSyntheticShowcaseBundle(issues);
+
   if (issues.length > 0) {
     console.error('Pages validation failed:');
     for (const issue of issues) {
@@ -144,6 +147,131 @@ async function validateHref(filePath, href) {
   return `${relativeRepoPath(filePath)} links to missing local target ${href}.`;
 }
 
+async function validateSyntheticShowcaseBundle(issues) {
+  const requiredDocs = [
+    path.join(docsRoot, 'synthetic-showcase', 'index.md'),
+    path.join(docsRoot, 'synthetic-showcase', 'coherence.md'),
+    path.join(docsRoot, 'synthetic-showcase', 'hrv.md'),
+    path.join(docsRoot, 'synthetic-showcase', 'dynamics.md')
+  ];
+
+  for (const docPath of requiredDocs) {
+    if (!await exists(docPath)) {
+      issues.push(`${relativeRepoPath(docPath)} is required for the synthetic showcase docs section.`);
+    }
+  }
+
+  if (!await exists(showcaseManifestPath)) {
+    issues.push('docs/data/synthetic-showcase/showcase-manifest.json is missing. Run the SyntheticBio publish-doc-bundle flow.');
+    return;
+  }
+
+  let manifest;
+  try {
+    manifest = JSON.parse(await fs.readFile(showcaseManifestPath, 'utf8'));
+  } catch (error) {
+    issues.push(`docs/data/synthetic-showcase/showcase-manifest.json is invalid JSON: ${error.message}`);
+    return;
+  }
+
+  const requiredTopLevel = ['presetId', 'generatedAtUtc', 'durationSeconds', 'generatorVersion', 'trackerSettings', 'scenarioIds', 'scenarios', 'assets', 'dataRootPath'];
+  for (const key of requiredTopLevel) {
+    if (!(key in manifest)) {
+      issues.push(`docs/data/synthetic-showcase/showcase-manifest.json is missing top-level property ${key}.`);
+    }
+  }
+
+  const requiredScenarioFiles = new Set(['analysis.json', 'ecg.csv', 'ground_truth.json', 'hr_rr.csv', 'scenario.json', 'session.json']);
+  if (!Array.isArray(manifest.scenarios) || manifest.scenarios.length === 0) {
+    issues.push('docs/data/synthetic-showcase/showcase-manifest.json must list at least one scenario entry.');
+  } else {
+    for (const scenario of manifest.scenarios) {
+      if (!scenario.path || !Array.isArray(scenario.files)) {
+        issues.push('Every showcase scenario entry must include path and files.');
+        continue;
+      }
+
+      const docsScenarioPath = path.join(docsRoot, scenario.path);
+      if (!await exists(docsScenarioPath)) {
+        issues.push(`Synthetic showcase scenario path is missing: ${scenario.path}.`);
+      }
+
+      const fileNames = new Set();
+      for (const file of scenario.files) {
+        if (!file.name || !file.path || !file.sha256 || !file.lastWriteTimeUtc) {
+          issues.push(`Synthetic showcase scenario ${scenario.scenarioId ?? '(unknown)'} has an incomplete file entry.`);
+          continue;
+        }
+
+        fileNames.add(file.name);
+        const docsPath = path.join(docsRoot, file.path);
+        if (!await exists(docsPath)) {
+          issues.push(`Synthetic showcase file is missing: ${file.path}.`);
+        }
+
+        if (await exists(siteRoot)) {
+          const sitePath = path.join(siteRoot, file.path);
+          if (!await exists(sitePath)) {
+            issues.push(`Built site is missing synthetic showcase data file ${file.path}.`);
+          }
+        }
+      }
+
+      for (const requiredFile of requiredScenarioFiles) {
+        if (!fileNames.has(requiredFile)) {
+          issues.push(`Synthetic showcase scenario ${scenario.scenarioId ?? '(unknown)'} is missing required file ${requiredFile}.`);
+        }
+      }
+    }
+  }
+
+  const requiredAssetIds = new Set([
+    'showcase-overview-svg',
+    'showcase-overview-png',
+    'coherence-derivation-svg',
+    'coherence-derivation-png',
+    'hrv-derivation-svg',
+    'hrv-derivation-png',
+    'dynamics-derivation-svg',
+    'dynamics-derivation-png',
+    'coherence-appendix-svg',
+    'coherence-appendix-png',
+    'dynamics-appendix-svg',
+    'dynamics-appendix-png',
+    'figure-pack-pdf'
+  ]);
+
+  if (!Array.isArray(manifest.assets) || manifest.assets.length === 0) {
+    issues.push('docs/data/synthetic-showcase/showcase-manifest.json must list synthetic showcase assets.');
+  } else {
+    const seenAssetIds = new Set();
+    for (const asset of manifest.assets) {
+      if (!asset.id || !asset.path || !asset.sha256 || !asset.lastWriteTimeUtc || !asset.format) {
+        issues.push('Every synthetic showcase asset entry must include id, path, sha256, lastWriteTimeUtc, and format.');
+        continue;
+      }
+
+      seenAssetIds.add(asset.id);
+      const docsPath = path.join(docsRoot, asset.path);
+      if (!await exists(docsPath)) {
+        issues.push(`Synthetic showcase asset is missing: ${asset.path}.`);
+      }
+
+      if (await exists(siteRoot)) {
+        const sitePath = path.join(siteRoot, asset.path);
+        if (!await exists(sitePath)) {
+          issues.push(`Built site is missing synthetic showcase asset ${asset.path}.`);
+        }
+      }
+    }
+
+    for (const assetId of requiredAssetIds) {
+      if (!seenAssetIds.has(assetId)) {
+        issues.push(`Synthetic showcase manifest is missing required asset id ${assetId}.`);
+      }
+    }
+  }
+}
 function validateFrontmatter(raw, filePath) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if (!match) {

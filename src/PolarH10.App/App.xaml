@@ -138,6 +138,21 @@
             </Setter>
         </Style>
 
+        <Style x:Key="CompactNumericTextBoxStyle"
+               TargetType="{x:Type TextBox}"
+               BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Width" Value="108" />
+            <Setter Property="Padding" Value="8,5" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+
+        <Style x:Key="CompactTinyTextBoxStyle"
+               TargetType="{x:Type TextBox}"
+               BasedOn="{StaticResource CompactNumericTextBoxStyle}">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Padding" Value="6,5" />
+        </Style>
+
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="Background" Value="{StaticResource AppPaperBrush}" />
             <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
@@ -184,6 +199,60 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="ReadinessProgressStyle" TargetType="{x:Type ProgressBar}">
+            <Setter Property="Minimum" Value="0" />
+            <Setter Property="Maximum" Value="1" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Background" Value="{StaticResource SurfaceTintBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FocusBlueBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ProgressBar}">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                SnapsToDevicePixels="True">
+                            <Grid x:Name="PART_Track"
+                                  ClipToBounds="True"
+                                  Background="Transparent">
+                                <Border x:Name="PART_Indicator"
+                                        HorizontalAlignment="Left"
+                                        Background="{TemplateBinding Foreground}"
+                                        CornerRadius="4" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TuningGroupFrameStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{StaticResource SurfaceTintBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelEdgeBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Margin" Value="0,0,12,12" />
+        </Style>
+
+        <Style x:Key="TuningGroupTitleStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource CarbonBrush}" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+
+        <Style x:Key="TuningHintStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource GraphiteBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,0,0,10" />
         </Style>
 
         <Style TargetType="{x:Type TabControl}">

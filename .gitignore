@@ -53,6 +53,10 @@ $RECYCLE.BIN/
 node_modules/
 /site/
 /out/
+/.codex-build/
+
+## Local preview and publish scratch
+/artifacts/
 
 ## Local captures and third-party reference files
 session/

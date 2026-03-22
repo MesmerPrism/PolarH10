@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "flat_breathing",
+  "DisplayName": "Flat low-excursion breathing",
+  "ExpectedBehavior": "Breathing dynamics should remain not-ready.",
+  "Seed": 5001,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 850,
+    "RsaAmplitudeMs": 8,
+    "SlowModulationMs": 5,
+    "IrregularNoiseMs": 4,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.015,
+    "HarmonicAmplitude01": 0.004,
+    "JitterAmount01": 0.01,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

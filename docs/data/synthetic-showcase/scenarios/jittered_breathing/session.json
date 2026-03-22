@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "jittered_breathing",
+  "DeviceName": "Jittered breathing",
+  "StartedAtUtc": "2026-03-22T14:14:43.1183371+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:48.3015947+00:00",
+  "HrRrSampleCount": 419,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

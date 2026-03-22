@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "coherence_high",
+  "DisplayName": "Coherence demo / high resonance",
+  "ExpectedBehavior": "Coherence should settle high near 0.10 Hz once the rolling window fills.",
+  "Seed": 1101,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 900,
+    "RsaAmplitudeMs": 110,
+    "SlowModulationMs": 12,
+    "IrregularNoiseMs": 4,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 6,
+    "Amplitude01": 0.31,
+    "HarmonicAmplitude01": 0.03,
+    "JitterAmount01": 0.01,
+    "WobbleRateHz": 0.08,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

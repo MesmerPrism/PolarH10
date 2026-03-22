@@ -26,6 +26,14 @@ public partial class BreathingDynamicsWindow : Window
     public TextBlock AmplitudeEntropyValueTextBlock => AmplitudeEntropyValueText;
     public TextBlock AmplitudeEntropyHintTextBlock => AmplitudeEntropyHintText;
     public TextBlock StatusTextBlock => BreathingDynamicsStatusText;
+    public TextBlock RequirementTextBlock => BreathingDynamicsRequirementText;
+    public TextBlock WarmupHintTextBlock => BreathingDynamicsWarmupHintText;
+    public ProgressBar MaturityProgressBar => BreathingDynamicsReadinessMaturityBar;
+    public TextBlock MaturityProgressTextBlock => BreathingDynamicsReadinessMaturityText;
+    public ProgressBar IntervalProgressBar => BreathingDynamicsReadinessIntervalBar;
+    public TextBlock IntervalProgressTextBlock => BreathingDynamicsReadinessIntervalText;
+    public ProgressBar AmplitudeProgressBar => BreathingDynamicsReadinessAmplitudeBar;
+    public TextBlock AmplitudeProgressTextBlock => BreathingDynamicsReadinessAmplitudeText;
     public TextBlock TrackingTextBlock => BreathingDynamicsTrackingText;
     public TextBlock LastWaveformTextBlock => BreathingDynamicsLastWaveformText;
     public TextBlock LastBreathTextBlock => BreathingDynamicsLastBreathText;

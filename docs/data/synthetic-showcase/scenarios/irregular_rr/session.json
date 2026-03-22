@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "irregular_rr",
+  "DeviceName": "Irregular RR / AF-like",
+  "StartedAtUtc": "2026-03-22T14:14:42.9387118+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:48.1179428+00:00",
+  "HrRrSampleCount": 413,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "hrv_low",
+  "DeviceName": "HRV demo / low beat-to-beat variability",
+  "StartedAtUtc": "2026-03-22T14:14:42.743876+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:47.9382658+00:00",
+  "HrRrSampleCount": 419,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

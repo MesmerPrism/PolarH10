@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "resonance_010hz",
+  "DisplayName": "0.10 Hz resonance breathing",
+  "ExpectedBehavior": "High coherence near 0.10 Hz and stable breathing metrics.",
+  "Seed": 2001,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 900,
+    "RsaAmplitudeMs": 110,
+    "SlowModulationMs": 12,
+    "IrregularNoiseMs": 4,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 6,
+    "Amplitude01": 0.31,
+    "HarmonicAmplitude01": 0.03,
+    "JitterAmount01": 0.01,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

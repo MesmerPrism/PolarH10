@@ -9,5 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
     <ProjectReference Include="..\PolarH10.Transport.Abstractions\PolarH10.Transport.Abstractions.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Runtime\PolarH10.Transport.Runtime.csproj" />
   </ItemGroup>
 </Project>

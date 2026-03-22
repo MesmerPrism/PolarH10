@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "breathing_pause",
+  "DisplayName": "Breathing pause / stale input",
+  "ExpectedBehavior": "Breathing dynamics should turn stale when the waveform pauses near the end of the scenario.",
+  "Seed": 6001,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 870,
+    "RsaAmplitudeMs": 24,
+    "SlowModulationMs": 9,
+    "IrregularNoiseMs": 4,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.26,
+    "HarmonicAmplitude01": 0.02,
+    "JitterAmount01": 0.03,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 40
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

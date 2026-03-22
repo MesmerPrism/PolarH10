@@ -18,6 +18,7 @@ Start with [Docs Home](docs/index.md) or the live
 - **Windows BLE transport** with WinRT scanner, connection, and GATT support
 - **Session recorder** that writes CSV sensor data plus JSON metadata and JSONL protocol transcripts
 - **GitHub Pages docs** with onboarding guides, troubleshooting, output-file notes, and Mermaid diagrams
+- **Synthetic showcase publication bundle** with committed figures, manifest metadata, and scenario exports for reproducible examples
 
 ## What This Project Is
 
@@ -85,6 +86,7 @@ Read next:
 - [Breathing Workflow](docs/breathing-workflow.md)
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
 - [Formula Sheets](docs/formula-sheets.md)
+- [Synthetic Showcase](docs/synthetic-showcase/index.md)
 
 If you want a stable repo-local desktop build instead of `dotnet run`, build it
 into `out/workspace-app`:
@@ -167,10 +169,22 @@ control-point commands, frame layouts, or code architecture.
 - [Troubleshooting](docs/troubleshooting.md)
 - [FAQ](docs/faq.md)
 - [Platform Guides](docs/platform-guides/index.md)
+- [Synthetic Showcase](docs/synthetic-showcase/index.md)
 - [Protocol Overview](docs/protocol/overview.md)
 - [References](docs/references.md)
 - [Diagrams](docs/diagrams/)
 
+## Synthetic Showcase Publication Bundle
+
+The sibling `SyntheticBio` repo is the deterministic generator for the
+synthetic showcase published by this repo. The committed publication bundle
+lives under `docs/data/synthetic-showcase/` and
+`docs/assets/synthetic-showcase/`, and the Pages build copies both trees
+directly so the public site does not depend on a sibling checkout.
+
+Start with [Synthetic Showcase](docs/synthetic-showcase/index.md) when you need
+example raw inputs, intermediate `analysis.json` traces, or downloadable
+SVG/PNG/PDF figures for supplementary material and methods explanation.
 ## Feedback and contributions
 
 PolarH10 is shaped by real device sessions, Windows BLE edge cases, and actual
@@ -189,6 +203,7 @@ The repository includes a custom GitHub Pages workflow that:
 
 - renders Mermaid diagrams to SVG
 - builds a static site from the Markdown docs
+- copies committed showcase data and figure assets from `docs/data/` and `docs/assets/`
 - validates links and diagram assets before deployment
 - adds static search indexing for the generated site
 - deploys the generated `site/` artifact via GitHub Actions
@@ -225,9 +240,10 @@ flowchart LR
     subgraph Source["src/ // runtime code"]
         P1["Protocol<br/>decoders · coherence · HRV · breathing"]
         P2["Transport.Abstractions<br/>BLE contracts"]
-        P3["Transport.Windows<br/>scanner · GATT · session"]
-        P4["Cli<br/>diagnostics · capture · replay"]
-        P5["App<br/>shell · coherence · HRV · dynamics"]
+        P3["Transport.Runtime<br/>session orchestration"]
+        P4["Transport.Windows<br/>scanner · GATT adapters"]
+        P5["Cli<br/>windows + synthetic workflows"]
+        P6["App<br/>shell · coherence · HRV · dynamics"]
     end
 
     subgraph Tests["tests/ // verification"]
@@ -238,12 +254,13 @@ flowchart LR
 
     subgraph Docs["docs/ // published reference"]
         D1["protocol/<br/>GATT · PMD · ECG · ACC · HR"]
-        D2["getting-started.md<br/>first-recording · coherence · HRV · entropy guides"]
-        D3["diagrams/<br/>mmd sources · svg output"]
+        D2["synthetic-showcase/<br/>overview · derivation pages"]
+        D3["assets/ + data/<br/>figures · manifest · scenarios"]
+        D4["guides + diagrams/<br/>onboarding · formulas · svg output"]
     end
 
     subgraph Tooling["tools/ + workflow"]
-        TL1["tools/<br/>fixtures · validators · Pages build"]
+        TL1["tools/<br/>validators · preview · Pages build"]
         TL2["package.json<br/>Mermaid CLI scripts"]
         TL3[".github/workflows/<br/>Pages deploy"]
     end
@@ -258,8 +275,9 @@ flowchart LR
     R --> Docs
     R --> Tooling
     R --> Samples
+    TL1 --> D4
     TL1 --> D3
-    TL2 --> D3
+    TL2 --> D4
     TL3 --> D3
 
     style Source fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
@@ -275,9 +293,9 @@ flowchart LR
     classDef tooling fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef sample fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
     class R hub;
-    class P1,P2,P3,P4,P5 source;
+    class P1,P2,P3,P4,P5,P6 source;
     class T1,T2,T3 tests;
-    class D1,D2,D3 docs;
+    class D1,D2,D3,D4 docs;
     class TL1,TL2,TL3 tooling;
     class S1,S2 sample;
     linkStyle default stroke:#626A72,stroke-width:1.8px;
@@ -310,12 +328,14 @@ flowchart LR
         IG["IGattServiceHandle<br/>IGattCharacteristicHandle"]
     end
 
-    subgraph Windows["WINDOWS BLE"]
-        WS["WindowsBleScanner<br/>advertisement watcher"]
-        WC["WindowsBleConnection<br/>GATT session"]
-        WG["WindowsGattServiceHandle<br/>WindowsGattCharacteristicHandle"]
+    subgraph Runtime["TRANSPORT RUNTIME"]
         SE["PolarH10Session<br/>PMD lifecycle + streaming"]
         MD["PolarMultiDeviceCoordinator<br/>device orchestration"]
+    end
+
+    subgraph Implementations["TRANSPORT IMPLEMENTATIONS"]
+        WB["Windows transport<br/>scanner · connection · GATT"]
+        SB["Synthetic transport<br/>named pipe demo devices"]
     end
 
     subgraph Recording["RECORDING + STATE"]
@@ -338,11 +358,13 @@ flowchart LR
     AC --> SE
     HR --> SE
     GID --> SE
-    IS -.-> WS
-    IC -.-> WC
-    IG -.-> WG
-    WC --> SE
-    WG --> SE
+    IS -.-> WB
+    IC -.-> WB
+    IG -.-> WB
+    IS -.-> SB
+    IC -.-> SB
+    WB --> SE
+    SB --> SE
     SE --> MD
     SE --> CH
     SE --> HV
@@ -369,19 +391,20 @@ flowchart LR
 
     style Protocol fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
     style Transport fill:#EFF6E8,stroke:#7DBA44,stroke-width:1.5px;
-    style Windows fill:#E8F4FB,stroke:#258ACB,stroke-width:1.5px;
+    style Runtime fill:#E8F4FB,stroke:#258ACB,stroke-width:1.5px;
+    style Implementations fill:#E9F1FF,stroke:#258ACB,stroke-width:1.5px;
     style Recording fill:#FFE8D4,stroke:#F28F28,stroke-width:1.5px;
     style Surfaces fill:#FFF4CC,stroke:#F3C333,stroke-width:1.5px;
 
     classDef core fill:#FFE1D9,stroke:#EC4736,color:#1F2226,stroke-width:1.5px;
     classDef contracts fill:#EEF6E8,stroke:#7DBA44,color:#1F2226,stroke-width:1.5px;
-    classDef windows fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
+    classDef impl fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
     classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
     classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef surface fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
     class EC,AC,HR,CH,HV,BR,BD,PMD,CP,GID core;
     class IS,IC,IG contracts;
-    class WS,WC,WG windows;
+    class WB,SB impl;
     class SE,MD active;
     class RE,SD,MA,DR record;
     class C1,G1,G2,G3 surface;

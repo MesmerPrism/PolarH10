@@ -310,6 +310,17 @@ public partial class MainWindow
             BreathingStateValueText.Text = "Bad tracking";
             BreathingTrackingValueText.Text = "Awaiting device selection";
             BreathingCalibrationValueText.Text = "No tracker";
+            BreathingRequirementText.Text = "Breathing output needs useful ACC motion, a completed calibration pass, and fresh post-calibration samples.";
+            BreathingWarmupHintText.Text = "Select a device and stream ACC data to inspect the breathing warmup stages.";
+            BreathingReadinessSignalText.Text = "--";
+            BreathingReadinessSignalBar.Value = 0d;
+            BreathingReadinessSignalBar.Foreground = ResourceBrush("GraphiteBrush");
+            BreathingReadinessCalibrationText.Text = "--";
+            BreathingReadinessCalibrationBar.Value = 0d;
+            BreathingReadinessCalibrationBar.Foreground = ResourceBrush("GraphiteBrush");
+            BreathingReadinessTrackingText.Text = "--";
+            BreathingReadinessTrackingBar.Value = 0d;
+            BreathingReadinessTrackingBar.Foreground = ResourceBrush("GraphiteBrush");
             BreathingTelemetrySampleRateText.Text = "--";
             BreathingTelemetryUsefulSignalText.Text = "--";
             BreathingTelemetryAxisRangeText.Text = "--";
@@ -353,6 +364,17 @@ public partial class MainWindow
                 ? "Calibrated"
                 : "Needs calibration";
         BreathingVolumeValueText.Foreground = ResourceBrush(GetBreathingAccentBrushKey(telemetry.CurrentState));
+        BreathingRequirementText.Text = BuildBreathingRequirementText(telemetry);
+        BreathingWarmupHintText.Text = BuildBreathingWarmupHint(telemetry);
+        BreathingReadinessSignalText.Text = BuildBreathingSignalText(telemetry);
+        BreathingReadinessSignalBar.Value = GetBreathingSignalProgress(telemetry);
+        BreathingReadinessSignalBar.Foreground = ResourceBrush(GetBreathingSignalBrushKey(telemetry));
+        BreathingReadinessCalibrationText.Text = BuildBreathingCalibrationReadinessText(telemetry);
+        BreathingReadinessCalibrationBar.Value = telemetry.IsCalibrated ? 1d : telemetry.CalibrationProgress01;
+        BreathingReadinessCalibrationBar.Foreground = ResourceBrush(GetBreathingCalibrationBrushKey(telemetry));
+        BreathingReadinessTrackingText.Text = BuildBreathingTrackingReadinessText(telemetry);
+        BreathingReadinessTrackingBar.Value = telemetry.HasTracking ? 1d : 0d;
+        BreathingReadinessTrackingBar.Foreground = ResourceBrush(GetBreathingTrackingBrushKey(telemetry));
 
         BreathingTelemetrySampleRateText.Text = telemetry.HasReceivedAnySample ? $"{telemetry.EstimatedSampleRateHz:0.0} Hz" : "No ACC";
         BreathingTelemetryUsefulSignalText.Text = telemetry.HasUsefulSignal ? "Detected" : "Not yet";
@@ -411,6 +433,99 @@ public partial class MainWindow
         if (telemetry.IsTransportConnected)
             return "Connected and waiting for calibration-ready breathing output";
         return "Breathing tracker is offline";
+    }
+
+    private static string BuildBreathingRequirementText(PolarBreathingTelemetry telemetry)
+        => $"Useful ACC motion must hold over {telemetry.Settings.UsefulSignalWindowSeconds:0.#} s, clear {telemetry.Settings.MinUsefulSamples} samples, reach {telemetry.Settings.MinUsefulSampleRateHz:0.#} Hz, and show {telemetry.Settings.MinUsefulAxisRangeG:0.0000} g of axis travel. Calibration then runs for {telemetry.Settings.CalibrationDurationSeconds:0.#} s before live output unlocks.";
+
+    private static string BuildBreathingWarmupHint(PolarBreathingTelemetry telemetry)
+    {
+        if (!telemetry.IsTransportConnected)
+            return "Connect the strap and stream ACC data to start signal detection.";
+        if (!telemetry.HasReceivedAnySample)
+            return "Waiting for ACC frames from the connected strap.";
+        if (telemetry.HasTracking)
+            return $"Breathing output is live via {FormatBaseMode(telemetry)}.";
+        if (telemetry.IsCalibrating)
+            return "Calibration is in progress. Keep breathing naturally until the capture completes.";
+        if (!telemetry.HasUsefulSignal)
+            return $"Need stronger chest motion or more recent ACC samples. Current axis range is {telemetry.UsefulAxisRangeG:0.0000} g; the signal gate needs {telemetry.Settings.MinUsefulAxisRangeG:0.0000} g and {telemetry.Settings.MinUsefulSampleRateHz:0.#} Hz.";
+        if (!telemetry.IsCalibrated)
+            return "Useful signal detected. Start calibration or enable auto-calibration to build the first breathing model.";
+        return "Calibration is ready. Fresh post-calibration ACC samples will move the tracker into live output.";
+    }
+
+    private static double GetBreathingSignalProgress(PolarBreathingTelemetry telemetry)
+    {
+        if (!telemetry.IsTransportConnected || !telemetry.HasReceivedAnySample)
+            return 0d;
+
+        if (telemetry.HasUsefulSignal)
+            return 1d;
+
+        float requiredRange = Math.Max(0.0005f, telemetry.Settings.MinUsefulAxisRangeG);
+        float requiredRate = Math.Max(1f, telemetry.Settings.MinUsefulSampleRateHz);
+        double rangeProgress = Math.Clamp(telemetry.UsefulAxisRangeG / requiredRange, 0f, 1f);
+        double rateProgress = telemetry.EstimatedSampleRateHz > 0f
+            ? Math.Clamp(telemetry.EstimatedSampleRateHz / requiredRate, 0f, 1f)
+            : 0d;
+        return Math.Min(rangeProgress, rateProgress);
+    }
+
+    private static string BuildBreathingSignalText(PolarBreathingTelemetry telemetry)
+    {
+        if (!telemetry.IsTransportConnected)
+            return "Offline";
+        if (!telemetry.HasReceivedAnySample)
+            return "No ACC yet";
+        if (telemetry.HasUsefulSignal)
+            return "Detected";
+        return $"{telemetry.UsefulAxisRangeG:0.0000} g at {telemetry.EstimatedSampleRateHz:0.0} Hz";
+    }
+
+    private static string GetBreathingSignalBrushKey(PolarBreathingTelemetry telemetry)
+    {
+        if (telemetry.HasUsefulSignal)
+            return "TelemetryGreenBrush";
+        return telemetry.HasReceivedAnySample ? "FocusBlueBrush" : "GraphiteBrush";
+    }
+
+    private static string BuildBreathingCalibrationReadinessText(PolarBreathingTelemetry telemetry)
+    {
+        if (!telemetry.IsTransportConnected)
+            return "Offline";
+        if (telemetry.IsCalibrated)
+            return "Ready";
+        if (telemetry.IsCalibrating)
+            return $"{telemetry.CalibrationProgress01 * 100f:0}%";
+        return telemetry.HasUsefulSignal ? "Pending" : "Waiting for signal";
+    }
+
+    private static string GetBreathingCalibrationBrushKey(PolarBreathingTelemetry telemetry)
+    {
+        if (telemetry.IsCalibrated)
+            return "TelemetryGreenBrush";
+        if (telemetry.IsCalibrating)
+            return "SafetyOrangeBrush";
+        return telemetry.IsTransportConnected ? "FocusBlueBrush" : "GraphiteBrush";
+    }
+
+    private static string BuildBreathingTrackingReadinessText(PolarBreathingTelemetry telemetry)
+    {
+        if (!telemetry.IsTransportConnected)
+            return "Offline";
+        if (telemetry.HasTracking)
+            return "Ready";
+        if (telemetry.IsCalibrating)
+            return "Calibration running";
+        return telemetry.IsCalibrated ? "Waiting for fresh output" : "Blocked by calibration";
+    }
+
+    private static string GetBreathingTrackingBrushKey(PolarBreathingTelemetry telemetry)
+    {
+        if (telemetry.HasTracking)
+            return "TelemetryGreenBrush";
+        return telemetry.IsTransportConnected ? "FocusBlueBrush" : "GraphiteBrush";
     }
 
     private static string GetBreathingAccentBrushKey(PolarBreathingState state) => state switch

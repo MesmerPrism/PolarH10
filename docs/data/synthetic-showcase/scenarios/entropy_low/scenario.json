@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "entropy_low",
+  "DisplayName": "Entropy demo / calm paced breathing",
+  "ExpectedBehavior": "Interval and amplitude entropy should remain low while breathing stays regular.",
+  "Seed": 4100,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 860,
+    "RsaAmplitudeMs": 24,
+    "SlowModulationMs": 9,
+    "IrregularNoiseMs": 1.5,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.24,
+    "HarmonicAmplitude01": 0.014,
+    "JitterAmount01": 0.005,
+    "WobbleRateHz": 0.07,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

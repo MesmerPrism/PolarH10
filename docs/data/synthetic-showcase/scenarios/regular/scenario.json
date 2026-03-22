@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "regular",
+  "DisplayName": "Regular breathing / stable sinus rhythm",
+  "ExpectedBehavior": "Lower entropy and moderate coherence.",
+  "Seed": 1001,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 860,
+    "RsaAmplitudeMs": 24,
+    "SlowModulationMs": 9,
+    "IrregularNoiseMs": 3,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.27,
+    "HarmonicAmplitude01": 0.024,
+    "JitterAmount01": 0.015,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "breathing_pause",
+  "DeviceName": "Breathing pause / stale input",
+  "StartedAtUtc": "2026-03-22T14:14:40.4820563+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:45.8537527+00:00",
+  "HrRrSampleCount": 414,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4000,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

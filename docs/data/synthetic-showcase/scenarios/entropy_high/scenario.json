@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "entropy_high",
+  "DisplayName": "Entropy demo / high irregularity",
+  "ExpectedBehavior": "Interval and amplitude entropy should stay above entropy_low because breath timing and excursion depth keep varying.",
+  "Seed": 4102,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 860,
+    "RsaAmplitudeMs": 28,
+    "SlowModulationMs": 10,
+    "IrregularNoiseMs": 9,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.28,
+    "HarmonicAmplitude01": 0.035,
+    "JitterAmount01": 0.22,
+    "WobbleRateHz": 0.17,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

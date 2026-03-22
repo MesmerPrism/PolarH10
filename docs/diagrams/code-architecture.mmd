@@ -21,12 +21,14 @@ flowchart LR
         IG["IGattServiceHandle<br/>IGattCharacteristicHandle"]
     end
 
-    subgraph Windows["WINDOWS BLE"]
-        WS["WindowsBleScanner<br/>advertisement watcher"]
-        WC["WindowsBleConnection<br/>GATT session"]
-        WG["WindowsGattServiceHandle<br/>WindowsGattCharacteristicHandle"]
+    subgraph Runtime["TRANSPORT RUNTIME"]
         SE["PolarH10Session<br/>PMD lifecycle + streaming"]
         MD["PolarMultiDeviceCoordinator<br/>device orchestration"]
+    end
+
+    subgraph Implementations["TRANSPORT IMPLEMENTATIONS"]
+        WB["Windows transport<br/>scanner · connection · GATT"]
+        SB["Synthetic transport<br/>named pipe demo devices"]
     end
 
     subgraph Recording["RECORDING + STATE"]
@@ -49,11 +51,13 @@ flowchart LR
     AC --> SE
     HR --> SE
     GID --> SE
-    IS -.-> WS
-    IC -.-> WC
-    IG -.-> WG
-    WC --> SE
-    WG --> SE
+    IS -.-> WB
+    IC -.-> WB
+    IG -.-> WB
+    IS -.-> SB
+    IC -.-> SB
+    WB --> SE
+    SB --> SE
     SE --> MD
     SE --> CH
     SE --> HV
@@ -80,19 +84,20 @@ flowchart LR
 
     style Protocol fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
     style Transport fill:#EFF6E8,stroke:#7DBA44,stroke-width:1.5px;
-    style Windows fill:#E8F4FB,stroke:#258ACB,stroke-width:1.5px;
+    style Runtime fill:#E8F4FB,stroke:#258ACB,stroke-width:1.5px;
+    style Implementations fill:#E9F1FF,stroke:#258ACB,stroke-width:1.5px;
     style Recording fill:#FFE8D4,stroke:#F28F28,stroke-width:1.5px;
     style Surfaces fill:#FFF4CC,stroke:#F3C333,stroke-width:1.5px;
 
     classDef core fill:#FFE1D9,stroke:#EC4736,color:#1F2226,stroke-width:1.5px;
     classDef contracts fill:#EEF6E8,stroke:#7DBA44,color:#1F2226,stroke-width:1.5px;
-    classDef windows fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
+    classDef impl fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
     classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
     classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef surface fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
     class EC,AC,HR,CH,HV,BR,BD,PMD,CP,GID core;
     class IS,IC,IG contracts;
-    class WS,WC,WG windows;
+    class WB,SB impl;
     class SE,MD active;
     class RE,SD,MA,DR record;
     class C1,G1,G2,G3 surface;

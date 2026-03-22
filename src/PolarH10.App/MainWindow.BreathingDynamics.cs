@@ -89,7 +89,7 @@ public partial class MainWindow
 
     private void RebuildBreathingDynamicsChart()
     {
-        _breathingDynamicsChart = CreateChart("Breathing Dynamics", _breathingDynamicsChartAxisOptions);
+        _breathingDynamicsChart = CreateChart("Breath Variability", _breathingDynamicsChartAxisOptions);
         _breathingDynamicsIntervalSeries = _breathingDynamicsChart.AddSeries("Interval entropy", FocusBlue, 360);
         _breathingDynamicsAmplitudeSeries = _breathingDynamicsChart.AddSeries("Amplitude entropy", TelemetryGreen, 360);
 
@@ -201,11 +201,11 @@ public partial class MainWindow
                 address,
                 current.TrackingState switch
                 {
-                    PolarBreathingDynamicsTrackingState.Tracking => "breathing dynamics tracking live",
+                    PolarBreathingDynamicsTrackingState.Tracking => "breath variability tracking live",
                     PolarBreathingDynamicsTrackingState.WaitingForCalibration => "waiting for breathing calibration",
                     PolarBreathingDynamicsTrackingState.WaitingForBreathingTracking => "waiting for stable breathing tracking",
-                    PolarBreathingDynamicsTrackingState.Stale => "breathing dynamics input stale",
-                    _ => "breathing dynamics unavailable",
+                    PolarBreathingDynamicsTrackingState.Stale => "breath variability input stale",
+                    _ => "breath variability unavailable",
                 },
                 state);
         }
@@ -286,11 +286,22 @@ public partial class MainWindow
         if (string.IsNullOrWhiteSpace(address))
         {
             _breathingDynamicsWindow.SelectedDeviceTextBlock.Text = "No device selected";
-            _breathingDynamicsWindow.SummaryTextBlock.Text = "Breath interval uses same-polarity extrema spacing; breath amplitude uses peak-trough excursion from the calibrated base waveform.";
+            _breathingDynamicsWindow.SummaryTextBlock.Text = "Breath variability tracks derived interval and amplitude series from the calibrated breathing waveform, then unlocks entropy as those series mature.";
             _breathingDynamicsWindow.IntervalEntropyValueTextBlock.Text = "--";
             _breathingDynamicsWindow.IntervalEntropyHintTextBlock.Text = "Waiting for enough derived breaths";
             _breathingDynamicsWindow.AmplitudeEntropyValueTextBlock.Text = "--";
             _breathingDynamicsWindow.AmplitudeEntropyHintTextBlock.Text = "Waiting for enough derived breaths";
+            _breathingDynamicsWindow.RequirementTextBlock.Text = "Variability metrics need accepted interval and amplitude breath series; basic stats unlock first, then entropy as the derived series fills.";
+            _breathingDynamicsWindow.WarmupHintTextBlock.Text = "Select a device, finish breathing calibration, and keep breathing long enough to accumulate derived breaths.";
+            _breathingDynamicsWindow.MaturityProgressBar.Value = 0d;
+            _breathingDynamicsWindow.MaturityProgressBar.Foreground = ResourceBrush("GraphiteBrush");
+            _breathingDynamicsWindow.MaturityProgressTextBlock.Text = "--";
+            _breathingDynamicsWindow.IntervalProgressBar.Value = 0d;
+            _breathingDynamicsWindow.IntervalProgressBar.Foreground = ResourceBrush("GraphiteBrush");
+            _breathingDynamicsWindow.IntervalProgressTextBlock.Text = "--";
+            _breathingDynamicsWindow.AmplitudeProgressBar.Value = 0d;
+            _breathingDynamicsWindow.AmplitudeProgressBar.Foreground = ResourceBrush("GraphiteBrush");
+            _breathingDynamicsWindow.AmplitudeProgressTextBlock.Text = "--";
             _breathingDynamicsWindow.TrackingTextBlock.Text = "--";
             _breathingDynamicsWindow.LastWaveformTextBlock.Text = "--";
             _breathingDynamicsWindow.LastBreathTextBlock.Text = "--";
@@ -316,9 +327,9 @@ public partial class MainWindow
             RebuildBreathingDynamicsChart();
 
         PolarBreathingDynamicsTelemetry telemetry = state.HasTelemetry ? state.LastTelemetry : state.Tracker.GetTelemetry();
-        _breathingDynamicsWindow.Title = $"Polar H10 // Breathing Dynamics // {CompactDisplayName(address)}";
+        _breathingDynamicsWindow.Title = $"Polar H10 // Breath Variability // {CompactDisplayName(address)}";
         _breathingDynamicsWindow.SelectedDeviceTextBlock.Text = DisplayName(address);
-        _breathingDynamicsWindow.SummaryTextBlock.Text = "Breath interval uses same-polarity extrema spacing; breath amplitude uses peak-trough excursion from the calibrated base waveform.";
+        _breathingDynamicsWindow.SummaryTextBlock.Text = "Breath variability tracks derived interval and amplitude series from the calibrated breathing waveform, then unlocks entropy as those series mature.";
         _breathingDynamicsWindow.IntervalEntropyValueTextBlock.Text = telemetry.IntervalHasEntropyMetrics
             ? telemetry.Interval.SampleEntropy.ToString("0.00", CultureInfo.InvariantCulture)
             : "--";
@@ -329,6 +340,17 @@ public partial class MainWindow
         _breathingDynamicsWindow.AmplitudeEntropyHintTextBlock.Text = BuildReadinessText(telemetry.AmplitudeHasBasicStats, telemetry.AmplitudeHasEntropyMetrics, telemetry.AmplitudeBreathCount);
         _breathingDynamicsWindow.IntervalEntropyValueTextBlock.Foreground = ResourceBrush(GetBreathingDynamicsAccentBrushKey(telemetry.TrackingState));
         _breathingDynamicsWindow.AmplitudeEntropyValueTextBlock.Foreground = ResourceBrush(telemetry.AmplitudeHasEntropyMetrics ? "TelemetryGreenBrush" : "GraphiteBrush");
+        _breathingDynamicsWindow.RequirementTextBlock.Text = BuildBreathingDynamicsRequirementText(telemetry);
+        _breathingDynamicsWindow.WarmupHintTextBlock.Text = BuildBreathingDynamicsWarmupHint(telemetry);
+        _breathingDynamicsWindow.MaturityProgressBar.Value = telemetry.StabilizationProgress01;
+        _breathingDynamicsWindow.MaturityProgressBar.Foreground = ResourceBrush(GetBreathingDynamicsMaturityBrushKey(telemetry));
+        _breathingDynamicsWindow.MaturityProgressTextBlock.Text = BuildBreathingDynamicsMaturityText(telemetry);
+        _breathingDynamicsWindow.IntervalProgressBar.Value = GetBreathingDynamicsEntropyProgress(telemetry.IntervalBreathCount, telemetry.Settings.MinimumBreathsForEntropy);
+        _breathingDynamicsWindow.IntervalProgressBar.Foreground = ResourceBrush(GetBreathingDynamicsSeriesBrushKey(telemetry.IntervalHasEntropyMetrics, telemetry.IntervalBreathCount > 0, telemetry.IsTransportConnected));
+        _breathingDynamicsWindow.IntervalProgressTextBlock.Text = BuildBreathingDynamicsSeriesProgressText(telemetry.IntervalBreathCount, telemetry.Settings.MinimumBreathsForEntropy);
+        _breathingDynamicsWindow.AmplitudeProgressBar.Value = GetBreathingDynamicsEntropyProgress(telemetry.AmplitudeBreathCount, telemetry.Settings.MinimumBreathsForEntropy);
+        _breathingDynamicsWindow.AmplitudeProgressBar.Foreground = ResourceBrush(GetBreathingDynamicsSeriesBrushKey(telemetry.AmplitudeHasEntropyMetrics, telemetry.AmplitudeBreathCount > 0, telemetry.IsTransportConnected));
+        _breathingDynamicsWindow.AmplitudeProgressTextBlock.Text = BuildBreathingDynamicsSeriesProgressText(telemetry.AmplitudeBreathCount, telemetry.Settings.MinimumBreathsForEntropy);
 
         _breathingDynamicsWindow.TrackingTextBlock.Text = FormatBreathingDynamicsTrackingState(telemetry.TrackingState);
         _breathingDynamicsWindow.LastWaveformTextBlock.Text = telemetry.HasReceivedAnyWaveformSample ? $"{telemetry.LastWaveformSampleAgeSeconds:0.00} s ago" : "Never";
@@ -367,14 +389,82 @@ public partial class MainWindow
     private static string BuildBreathingDynamicsStatusLine(PolarBreathingDynamicsTelemetry telemetry)
     {
         if (telemetry.HasTracking && telemetry.IntervalHasEntropyMetrics && telemetry.AmplitudeHasEntropyMetrics)
-            return "Breathing dynamics live with interval and amplitude entropy";
+            return "Breath variability is live with interval and amplitude entropy";
         if (telemetry.HasTracking)
             return "Tracking live and accumulating enough derived breaths for entropy";
         if (telemetry.IsTransportConnected && telemetry.IsBreathingCalibrated)
             return "Connected and waiting for stable breathing tracking";
         if (telemetry.IsTransportConnected)
             return "Connected and waiting for breathing calibration";
-        return "Breathing dynamics tracker is offline";
+        return "Breath variability tracker is offline";
+    }
+
+    private static string BuildBreathingDynamicsRequirementText(PolarBreathingDynamicsTelemetry telemetry)
+        => $"Basic stats unlock at {telemetry.Settings.MinimumBreathsForBasicStats} breaths per series. Entropy unlocks at {telemetry.Settings.MinimumBreathsForEntropy}, and the confidence target ramps toward {telemetry.Settings.FullConfidenceBreathCount} accepted breaths.";
+
+    private static string BuildBreathingDynamicsWarmupHint(PolarBreathingDynamicsTelemetry telemetry)
+    {
+        if (!telemetry.IsTransportConnected)
+            return "Connect the strap and keep breathing tracking live to start deriving interval and amplitude breaths.";
+        if (!telemetry.IsBreathingCalibrated)
+            return "Breathing calibration must finish before the variability tracker can derive breaths.";
+        if (!telemetry.HasBreathingTracking)
+            return "The breathing tracker is not live yet. Hold a stable breathing waveform first.";
+        if (telemetry.IntervalHasEntropyMetrics && telemetry.AmplitudeHasEntropyMetrics)
+            return "Interval and amplitude entropy are live.";
+        if (!telemetry.HasAcceptedAnyBreath)
+            return "Tracking is live. Keep breathing to accumulate the first accepted interval and amplitude breaths.";
+
+        int remainingInterval = Math.Max(0, telemetry.Settings.MinimumBreathsForEntropy - telemetry.IntervalBreathCount);
+        int remainingAmplitude = Math.Max(0, telemetry.Settings.MinimumBreathsForEntropy - telemetry.AmplitudeBreathCount);
+        if (remainingInterval > 0 || remainingAmplitude > 0)
+            return $"Need {remainingInterval} more interval breath(s) and {remainingAmplitude} more amplitude breath(s) for entropy.";
+
+        int maturityCount = Math.Min(telemetry.IntervalBreathCount, telemetry.AmplitudeBreathCount);
+        int remainingConfidence = Math.Max(0, telemetry.Settings.FullConfidenceBreathCount - maturityCount);
+        return remainingConfidence > 0
+            ? $"Entropy is live. Keep recording for about {remainingConfidence} more matched breaths to approach full confidence."
+            : "Entropy and confidence targets are fully armed.";
+    }
+
+    private static string BuildBreathingDynamicsMaturityText(PolarBreathingDynamicsTelemetry telemetry)
+    {
+        int maturityCount = Math.Min(telemetry.IntervalBreathCount, telemetry.AmplitudeBreathCount);
+        return $"{maturityCount}/{telemetry.Settings.FullConfidenceBreathCount} breaths ({telemetry.StabilizationProgress01 * 100f:0}%)";
+    }
+
+    private static double GetBreathingDynamicsEntropyProgress(int breathCount, int entropyTarget)
+    {
+        if (entropyTarget <= 0)
+            return breathCount > 0 ? 1d : 0d;
+
+        return Math.Clamp(breathCount / (double)entropyTarget, 0d, 1d);
+    }
+
+    private static string BuildBreathingDynamicsSeriesProgressText(int breathCount, int entropyTarget)
+    {
+        if (breathCount >= entropyTarget)
+            return $"Ready ({breathCount} breaths)";
+
+        return $"{breathCount}/{entropyTarget} breaths";
+    }
+
+    private static string GetBreathingDynamicsMaturityBrushKey(PolarBreathingDynamicsTelemetry telemetry)
+    {
+        if (telemetry.IntervalHasEntropyMetrics && telemetry.AmplitudeHasEntropyMetrics)
+            return "TelemetryGreenBrush";
+        if (telemetry.HasAcceptedAnyBreath || telemetry.HasTracking)
+            return "FocusBlueBrush";
+        return "GraphiteBrush";
+    }
+
+    private static string GetBreathingDynamicsSeriesBrushKey(bool isReady, bool hasSeries, bool isConnected)
+    {
+        if (isReady)
+            return "TelemetryGreenBrush";
+        if (hasSeries || isConnected)
+            return "FocusBlueBrush";
+        return "GraphiteBrush";
     }
 
     private void SetBreathingDynamicsStatus(string text, string brushKey)
@@ -628,7 +718,7 @@ public partial class MainWindow
             if (!connected)
             {
                 CaptureBreathingDynamicsTelemetry(address, state, pushChartValue: true);
-                AddBreathingDynamicsLog(address, "preview breathing dynamics tracker idle", state);
+                AddBreathingDynamicsLog(address, "preview breath variability tracker idle", state);
                 continue;
             }
 
@@ -648,7 +738,7 @@ public partial class MainWindow
                 CaptureBreathingDynamicsTelemetry(address, state, pushChartValue: true);
             }
 
-            AddBreathingDynamicsLog(address, "preview breathing dynamics tracker armed", state);
+            AddBreathingDynamicsLog(address, "preview breath variability tracker armed", state);
         }
     }
 

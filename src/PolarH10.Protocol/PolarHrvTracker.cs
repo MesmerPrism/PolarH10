@@ -156,6 +156,25 @@ public sealed class PolarHrvTracker
             LastRrReceivedAtUtc: LastRrReceivedAtUtc);
     }
 
+    public PolarHrvDiagnostics GetDiagnostics()
+    {
+        PolarRrSamplePoint[] acceptedRrSamples = _samples
+            .Select(static sample => new PolarRrSamplePoint(sample.XMs / 1000.0, sample.IbiMs))
+            .ToArray();
+
+        PolarHrvDeltaPoint[] adjacentRrDeltas = _samples.Count < 2
+            ? []
+            : Enumerable.Range(1, _samples.Count - 1)
+                .Select(index => new PolarHrvDeltaPoint(
+                    _samples[index].XMs / 1000.0,
+                    _samples[index].IbiMs - _samples[index - 1].IbiMs))
+                .ToArray();
+
+        return new PolarHrvDiagnostics(
+            AcceptedRrSamples: acceptedRrSamples,
+            AdjacentRrDeltas: adjacentRrDeltas);
+    }
+
     private void TrySolveMetrics(double now)
     {
         int minimumSampleRequirement = Math.Max(2, Settings.MinimumRrSamples);

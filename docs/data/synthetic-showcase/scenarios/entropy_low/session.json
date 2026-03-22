@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "entropy_low",
+  "DeviceName": "Entropy demo / calm paced breathing",
+  "StartedAtUtc": "2026-03-22T14:14:41.6633516+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:46.9724147+00:00",
+  "HrRrSampleCount": 419,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

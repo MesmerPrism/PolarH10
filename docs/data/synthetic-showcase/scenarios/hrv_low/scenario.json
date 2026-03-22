@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "hrv_low",
+  "DisplayName": "HRV demo / low beat-to-beat variability",
+  "ExpectedBehavior": "RMSSD, SDNN, and pNN50 should stay low because the accepted RR stream changes only slightly from beat to beat.",
+  "Seed": 1202,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 860,
+    "RsaAmplitudeMs": 8,
+    "SlowModulationMs": 4,
+    "IrregularNoiseMs": 1.5,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.24,
+    "HarmonicAmplitude01": 0.014,
+    "JitterAmount01": 0.005,
+    "WobbleRateHz": 0.07,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

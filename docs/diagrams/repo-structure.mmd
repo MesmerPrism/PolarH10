@@ -7,9 +7,10 @@ flowchart LR
     subgraph Source["src/ // runtime code"]
         P1["Protocol<br/>decoders · coherence · HRV · breathing"]
         P2["Transport.Abstractions<br/>BLE contracts"]
-        P3["Transport.Windows<br/>scanner · GATT · session"]
-        P4["Cli<br/>diagnostics · capture · replay"]
-        P5["App<br/>shell · coherence · HRV · dynamics"]
+        P3["Transport.Runtime<br/>session orchestration"]
+        P4["Transport.Windows<br/>scanner · GATT adapters"]
+        P5["Cli<br/>windows + synthetic workflows"]
+        P6["App<br/>shell · coherence · HRV · dynamics"]
     end
 
     subgraph Tests["tests/ // verification"]
@@ -20,12 +21,13 @@ flowchart LR
 
     subgraph Docs["docs/ // published reference"]
         D1["protocol/<br/>GATT · PMD · ECG · ACC · HR"]
-        D2["getting-started.md<br/>first-recording · coherence · HRV · entropy guides"]
-        D3["diagrams/<br/>mmd sources · svg output"]
+        D2["synthetic-showcase/<br/>overview · derivation pages"]
+        D3["assets/ + data/<br/>figures · manifest · scenarios"]
+        D4["guides + diagrams/<br/>onboarding · formulas · svg output"]
     end
 
     subgraph Tooling["tools/ + workflow"]
-        TL1["tools/<br/>fixtures · validators · Pages build"]
+        TL1["tools/<br/>validators · preview · Pages build"]
         TL2["package.json<br/>Mermaid CLI scripts"]
         TL3[".github/workflows/<br/>Pages deploy"]
     end
@@ -40,8 +42,9 @@ flowchart LR
     R --> Docs
     R --> Tooling
     R --> Samples
+    TL1 --> D4
     TL1 --> D3
-    TL2 --> D3
+    TL2 --> D4
     TL3 --> D3
 
     style Source fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
@@ -57,9 +60,9 @@ flowchart LR
     classDef tooling fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef sample fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
     class R hub;
-    class P1,P2,P3,P4,P5 source;
+    class P1,P2,P3,P4,P5,P6 source;
     class T1,T2,T3 tests;
-    class D1,D2,D3 docs;
+    class D1,D2,D3,D4 docs;
     class TL1,TL2,TL3 tooling;
     class S1,S2 sample;
     linkStyle default stroke:#626A72,stroke-width:1.8px;

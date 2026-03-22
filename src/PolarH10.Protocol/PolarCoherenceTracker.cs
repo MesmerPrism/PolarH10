@@ -137,6 +137,9 @@ public sealed class PolarCoherenceTracker
             LastRrReceivedAtUtc: LastRrReceivedAtUtc);
     }
 
+    public PolarCoherenceDiagnostics GetDiagnostics()
+        => _calculator.GetDiagnostics();
+
     private void Advance(double now)
     {
         if (_lastAdvanceAt <= 0d)

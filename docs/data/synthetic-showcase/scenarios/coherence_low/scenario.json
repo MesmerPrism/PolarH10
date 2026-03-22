@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "coherence_low",
+  "DisplayName": "Coherence demo / low and unstable",
+  "ExpectedBehavior": "Coherence should stay low because respiration remains off-resonance and RR stays noisy.",
+  "Seed": 1102,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 840,
+    "RsaAmplitudeMs": 14,
+    "SlowModulationMs": 10,
+    "IrregularNoiseMs": 62,
+    "EctopyEveryNBeats": 9,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 115
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 17.5,
+    "Amplitude01": 0.22,
+    "HarmonicAmplitude01": 0.018,
+    "JitterAmount01": 0.11,
+    "WobbleRateHz": 0.19,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

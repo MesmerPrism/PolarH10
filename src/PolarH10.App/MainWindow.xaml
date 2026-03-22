@@ -682,6 +682,105 @@
                                     </Border>
                                 </Grid>
 
+                                <TextBlock Text="Readiness"
+                                           Style="{StaticResource SectionTitleStyle}"
+                                           Margin="0,0,0,8" />
+                                <Border Style="{StaticResource PanelFrameStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1.15*" />
+                                            <ColumnDefinition Width="0.85*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Margin="0,0,18,0">
+                                            <TextBlock x:Name="BreathingRequirementText"
+                                                       Text="Breathing output needs useful ACC motion, a completed calibration pass, and fresh post-calibration samples."
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock x:Name="BreathingWarmupHintText"
+                                                       Text="Connect a device and stream ACC data to begin the breathing warmup."
+                                                       FontSize="13"
+                                                       Foreground="{StaticResource GraphiteBrush}"
+                                                       Margin="0,10,0,0"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+
+                                        <Grid Grid.Column="1">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Useful signal"
+                                                           Style="{StaticResource MetricLabelStyle}"
+                                                           Margin="0,0,0,0" />
+                                                <TextBlock x:Name="BreathingReadinessSignalText"
+                                                           Grid.Column="1"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Right" />
+                                            </Grid>
+
+                                            <ProgressBar x:Name="BreathingReadinessSignalBar"
+                                                         Grid.Row="1"
+                                                         Style="{StaticResource ReadinessProgressStyle}"
+                                                         Margin="0,4,0,0" />
+
+                                            <Grid Grid.Row="2"
+                                                  Margin="0,14,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Calibration"
+                                                           Style="{StaticResource MetricLabelStyle}"
+                                                           Margin="0,0,0,0" />
+                                                <TextBlock x:Name="BreathingReadinessCalibrationText"
+                                                           Grid.Column="1"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Right" />
+                                            </Grid>
+
+                                            <ProgressBar x:Name="BreathingReadinessCalibrationBar"
+                                                         Grid.Row="3"
+                                                         Style="{StaticResource ReadinessProgressStyle}"
+                                                         Margin="0,4,0,0" />
+
+                                            <Grid Grid.Row="4"
+                                                  Margin="0,14,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Live output"
+                                                           Style="{StaticResource MetricLabelStyle}"
+                                                           Margin="0,0,0,0" />
+                                                <TextBlock x:Name="BreathingReadinessTrackingText"
+                                                           Grid.Column="1"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Right" />
+                                            </Grid>
+
+                                            <ProgressBar x:Name="BreathingReadinessTrackingBar"
+                                                         Grid.Row="5"
+                                                         Style="{StaticResource ReadinessProgressStyle}"
+                                                         Margin="0,4,0,0" />
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
                                 <TextBlock Text="Breathing telemetry"
                                            Style="{StaticResource SectionTitleStyle}"
                                            Margin="0,0,0,8" />
@@ -775,6 +874,8 @@
 
                                 <Border Style="{StaticResource PanelFrameStyle}">
                                     <StackPanel>
+                                        <TextBlock Style="{StaticResource TuningHintStyle}"
+                                                   Text="Signal gating, calibration, smoothing, and adaptive bounds now follow the tracker lifecycle instead of one long wall of numeric fields." />
                                         <WrapPanel Margin="0,0,0,12">
                                             <CheckBox x:Name="BreathingAutoCalibrateCheckBox"
                                                       Content="Auto-calibrate"
@@ -791,69 +892,201 @@
                                         </WrapPanel>
 
                                         <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="118" />
-                                                <ColumnDefinition Width="24" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="118" />
-                                            </Grid.ColumnDefinitions>
 
-                                            <TextBlock Text="Calibration seconds" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingCalibrationDurationBox" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Column="3" Text="Min calibration samples" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingMinCalibrationSamplesBox" Grid.Column="4" Margin="0,0,0,8" />
+                                            <Border Style="{StaticResource TuningGroupFrameStyle}">
+                                                <StackPanel>
+                                                    <TextBlock Text="Signal gate"
+                                                               Style="{StaticResource TuningGroupTitleStyle}" />
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Row="1" Text="Min travel (g)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingMinCalibrationTravelBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="1" Grid.Column="3" Text="Useful window (s)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingUsefulWindowBox" Grid.Row="1" Grid.Column="4" Margin="0,0,0,8" />
+                                                        <TextBlock Text="Useful window (s)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingUsefulWindowBox"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="1" Text="Min useful samples" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingMinUsefulSamplesBox"
+                                                                 Grid.Row="1"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="2" Text="Min useful rate (Hz)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingMinUsefulSampleRateBox"
+                                                                 Grid.Row="2"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="3" Text="Min axis range (g)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingMinUsefulAxisRangeBox"
+                                                                 Grid.Row="3"
+                                                                 Grid.Column="1"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
 
-                                            <TextBlock Grid.Row="2" Text="Min useful samples" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingMinUsefulSamplesBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="2" Grid.Column="3" Text="Min useful rate (Hz)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingMinUsefulSampleRateBox" Grid.Row="2" Grid.Column="4" Margin="0,0,0,8" />
+                                            <Border Grid.Column="1"
+                                                    Style="{StaticResource TuningGroupFrameStyle}"
+                                                    Margin="0,0,0,12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Calibration"
+                                                               Style="{StaticResource TuningGroupTitleStyle}" />
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Row="3" Text="Min axis range (g)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingMinUsefulAxisRangeBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="3" Grid.Column="3" Text="Sample EMA" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingSampleEmaBox" Grid.Row="3" Grid.Column="4" Margin="0,0,0,8" />
+                                                        <TextBlock Text="Calibration seconds" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingCalibrationDurationBox"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="1" Text="Min calibration samples" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingMinCalibrationSamplesBox"
+                                                                 Grid.Row="1"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="2" Text="Min travel (g)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingMinCalibrationTravelBox"
+                                                                 Grid.Row="2"
+                                                                 Grid.Column="1"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
 
-                                            <TextBlock Grid.Row="4" Text="Projection EMA" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingProjectionEmaBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="4" Grid.Column="3" Text="Lower quantile" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingBoundsLowerQuantileBox" Grid.Row="4" Grid.Column="4" Margin="0,0,0,8" />
+                                            <Border Grid.Row="1" Style="{StaticResource TuningGroupFrameStyle}">
+                                                <StackPanel>
+                                                    <TextBlock Text="Wave shaping"
+                                                               Style="{StaticResource TuningGroupTitleStyle}" />
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Row="5" Text="Upper quantile" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingBoundsUpperQuantileBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="5" Grid.Column="3" Text="Bounds edge ease" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingBoundsEdgeEaseBox" Grid.Row="5" Grid.Column="4" Margin="0,0,0,8" />
+                                                        <TextBlock Text="Sample EMA" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingSampleEmaBox"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="1" Text="Projection EMA" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingProjectionEmaBox"
+                                                                 Grid.Row="1"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="2" Text="State delta threshold" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingStateDeltaThresholdBox"
+                                                                 Grid.Row="2"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="3" Text="Stale timeout (s)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingStaleTimeoutBox"
+                                                                 Grid.Row="3"
+                                                                 Grid.Column="1"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
 
-                                            <TextBlock Grid.Row="6" Text="Adaptive window (s)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingAdaptiveWindowBox" Grid.Row="6" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="6" Grid.Column="3" Text="Adaptive update (s)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingAdaptiveUpdateIntervalBox" Grid.Row="6" Grid.Column="4" Margin="0,0,0,8" />
+                                            <Border Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    Style="{StaticResource TuningGroupFrameStyle}"
+                                                    Margin="0,0,0,12">
+                                                <StackPanel>
+                                                    <TextBlock Text="Bounds model"
+                                                               Style="{StaticResource TuningGroupTitleStyle}" />
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Row="7" Text="Adaptive lerp speed" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingAdaptiveLerpSpeedBox" Grid.Row="7" Grid.Column="1" Margin="0,0,0,8" />
-                                            <TextBlock Grid.Row="7" Grid.Column="3" Text="Adaptive contract" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingAdaptiveContractBox" Grid.Row="7" Grid.Column="4" Margin="0,0,0,8" />
-
-                                            <TextBlock Grid.Row="8" Text="Stale timeout (s)" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingStaleTimeoutBox" Grid.Row="8" Grid.Column="1" />
-                                            <TextBlock Grid.Row="8" Grid.Column="3" Text="State delta threshold" Style="{StaticResource MetricLabelStyle}" />
-                                            <TextBox x:Name="BreathingStateDeltaThresholdBox" Grid.Row="8" Grid.Column="4" />
+                                                        <TextBlock Text="Lower quantile" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingBoundsLowerQuantileBox"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="1" Text="Upper quantile" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingBoundsUpperQuantileBox"
+                                                                 Grid.Row="1"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="2" Text="Bounds edge ease" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingBoundsEdgeEaseBox"
+                                                                 Grid.Row="2"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="3" Text="Adaptive window (s)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingAdaptiveWindowBox"
+                                                                 Grid.Row="3"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="4" Text="Adaptive update (s)" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingAdaptiveUpdateIntervalBox"
+                                                                 Grid.Row="4"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="5" Text="Adaptive lerp speed" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingAdaptiveLerpSpeedBox"
+                                                                 Grid.Row="5"
+                                                                 Grid.Column="1"
+                                                                 Margin="0,0,0,8"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                        <TextBlock Grid.Row="6" Text="Adaptive contract" Style="{StaticResource MetricLabelStyle}" />
+                                                        <TextBox x:Name="BreathingAdaptiveContractBox"
+                                                                 Grid.Row="6"
+                                                                 Grid.Column="1"
+                                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
                                         </Grid>
                                     </StackPanel>
                                 </Border>
@@ -873,7 +1106,7 @@
 
                     <TabItem x:Name="HrvTab" Header="HRV" />
 
-                    <TabItem x:Name="DynamicsTab" Header="Dynamics" />
+                    <TabItem x:Name="DynamicsTab" Header="Breath Variability" />
 
                     <TabItem Header="Diagnostics">
                         <Grid>

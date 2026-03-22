@@ -1,0 +1,16 @@
+{
+  "SchemaVersion": 1,
+  "PresetId": "showcase-v1",
+  "ScenarioId": "off_10bpm",
+  "DeviceName": "Off-resonance 10 BPM",
+  "StartedAtUtc": "2026-03-22T14:14:43.3019822+00:00",
+  "SavedAtUtc": "2026-03-22T14:20:48.4477522+00:00",
+  "HrRrSampleCount": 410,
+  "EcgFrameCount": 3600,
+  "BreathingSampleCount": 4501,
+  "DerivedMeasures": {
+    "CoherenceReady": true,
+    "HrvReady": true,
+    "DynamicsTrackingState": "Stale"
+  }
+}

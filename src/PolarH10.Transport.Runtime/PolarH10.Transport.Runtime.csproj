@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>PolarH10.Transport.Runtime</RootNamespace>
+    <AssemblyName>PolarH10.Transport.Runtime</AssemblyName>
+    <Description>Transport-neutral session coordinator for the Polar H10 using abstract BLE adapters.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolarH10.Protocol\PolarH10.Protocol.csproj" />
+    <ProjectReference Include="..\PolarH10.Transport.Abstractions\PolarH10.Transport.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

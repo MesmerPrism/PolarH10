@@ -1,7 +1,7 @@
 using System.CommandLine;
 using PolarH10.Cli;
 using PolarH10.Protocol;
-using PolarH10.Transport.Windows;
+using PolarH10.Transport.Runtime;
 
 namespace PolarH10.Cli.Commands;
 
@@ -45,7 +45,22 @@ internal static class MonitorCommand
             Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
 
             Console.WriteLine($"Connecting to {device}...");
-            await session.ConnectAsync(device, cts.Token);
+            try
+            {
+                await session.ConnectAsync(device, cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    CliTransportOptions.RewriteTransportException(
+                        transport,
+                        syntheticPipe,
+                        "device connection",
+                        ex).Message);
+                Environment.ExitCode = 1;
+                await session.DisposeAsync();
+                return;
+            }
             Console.WriteLine("Connected. Press Ctrl+C to stop.\n");
 
             var ch = channels.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

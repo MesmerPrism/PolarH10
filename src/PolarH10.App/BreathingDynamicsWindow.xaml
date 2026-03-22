@@ -1,7 +1,7 @@
 <Window x:Class="PolarH10.App.BreathingDynamicsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Polar H10 // Breathing Dynamics"
+        Title="Polar H10 // Breath Variability"
         Width="1320"
         Height="980"
         MinWidth="1120"
@@ -82,7 +82,7 @@
                                FontWeight="Bold"
                                Margin="0,0,0,4" />
                     <TextBlock x:Name="BreathingDynamicsSummaryText"
-                               Text="Breath interval uses same-polarity extrema spacing; breath amplitude uses peak-trough excursion from the calibrated base waveform."
+                               Text="Breath variability tracks derived interval and amplitude series from the calibrated breathing waveform, then unlocks entropy as those series mature."
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource GraphiteBrush}" />
@@ -160,7 +160,106 @@
                 </Border>
             </Grid>
 
-            <TextBlock Text="Entropy telemetry"
+            <TextBlock Text="Readiness"
+                       Style="{StaticResource SectionTitleStyle}"
+                       Margin="0,0,0,8" />
+            <Border Style="{StaticResource PanelFrameStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.15*" />
+                        <ColumnDefinition Width="0.85*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Margin="0,0,18,0">
+                        <TextBlock x:Name="BreathingDynamicsRequirementText"
+                                   Text="Variability metrics need accepted interval and amplitude breath series; basic stats unlock first, then entropy as the derived series fills."
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="BreathingDynamicsWarmupHintText"
+                                   Text="Connect a device, finish breathing calibration, and keep breathing long enough to accumulate interval and amplitude breaths."
+                                   FontSize="13"
+                                   Foreground="{StaticResource GraphiteBrush}"
+                                   Margin="0,10,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Recording maturity"
+                                       Style="{StaticResource MetricLabelStyle}"
+                                       Margin="0,0,0,0" />
+                            <TextBlock x:Name="BreathingDynamicsReadinessMaturityText"
+                                       Grid.Column="1"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <ProgressBar x:Name="BreathingDynamicsReadinessMaturityBar"
+                                     Grid.Row="1"
+                                     Style="{StaticResource ReadinessProgressStyle}"
+                                     Margin="0,4,0,0" />
+
+                        <Grid Grid.Row="2"
+                              Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Interval entropy"
+                                       Style="{StaticResource MetricLabelStyle}"
+                                       Margin="0,0,0,0" />
+                            <TextBlock x:Name="BreathingDynamicsReadinessIntervalText"
+                                       Grid.Column="1"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <ProgressBar x:Name="BreathingDynamicsReadinessIntervalBar"
+                                     Grid.Row="3"
+                                     Style="{StaticResource ReadinessProgressStyle}"
+                                     Margin="0,4,0,0" />
+
+                        <Grid Grid.Row="4"
+                              Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Amplitude entropy"
+                                       Style="{StaticResource MetricLabelStyle}"
+                                       Margin="0,0,0,0" />
+                            <TextBlock x:Name="BreathingDynamicsReadinessAmplitudeText"
+                                       Grid.Column="1"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <ProgressBar x:Name="BreathingDynamicsReadinessAmplitudeBar"
+                                     Grid.Row="5"
+                                     Style="{StaticResource ReadinessProgressStyle}"
+                                     Margin="0,4,0,0" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <TextBlock Text="Variability telemetry"
                        Style="{StaticResource SectionTitleStyle}"
                        Margin="0,0,0,8" />
             <Border x:Name="BreathingDynamicsChartHost"
@@ -342,58 +441,162 @@
                        Style="{StaticResource SectionTitleStyle}"
                        Margin="0,0,0,8" />
             <Border Style="{StaticResource PanelFrameStyle}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="118" />
-                        <ColumnDefinition Width="24" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="118" />
-                        <ColumnDefinition Width="24" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="118" />
-                    </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TuningHintStyle}"
+                               Text="Extraction, warm-up targets, and entropy parameters are grouped by what they change in the pipeline." />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Extremum delta" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsTurningThresholdBox" Grid.Column="1" Margin="0,0,0,8" />
-                    <TextBlock Grid.Column="3" Text="Peak/trough gap (s)" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsMinSpacingBox" Grid.Column="4" Margin="0,0,0,8" />
-                    <TextBlock Grid.Column="6" Text="Peak-trough excursion" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsMinExcursionBox" Grid.Column="7" Margin="0,0,0,8" />
+                        <Border Style="{StaticResource TuningGroupFrameStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Wave extraction"
+                                           Style="{StaticResource TuningGroupTitleStyle}" />
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Text="Retained series size" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsRetainedBreathsBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" />
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text="Basic-stats warmup" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsMinBasicBreathsBox" Grid.Row="1" Grid.Column="4" Margin="0,0,0,8" />
-                    <TextBlock Grid.Row="1" Grid.Column="6" Text="Entropy warmup" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsMinEntropyBreathsBox" Grid.Row="1" Grid.Column="7" Margin="0,0,0,8" />
+                                    <TextBlock Text="Extremum delta" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsTurningThresholdBox"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    <TextBlock Grid.Row="1" Text="Peak/trough gap (s)" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsMinSpacingBox"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    <TextBlock Grid.Row="2" Text="Peak-trough excursion" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsMinExcursionBox"
+                                             Grid.Row="2"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    <TextBlock Grid.Row="3" Text="Retained series size" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsRetainedBreathsBox"
+                                             Grid.Row="3"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    <TextBlock Grid.Row="4" Text="Stale timeout (s)" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsStaleTimeoutBox"
+                                             Grid.Row="4"
+                                             Grid.Column="1"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                    <TextBlock Grid.Row="2" Text="Confidence target" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsFullConfidenceBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,8" />
-                    <TextBlock Grid.Row="2" Grid.Column="3" Text="Stale timeout (s)" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsStaleTimeoutBox" Grid.Row="2" Grid.Column="4" Margin="0,0,0,8" />
-                    <TextBlock Grid.Row="2" Grid.Column="6" Text="MSE max scale" Style="{StaticResource MetricLabelStyle}" />
-                    <TextBox x:Name="DynamicsMseMaxScaleBox" Grid.Row="2" Grid.Column="7" Margin="0,0,0,8" />
+                        <Border Grid.Column="1" Style="{StaticResource TuningGroupFrameStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Warm-up targets"
+                                           Style="{StaticResource TuningGroupTitleStyle}" />
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="3" Text="SampEn m / delay / r·SD" Style="{StaticResource MetricLabelStyle}" />
-                    <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
-                        <TextBox x:Name="DynamicsSampleEntropyDimensionBox" Width="34" Margin="0,0,6,0" />
-                        <TextBox x:Name="DynamicsSampleEntropyDelayBox" Width="34" Margin="0,0,6,0" />
-                        <TextBox x:Name="DynamicsSampleEntropyToleranceBox" Width="56" />
-                    </StackPanel>
-                    <TextBlock Grid.Row="3" Grid.Column="3" Text="MSE m / delay / r·SD" Style="{StaticResource MetricLabelStyle}" />
-                    <StackPanel Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="2" Orientation="Horizontal">
-                        <TextBox x:Name="DynamicsMultiscaleEntropyDimensionBox" Width="34" Margin="0,0,6,0" />
-                        <TextBox x:Name="DynamicsMultiscaleEntropyDelayBox" Width="34" Margin="0,0,6,0" />
-                        <TextBox x:Name="DynamicsMultiscaleEntropyToleranceBox" Width="56" />
-                    </StackPanel>
-                </Grid>
+                                    <TextBlock Text="Basic-stats warmup" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsMinBasicBreathsBox"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    <TextBlock Grid.Row="1" Text="Entropy warmup" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsMinEntropyBreathsBox"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    <TextBlock Grid.Row="2" Text="Confidence target" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsFullConfidenceBox"
+                                             Grid.Row="2"
+                                             Grid.Column="1"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Style="{StaticResource TuningGroupFrameStyle}"
+                                Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Entropy parameters"
+                                           Style="{StaticResource TuningGroupTitleStyle}" />
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="MSE max scale" Style="{StaticResource MetricLabelStyle}" />
+                                    <TextBox x:Name="DynamicsMseMaxScaleBox"
+                                             Grid.Column="1"
+                                             Margin="0,0,0,8"
+                                             Style="{StaticResource CompactNumericTextBoxStyle}" />
+
+                                    <TextBlock Grid.Row="1"
+                                               Text="SampEn m / delay / r·SD"
+                                               Style="{StaticResource MetricLabelStyle}" />
+                                    <StackPanel Grid.Row="1"
+                                                Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                Margin="0,0,0,8">
+                                        <TextBox x:Name="DynamicsSampleEntropyDimensionBox"
+                                                 Margin="0,0,6,0"
+                                                 Style="{StaticResource CompactTinyTextBoxStyle}" />
+                                        <TextBox x:Name="DynamicsSampleEntropyDelayBox"
+                                                 Margin="0,0,6,0"
+                                                 Style="{StaticResource CompactTinyTextBoxStyle}" />
+                                        <TextBox x:Name="DynamicsSampleEntropyToleranceBox"
+                                                 Width="58"
+                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="2"
+                                               Text="MSE m / delay / r·SD"
+                                               Style="{StaticResource MetricLabelStyle}" />
+                                    <StackPanel Grid.Row="2"
+                                                Grid.Column="1"
+                                                Orientation="Horizontal">
+                                        <TextBox x:Name="DynamicsMultiscaleEntropyDimensionBox"
+                                                 Margin="0,0,6,0"
+                                                 Style="{StaticResource CompactTinyTextBoxStyle}" />
+                                        <TextBox x:Name="DynamicsMultiscaleEntropyDelayBox"
+                                                 Margin="0,0,6,0"
+                                                 Style="{StaticResource CompactTinyTextBoxStyle}" />
+                                        <TextBox x:Name="DynamicsMultiscaleEntropyToleranceBox"
+                                                 Width="58"
+                                                 Style="{StaticResource CompactNumericTextBoxStyle}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
             </Border>
 
             <TextBlock Text="Method references"
@@ -427,7 +630,7 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="Breathing dynamics log"
+            <TextBlock Text="Breath variability log"
                        Style="{StaticResource SectionTitleStyle}"
                        Margin="0,4,0,8" />
             <ListBox x:Name="BreathingDynamicsLogList"

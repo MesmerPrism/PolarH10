@@ -1,0 +1,145 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='960' viewBox='0 0 1600 960'>
+<style>
+text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif; }
+</style>
+<rect x='0' y='0' width='1600' height='960' fill='#f7f2ea' />
+<text x='48.0' y='52.0' font-size='34' fill='#1f2226'>Coherence derivation</text>
+<text x='48.0' y='92.0' font-size='16' fill='#626a72'>Raw RR intervals feed the spline-resampled tachogram and PSD solve used for the normalized coherence score.</text>
+<rect x='40.0' y='120.0' width='740.0' height='360.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
+<text x='60.0' y='154.0' font-size='20' fill='#1f2226'>Accepted RR window</text>
+<line x1='96.0' y1='430.0' x2='752.0' y2='430.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<line x1='96.0' y1='190.0' x2='96.0' y2='430.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<line x1='90.0' y1='430.0' x2='96.0' y2='430.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='48.0' y='434.0' font-size='12' fill='#626a72'>577.05</text>
+<line x1='90.0' y1='370.0' x2='96.0' y2='370.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='48.0' y='374.0' font-size='12' fill='#626a72'>696.83</text>
+<line x1='90.0' y1='310.0' x2='96.0' y2='310.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='48.0' y='314.0' font-size='12' fill='#626a72'>816.62</text>
+<line x1='90.0' y1='250.0' x2='96.0' y2='250.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='48.0' y='254.0' font-size='12' fill='#626a72'>936.41</text>
+<line x1='90.0' y1='190.0' x2='96.0' y2='190.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='48.0' y='194.0' font-size='12' fill='#626a72'>1056.19</text>
+<line x1='96.0' y1='430.0' x2='96.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='82.0' y='454.0' font-size='12' fill='#626a72'>324</text>
+<line x1='260.0' y1='430.0' x2='260.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='246.0' y='454.0' font-size='12' fill='#626a72'>332</text>
+<line x1='424.0' y1='430.0' x2='424.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='410.0' y='454.0' font-size='12' fill='#626a72'>340</text>
+<line x1='588.0' y1='430.0' x2='588.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='574.0' y='454.0' font-size='12' fill='#626a72'>348</text>
+<line x1='752.0' y1='430.0' x2='752.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='738.0' y='454.0' font-size='12' fill='#626a72'>356</text>
+<text x='384.0' y='462.0' font-size='12' fill='#626a72'>Time (s)</text>
+<text x='58.0' y='202.0' font-size='12' fill='#626a72'>RR (ms)</text>
+<line x1='560.0' y1='148.0' x2='578.0' y2='148.0' stroke='#258acb' stroke-width='3' stroke-linecap='round' />
+<text x='588.0' y='152.0' font-size='12' fill='#626a72'>coherence_high</text>
+<line x1='560.0' y1='166.0' x2='578.0' y2='166.0' stroke='#c85454' stroke-width='3' stroke-linecap='round' />
+<text x='588.0' y='170.0' font-size='12' fill='#626a72'>coherence_low</text>
+<polyline points='99.5,288.9 116.8,265.2 135.1,245.1 154.2,238.1 173.6,242.5 192.8,255.4 211.5,272.2 229.5,286.9 247.0,298.3 263.9,306.7 280.6,307.2 297.2,295.3 314.2,274.4 332.2,253.9 350.9,240.6 370.2,236.4 389.7,244.1 408.8,260.5 427.3,277.2 445.1,290.9 462.4,300.3 479.3,299.8 496.2,286.2 513.6,265.0 531.9,245.9 551.0,233.7 570.6,230.8 590.2,238.9 609.6,253.2 628.4,268.3 646.5,285.0 664.0,299.6 681.0,302.7 697.7,291.0 715.0,270.5 733.1,249.9 752.0,236.3' fill='none' stroke='#258acb' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
+<circle cx='99.5' cy='288.9' r='3.0' fill='#258acb' />
+<circle cx='154.2' cy='238.1' r='3.0' fill='#258acb' />
+<circle cx='211.5' cy='272.2' r='3.0' fill='#258acb' />
+<circle cx='263.9' cy='306.7' r='3.0' fill='#258acb' />
+<circle cx='314.2' cy='274.4' r='3.0' fill='#258acb' />
+<circle cx='370.2' cy='236.4' r='3.0' fill='#258acb' />
+<circle cx='427.3' cy='277.2' r='3.0' fill='#258acb' />
+<circle cx='479.3' cy='299.8' r='3.0' fill='#258acb' />
+<circle cx='531.9' cy='245.9' r='3.0' fill='#258acb' />
+<circle cx='590.2' cy='238.9' r='3.0' fill='#258acb' />
+<circle cx='646.5' cy='285.0' r='3.0' fill='#258acb' />
+<circle cx='697.7' cy='291.0' r='3.0' fill='#258acb' />
+<circle cx='752.0' cy='236.3' r='3.0' fill='#258acb' />
+<polyline points='96.0,323.8 111.9,365.8 126.2,190.0 147.5,279.3 165.2,308.0 181.8,307.4 198.4,313.4 214.8,321.1 230.8,295.6 247.9,256.0 266.5,356.4 281.2,250.0 300.1,329.4 315.8,318.2 331.9,310.5 348.4,304.6 365.1,278.2 382.9,263.6 401.3,301.7 418.1,430.0 429.7,281.2 447.4,311.8 463.8,296.2 480.8,288.6 498.2,273.5 516.2,283.2 533.7,325.8 549.6,344.3 564.7,409.7 577.2,233.7 596.7,277.8 614.5,280.1 632.2,279.1 650.0,302.9 666.7,336.8 682.1,329.8 697.8,288.2 715.2,349.6 730.1,214.3 750.5,289.4' fill='none' stroke='#c85454' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
+<circle cx='96.0' cy='323.8' r='3.0' fill='#c85454' />
+<circle cx='147.5' cy='279.3' r='3.0' fill='#c85454' />
+<circle cx='198.4' cy='313.4' r='3.0' fill='#c85454' />
+<circle cx='247.9' cy='256.0' r='3.0' fill='#c85454' />
+<circle cx='300.1' cy='329.4' r='3.0' fill='#c85454' />
+<circle cx='348.4' cy='304.6' r='3.0' fill='#c85454' />
+<circle cx='401.3' cy='301.7' r='3.0' fill='#c85454' />
+<circle cx='447.4' cy='311.8' r='3.0' fill='#c85454' />
+<circle cx='498.2' cy='273.5' r='3.0' fill='#c85454' />
+<circle cx='549.6' cy='344.3' r='3.0' fill='#c85454' />
+<circle cx='596.7' cy='277.8' r='3.0' fill='#c85454' />
+<circle cx='650.0' cy='302.9' r='3.0' fill='#c85454' />
+<circle cx='697.8' cy='288.2' r='3.0' fill='#c85454' />
+<circle cx='750.5' cy='289.4' r='3.0' fill='#c85454' />
+<rect x='820.0' y='120.0' width='740.0' height='360.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
+<text x='840.0' y='154.0' font-size='20' fill='#1f2226'>Power spectrum</text>
+<line x1='876.0' y1='430.0' x2='1532.0' y2='430.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<line x1='876.0' y1='190.0' x2='876.0' y2='430.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<line x1='870.0' y1='430.0' x2='876.0' y2='430.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='828.0' y='434.0' font-size='12' fill='#626a72'>1.00</text>
+<line x1='870.0' y1='370.0' x2='876.0' y2='370.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='828.0' y='374.0' font-size='12' fill='#626a72'>1114481.79</text>
+<line x1='870.0' y1='310.0' x2='876.0' y2='310.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='828.0' y='314.0' font-size='12' fill='#626a72'>2228962.59</text>
+<line x1='870.0' y1='250.0' x2='876.0' y2='250.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='828.0' y='254.0' font-size='12' fill='#626a72'>3343443.38</text>
+<line x1='870.0' y1='190.0' x2='876.0' y2='190.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='828.0' y='194.0' font-size='12' fill='#626a72'>4457924.18</text>
+<line x1='876.0' y1='430.0' x2='876.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='862.0' y='454.0' font-size='12' fill='#626a72'>0</text>
+<line x1='1040.0' y1='430.0' x2='1040.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='1026.0' y='454.0' font-size='12' fill='#626a72'>0</text>
+<line x1='1204.0' y1='430.0' x2='1204.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='1190.0' y='454.0' font-size='12' fill='#626a72'>0</text>
+<line x1='1368.0' y1='430.0' x2='1368.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='1354.0' y='454.0' font-size='12' fill='#626a72'>0</text>
+<line x1='1532.0' y1='430.0' x2='1532.0' y2='436.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
+<text x='1518.0' y='454.0' font-size='12' fill='#626a72'>0</text>
+<text x='1164.0' y='462.0' font-size='12' fill='#626a72'>Frequency (Hz)</text>
+<text x='838.0' y='202.0' font-size='12' fill='#626a72'>Power</text>
+<line x1='1340.0' y1='148.0' x2='1358.0' y2='148.0' stroke='#258acb' stroke-width='3' stroke-linecap='round' />
+<text x='1368.0' y='152.0' font-size='12' fill='#626a72'>coherence_high</text>
+<line x1='1340.0' y1='166.0' x2='1358.0' y2='166.0' stroke='#c85454' stroke-width='3' stroke-linecap='round' />
+<text x='1368.0' y='170.0' font-size='12' fill='#626a72'>coherence_low</text>
+<polyline points='876.0,429.7 927.2,421.6 978.5,409.8 1029.8,190.0 1081.0,317.6 1132.2,428.3 1183.5,429.4 1234.8,429.0 1286.0,430.0 1337.2,429.9 1388.5,429.7 1439.8,430.0 1491.0,430.0' fill='none' stroke='#258acb' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
+<circle cx='876.0' cy='429.7' r='3.0' fill='#258acb' />
+<circle cx='927.2' cy='421.6' r='3.0' fill='#258acb' />
+<circle cx='978.5' cy='409.8' r='3.0' fill='#258acb' />
+<circle cx='1029.8' cy='190.0' r='3.0' fill='#258acb' />
+<circle cx='1081.0' cy='317.6' r='3.0' fill='#258acb' />
+<circle cx='1132.2' cy='428.3' r='3.0' fill='#258acb' />
+<circle cx='1183.5' cy='429.4' r='3.0' fill='#258acb' />
+<circle cx='1234.8' cy='429.0' r='3.0' fill='#258acb' />
+<circle cx='1286.0' cy='430.0' r='3.0' fill='#258acb' />
+<circle cx='1337.2' cy='429.9' r='3.0' fill='#258acb' />
+<circle cx='1388.5' cy='429.7' r='3.0' fill='#258acb' />
+<circle cx='1439.8' cy='430.0' r='3.0' fill='#258acb' />
+<circle cx='1491.0' cy='430.0' r='3.0' fill='#258acb' />
+<polyline points='876.0,407.5 927.2,418.7 978.5,427.8 1029.8,429.2 1081.0,394.9 1132.2,252.9 1183.5,281.8 1234.8,421.6 1286.0,383.0 1337.2,298.4 1388.5,356.3 1439.8,417.3 1491.0,388.6' fill='none' stroke='#c85454' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
+<circle cx='876.0' cy='407.5' r='3.0' fill='#c85454' />
+<circle cx='927.2' cy='418.7' r='3.0' fill='#c85454' />
+<circle cx='978.5' cy='427.8' r='3.0' fill='#c85454' />
+<circle cx='1029.8' cy='429.2' r='3.0' fill='#c85454' />
+<circle cx='1081.0' cy='394.9' r='3.0' fill='#c85454' />
+<circle cx='1132.2' cy='252.9' r='3.0' fill='#c85454' />
+<circle cx='1183.5' cy='281.8' r='3.0' fill='#c85454' />
+<circle cx='1234.8' cy='421.6' r='3.0' fill='#c85454' />
+<circle cx='1286.0' cy='383.0' r='3.0' fill='#c85454' />
+<circle cx='1337.2' cy='298.4' r='3.0' fill='#c85454' />
+<circle cx='1388.5' cy='356.3' r='3.0' fill='#c85454' />
+<circle cx='1439.8' cy='417.3' r='3.0' fill='#c85454' />
+<circle cx='1491.0' cy='388.6' r='3.0' fill='#c85454' />
+<rect x='40.0' y='520.0' width='1520.0' height='340.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
+<text x='60.0' y='554.0' font-size='20' fill='#1f2226'>Peak-window summary</text>
+<text x='60.0' y='590.0' font-size='14' fill='#626a72'>Scenario</text>
+<text x='424.8' y='590.0' font-size='14' fill='#626a72'>Peak freq</text>
+<text x='702.7' y='590.0' font-size='14' fill='#626a72'>Peak power</text>
+<text x='980.5' y='590.0' font-size='14' fill='#626a72'>Total power</text>
+<text x='1258.4' y='590.0' font-size='14' fill='#626a72'>Norm score</text>
+<line x1='60.0' y1='602.0' x2='1536.0' y2='602.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
+<text x='60.0' y='618.0' font-size='14' fill='#1f2226'>High</text>
+<text x='424.8' y='618.0' font-size='14' fill='#1f2226'>0.097 Hz</text>
+<text x='702.7' y='618.0' font-size='14' fill='#1f2226'>124216.950</text>
+<text x='980.5' y='618.0' font-size='14' fill='#1f2226'>224684.170</text>
+<text x='1258.4' y='618.0' font-size='14' fill='#1f2226'>0.517</text>
+<line x1='60.0' y1='630.0' x2='1536.0' y2='630.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
+<text x='60.0' y='646.0' font-size='14' fill='#1f2226'>Low</text>
+<text x='424.8' y='646.0' font-size='14' fill='#1f2226'>0.167 Hz</text>
+<text x='702.7' y='646.0' font-size='14' fill='#1f2226'>102350.010</text>
+<text x='980.5' y='646.0' font-size='14' fill='#1f2226'>434405.300</text>
+<text x='1258.4' y='646.0' font-size='14' fill='#1f2226'>0.286</text>
+<text x='64.0' y='884.0' font-size='14' fill='#626a72'>Normalized coherence = P_peak / P_total; the SVG/PNG pair is backed by analysis.json and the formula sheet uses the same runtime telemetry.</text>
+</svg>

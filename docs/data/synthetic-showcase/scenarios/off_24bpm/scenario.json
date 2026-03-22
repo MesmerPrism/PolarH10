@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "off_24bpm",
+  "DisplayName": "Off-resonance 24 BPM",
+  "ExpectedBehavior": "Coherence lower than resonance and smaller breathing excursion.",
+  "Seed": 3003,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 820,
+    "RsaAmplitudeMs": 12,
+    "SlowModulationMs": 7,
+    "IrregularNoiseMs": 5,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": null,
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 24,
+    "Amplitude01": 0.18,
+    "HarmonicAmplitude01": 0.015,
+    "JitterAmount01": 0.02,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": null,
+  "TransitionStartFraction": 0,
+  "TransitionEndFraction": 1
+}

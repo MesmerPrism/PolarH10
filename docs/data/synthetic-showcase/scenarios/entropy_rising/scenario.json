@@ -1,0 +1,49 @@
+{
+  "ScenarioId": "entropy_rising",
+  "DisplayName": "Entropy demo / increasing variability",
+  "ExpectedBehavior": "Interval and amplitude entropy should rise gradually as breathing becomes less regular.",
+  "Seed": 4101,
+  "DurationSeconds": 360,
+  "Heart": {
+    "CenterIbiMs": 860,
+    "RsaAmplitudeMs": 24,
+    "SlowModulationMs": 9,
+    "IrregularNoiseMs": 2,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "HeartEnd": {
+    "CenterIbiMs": 858,
+    "RsaAmplitudeMs": 28,
+    "SlowModulationMs": 10,
+    "IrregularNoiseMs": 9,
+    "EctopyEveryNBeats": 0,
+    "EctopyDeltaMs": 180,
+    "CompensatoryDeltaMs": 120
+  },
+  "Breathing": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.26,
+    "HarmonicAmplitude01": 0.022,
+    "JitterAmount01": 0.018,
+    "WobbleRateHz": 0.09,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "BreathingEnd": {
+    "SampleRateHz": 12.5,
+    "BaseRateBpm": 12,
+    "Amplitude01": 0.28,
+    "HarmonicAmplitude01": 0.035,
+    "JitterAmount01": 0.22,
+    "WobbleRateHz": 0.17,
+    "PauseStartSeconds": -1,
+    "PauseDurationSeconds": 0,
+    "PauseTailSeconds": 0
+  },
+  "TransitionStartFraction": 0.1,
+  "TransitionEndFraction": 0.65
+}

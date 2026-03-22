@@ -28,6 +28,9 @@ internal sealed class PolarCoherenceRrWindowCalculator
 
     private readonly List<SamplePoint> _samples = new(256);
     private readonly double[] _hannWindow;
+    private PolarRrSamplePoint[] _acceptedRrSamples = [];
+    private PolarSeriesPoint[] _resampledTachogram = [];
+    private PolarSpectrumPoint[] _powerSpectrum = [];
     private double _currentXMs;
     private int _consecutiveArtifactCount;
     private int _consecutiveValids;
@@ -51,6 +54,10 @@ internal sealed class PolarCoherenceRrWindowCalculator
     public float LastTotalPower { get; private set; }
     public float LastPaperCoherenceRatio { get; private set; }
     public float LastComputedCoherence01 { get; private set; }
+    public float LastPeakWindowLowerHz { get; private set; }
+    public float LastPeakWindowUpperHz { get; private set; }
+    public float LastTotalBandLowerHz => (float)TotalBandLowerBound;
+    public float LastTotalBandUpperHz => (float)TotalBandUpperBound;
 
     public static bool IsValidIbi(float ibiMs) => PolarRrIntervalValidator.IsValid(ibiMs);
 
@@ -66,6 +73,11 @@ internal sealed class PolarCoherenceRrWindowCalculator
         LastTotalPower = 0f;
         LastPaperCoherenceRatio = 0f;
         LastComputedCoherence01 = 0f;
+        LastPeakWindowLowerHz = 0f;
+        LastPeakWindowUpperHz = 0f;
+        _acceptedRrSamples = [];
+        _resampledTachogram = [];
+        _powerSpectrum = [];
     }
 
     public bool PushIbi(
@@ -132,6 +144,10 @@ internal sealed class PolarCoherenceRrWindowCalculator
             y[i] = _samples[i].IbiMs;
         }
 
+        _acceptedRrSamples = _samples
+            .Select(static sample => new PolarRrSamplePoint(sample.XMs / 1000.0, sample.IbiMs))
+            .ToArray();
+
         NaturalCubicSpline ibiSpline = NaturalCubicSpline.Fit(x, y);
 
         double[] resampled = new double[FftInputLength];
@@ -142,6 +158,12 @@ internal sealed class PolarCoherenceRrWindowCalculator
             t += resamplingIntervalMs;
             resampled[i] = ibiSpline.Interpolate(t);
         }
+
+        _resampledTachogram = resampled
+            .Select((value, index) => new PolarSeriesPoint(
+                (_samples[^1].XMs - _windowLengthMs + ((index + 1) * resamplingIntervalMs)) / 1000.0,
+                value))
+            .ToArray();
 
         double mean = 0.0;
         for (int i = 0; i < resampled.Length; i++)
@@ -155,6 +177,10 @@ internal sealed class PolarCoherenceRrWindowCalculator
         BuildPowerSpectrum(resampled, sampleRateHz, out double[] frequencies, out double[] magnitudes);
         if (frequencies.Length < 4)
             return false;
+
+        _powerSpectrum = frequencies
+            .Select((frequency, index) => new PolarSpectrumPoint(frequency, magnitudes[index]))
+            .ToArray();
 
         NaturalCubicSpline psdSpline = NaturalCubicSpline.Fit(frequencies, magnitudes);
 
@@ -180,11 +206,30 @@ internal sealed class PolarCoherenceRrWindowCalculator
         double paperRatio = Math.Pow(peakBandPower / remainingPower, 2.0);
         coherence01 = Clamp01((float)(peakBandPower / totalPower));
         LastPeakFrequencyHz = (float)peakFrequency;
+        LastPeakWindowLowerHz = (float)(peakFrequency - halfWindow);
+        LastPeakWindowUpperHz = (float)(peakFrequency + halfWindow);
         LastPeakBandPower = (float)peakBandPower;
         LastTotalPower = (float)totalPower;
         LastPaperCoherenceRatio = (float)Math.Min(float.MaxValue, paperRatio);
         LastComputedCoherence01 = coherence01;
         return true;
+    }
+
+    public PolarCoherenceDiagnostics GetDiagnostics()
+    {
+        return new PolarCoherenceDiagnostics(
+            AcceptedRrSamples: _acceptedRrSamples,
+            ResampledTachogram: _resampledTachogram,
+            PowerSpectrum: _powerSpectrum,
+            PeakFrequencyHz: LastPeakFrequencyHz,
+            PeakWindowLowerHz: LastPeakWindowLowerHz,
+            PeakWindowUpperHz: LastPeakWindowUpperHz,
+            PeakBandPower: LastPeakBandPower,
+            TotalBandLowerHz: LastTotalBandLowerHz,
+            TotalBandUpperHz: LastTotalBandUpperHz,
+            TotalBandPower: LastTotalPower,
+            PaperCoherenceRatio: LastPaperCoherenceRatio,
+            NormalizedCoherence01: LastComputedCoherence01);
     }
 
     private static void BuildPowerSpectrum(double[] samples, double sampleRateHz, out double[] frequencies, out double[] magnitudes)

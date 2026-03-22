@@ -1,7 +1,7 @@
 using System.CommandLine;
 using PolarH10.Cli;
 using PolarH10.Protocol;
-using PolarH10.Transport.Windows;
+using PolarH10.Transport.Runtime;
 
 namespace PolarH10.Cli.Commands;
 
@@ -64,7 +64,22 @@ internal static class StreamCommand
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
 
-        await session.ConnectAsync(device, cts.Token);
+        try
+        {
+            await session.ConnectAsync(device, cts.Token);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(
+                CliTransportOptions.RewriteTransportException(
+                    transport,
+                    syntheticPipe,
+                    "device connection",
+                    ex).Message);
+            Environment.ExitCode = 1;
+            await session.DisposeAsync();
+            return;
+        }
         if (!session.IsPmdReady)
         {
             Console.Error.WriteLine($"PMD is not available on the selected transport; cannot stream {channel}.");

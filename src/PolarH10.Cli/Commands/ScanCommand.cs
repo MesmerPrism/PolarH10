@@ -51,7 +51,21 @@ internal static class ScanCommand
                 if (!json)
                     Console.WriteLine($"Scanning for {duration}s...\n");
 
-                await scanner.StartScanAsync(TimeSpan.FromSeconds(duration));
+                try
+                {
+                    await scanner.StartScanAsync(TimeSpan.FromSeconds(duration));
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(
+                        CliTransportOptions.RewriteTransportException(
+                            transport,
+                            syntheticPipe,
+                            "device discovery",
+                            ex).Message);
+                    Environment.ExitCode = 1;
+                    return;
+                }
 
                 if (json)
                 {
