@@ -1091,31 +1091,44 @@ button:focus-visible {
 }
 
 .viewer-toolbar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .viewer-toolbar h2 {
-  flex: 1 1 240px;
-  margin-bottom: 0;
+  margin: 0;
+}
+
+.viewer-canvas-shell {
+  --viewer-overlay-offset: 78px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.viewer-overlay {
+  position: absolute;
+  inset: 12px 12px auto 12px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.viewer-overlay > * {
+  pointer-events: auto;
 }
 
 .viewer-controls {
   display: flex;
   flex-wrap: wrap;
+  justify-self: end;
+  justify-content: flex-end;
   gap: 10px;
 }
 
 .viewer-hint {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin: -2px 0 14px;
+  margin: 0 0 14px;
   color: var(--ink-muted);
   font-size: 0.96rem;
 }
@@ -1136,7 +1149,7 @@ button:focus-visible {
 .viewer-stage,
 .source-stage {
   min-height: 58vh;
-  padding: 14px;
+  padding: var(--viewer-overlay-offset) 14px 14px;
   border-radius: var(--radius-lg);
 }
 
@@ -1250,27 +1263,41 @@ button:focus-visible {
   touch-action: none;
 }
 
-.viewer-stage:fullscreen,
-.source-stage:fullscreen {
+.viewer-canvas-shell:fullscreen {
   width: 100vw;
   height: 100vh;
-  min-height: 100vh;
   margin: 0;
   padding: 18px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(250, 246, 240, 0.98), rgba(242, 236, 226, 1));
+  --viewer-overlay-offset: 86px;
+}
+
+.viewer-canvas-shell:fullscreen .viewer-overlay {
+  inset: 18px 18px auto 18px;
+}
+
+.viewer-canvas-shell:fullscreen .viewer-stage,
+.viewer-canvas-shell:fullscreen .source-stage {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: var(--viewer-overlay-offset) 18px 18px;
   border: 0;
   border-radius: 0;
 }
 
-.viewer-stage:fullscreen {
+.viewer-canvas-shell:fullscreen .viewer-stage {
   background: linear-gradient(180deg, rgba(250, 246, 240, 0.98), rgba(242, 236, 226, 1));
 }
 
-.source-stage:fullscreen {
+.viewer-canvas-shell:fullscreen .source-stage {
   background: #222932;
 }
 
-.viewer-stage:fullscreen .diagram-frame {
-  height: calc(100vh - 36px);
+.viewer-canvas-shell:fullscreen .diagram-frame {
+  height: 100%;
   min-height: 0;
 }
 
@@ -1316,19 +1343,19 @@ button:focus-visible {
 }
 
 @media (hover: none) and (pointer: coarse) and (min-width: 681px) and (max-width: 1024px) {
-  .viewer-toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .viewer-canvas-shell {
+    --viewer-overlay-offset: 124px;
   }
 
-  .viewer-toolbar h2 {
-    flex-basis: auto;
+  .viewer-overlay {
+    grid-template-columns: 1fr;
   }
 
   .viewer-controls {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
+    justify-self: stretch;
   }
 
   .viewer-controls .button {
@@ -1343,12 +1370,6 @@ button:focus-visible {
 
   #btn-fullscreen {
     grid-column: span 2;
-  }
-
-  .viewer-hint {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
   }
 }
 
@@ -1543,11 +1564,22 @@ button:focus-visible {
     width: 100%;
   }
 
+  .viewer-canvas-shell {
+    --viewer-overlay-offset: 124px;
+  }
+
+  .viewer-overlay {
+    inset: 10px 10px auto 10px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
   .viewer-controls {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
     width: 100%;
+    justify-self: stretch;
   }
 
   .viewer-controls .button {
@@ -1555,10 +1587,8 @@ button:focus-visible {
     min-width: 0;
   }
 
-  .viewer-hint {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
+  #btn-fullscreen {
+    grid-column: span 2;
   }
 
   .viewer-meta {
@@ -1568,7 +1598,7 @@ button:focus-visible {
 
   .viewer-stage,
   .source-stage {
-    padding: 10px;
+    padding: var(--viewer-overlay-offset) 10px 10px;
   }
 
   .diagram-frame {
@@ -1610,10 +1640,6 @@ button:focus-visible {
     font-size: clamp(2rem, 11.5vw, 3rem);
   }
 
-  .viewer-controls {
-    grid-template-columns: 1fr;
-  }
-
   .diagram-frame {
     min-height: 17rem;
     height: min(55vh, 26rem);
@@ -1622,8 +1648,7 @@ button:focus-visible {
 
 @media (max-width: 360px) {
   .top-nav,
-  .action-row,
-  .viewer-controls {
+  .action-row {
     grid-template-columns: 1fr;
   }
 }

@@ -52,15 +52,7 @@
         <main class="viewer-main">
           <div class="viewer-toolbar">
             <h2 id="title">Select a diagram</h2>
-            <div class="viewer-controls">
-              <button id="btn-zoom-out" class="button" title="Zoom out" type="button" disabled>-</button>
-              <button id="btn-fit" class="button" title="Fit diagram to frame" type="button" disabled>Fit</button>
-              <button id="btn-zoom-in" class="button" title="Zoom in" type="button" disabled>+</button>
-              <button id="btn-source" class="button" title="Toggle Mermaid source" type="button">Source</button>
-              <button id="btn-fullscreen" class="button" title="Fullscreen" type="button">Fullscreen</button>
-            </div>
           </div>
-          <p class="viewer-hint"><span id="viewer-zoom" class="viewer-zoom">100%</span><span>Scroll or drag to pan, pinch or Ctrl/Cmd + scroll to zoom, and use Fit to snap back to the full diagram.</span></p>
           <div id="viewer-meta" class="viewer-meta" hidden>
             <div class="viewer-meta-item">
               <span class="meta-key">Brief</span>
@@ -82,8 +74,21 @@
             <a id="link-related-doc" class="button" href="#" hidden>Open related doc</a>
           </div>
           <p id="viewer-related-note" class="viewer-related-note" hidden></p>
-          <div id="viewer" class="viewer-stage"><div class="empty-state">Choose a diagram from the sidebar.</div></div>
-          <div id="source-panel" class="source-stage" hidden><pre id="source-code"></pre></div>
+          <div id="viewer-canvas-shell" class="viewer-canvas-shell">
+            <div class="viewer-overlay" data-pagefind-ignore>
+              <span id="viewer-zoom" class="viewer-zoom">100%</span>
+              <div class="viewer-controls">
+                <button id="btn-zoom-out" class="button" title="Zoom out" type="button" disabled>-</button>
+                <button id="btn-fit" class="button" title="Fit diagram to frame" type="button" disabled>Fit</button>
+                <button id="btn-zoom-in" class="button" title="Zoom in" type="button" disabled>+</button>
+                <button id="btn-source" class="button" title="Toggle Mermaid source" type="button">Source</button>
+                <button id="btn-fullscreen" class="button" title="Fullscreen" type="button">Fullscreen</button>
+              </div>
+            </div>
+            <div id="viewer" class="viewer-stage"><div class="empty-state">Choose a diagram from the sidebar.</div></div>
+            <div id="source-panel" class="source-stage" hidden><pre id="source-code"></pre></div>
+          </div>
+          <p class="viewer-hint">Scroll or drag to pan, pinch or Ctrl/Cmd + scroll to zoom, and use Fit to snap back to the full diagram.</p>
         </main>
       </div>
     </section>
@@ -128,6 +133,7 @@
 
       const navList = document.getElementById('nav-list');
       const viewer = document.getElementById('viewer');
+      const viewerCanvasShell = document.getElementById('viewer-canvas-shell');
       const srcPanel = document.getElementById('source-panel');
       const srcCode = document.getElementById('source-code');
       const titleEl = document.getElementById('title');
@@ -177,7 +183,7 @@
       }
 
       function getFullscreenTarget() {
-        return showSource ? srcPanel : viewer;
+        return viewerCanvasShell;
       }
 
       function syncFullscreenButton() {
@@ -503,16 +509,17 @@
       }
 
       btnSrc.addEventListener('click', async () => {
-        if (document.fullscreenElement) {
-          await document.exitFullscreen();
-        }
-
         showSource = !showSource;
         viewer.hidden = showSource;
         srcPanel.hidden = !showSource;
         btnSrc.textContent = showSource ? 'Diagram' : 'Source';
         updateZoomControls();
         syncFullscreenButton();
+
+        if (!showSource && activeSvg) {
+          userAdjustedView = false;
+          requestDiagramFit();
+        }
       });
 
       btnFs.addEventListener('click', async () => {
@@ -569,7 +576,7 @@
       });
 
       document.addEventListener('fullscreenchange', () => {
-        const viewerFullscreen = document.fullscreenElement === viewer;
+        const viewerFullscreen = document.fullscreenElement === viewerCanvasShell;
         const viewerExited = lastViewerFullscreen && !viewerFullscreen;
         lastViewerFullscreen = viewerFullscreen;
         syncFullscreenButton();
