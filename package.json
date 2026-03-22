@@ -13,8 +13,8 @@
     "ui:preview:capture": "node ./tools/diagrams/invoke-powershell.mjs ../site/capture-wpf-preview.ps1",
     "pages:build:site": "node ./tools/site/build-pages.mjs",
     "pages:validate": "node ./tools/site/validate-pages.mjs",
-    "pages:index": "pagefind --site site",
-    "pages:build": "npm run pages:build:site && npm run pages:validate && npm run pages:index",
+    "pages:index": "pagefind --site site && node ./tools/site/index-pages.mjs",
+    "pages:build": "npm run pages:build:site && npm run pages:index && npm run pages:validate",
     "pages:watch": "chokidar \"docs/**/*.md\" \"docs/assets/*\" \"docs/diagrams/*\" -c \"npm run diagram:render:all && npm run pages:build\"",
     "pages:serve": "browser-sync start --server site --files \"site/**/*\" --startPath \"index.html\"",
     "pages:dev": "concurrently \"npm:pages:watch\" \"npm:pages:serve\""

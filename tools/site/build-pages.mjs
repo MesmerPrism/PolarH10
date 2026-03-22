@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import katex from 'katex';
 import { marked } from 'marked';
 import { parse as parseYaml } from 'yaml';
+import { assetVersion, pagefindBundleDir, searchPagePath } from './site-config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,8 +17,6 @@ const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown'
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
 const katexDistSource = path.join(repoRoot, 'node_modules', 'katex', 'dist');
-const assetVersion = '20260322-pages-19';
-const searchPagePath = 'reference/search.html';
 
 const siteConfig = {
   repoUrl: 'https://github.com/MesmerPrism/PolarH10',
@@ -520,7 +519,7 @@ function renderHead({ title, description, currentDir, canonicalPath, includeSear
   <meta name="twitter:image" content="${escapeHtml(socialImage)}" />
   <link rel="stylesheet" href="${asset('assets/site.css')}?v=${assetVersion}" />
   ${includeMathStyles ? `<link rel="stylesheet" href="${asset('assets/vendor/katex/katex.min.css')}?v=${assetVersion}" />` : ''}
-  ${includeSearch ? `<link rel="stylesheet" href="${asset('pagefind/pagefind-ui.css')}" />` : ''}`;
+  ${includeSearch ? `<link rel="stylesheet" href="${asset(`${pagefindBundleDir}/pagefind-ui.css`)}" />` : ''}`;
 }
 
 function renderSidebar(currentDoc, docs) {
@@ -684,7 +683,8 @@ function renderHeaderBoot() {
 }
 
 function renderSearchBoot(asset) {
-  const jsHref = asset('pagefind/pagefind-ui.js');
+  const jsHref = asset(`${pagefindBundleDir}/pagefind-ui.js`);
+  const bundlePath = `${asset(pagefindBundleDir)}/`;
 
   return `<script src="${jsHref}"></script>
 <script>
@@ -698,6 +698,7 @@ function renderSearchBoot(asset) {
 
     new window.PagefindUI({
       element: '#pagefind-search',
+      bundlePath: ${JSON.stringify(bundlePath)},
       showImages: false,
       resetStyles: false,
       excerptLength: 18,
