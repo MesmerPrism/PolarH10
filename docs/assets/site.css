@@ -280,6 +280,11 @@ button:focus-visible {
   grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.92fr);
 }
 
+.hero-home {
+  grid-template-columns: minmax(0, 1.38fr) minmax(380px, 0.9fr);
+  align-items: stretch;
+}
+
 .page-layout,
 .viewer-layout {
   grid-template-columns: 320px minmax(0, 1fr);
@@ -602,10 +607,17 @@ button:focus-visible {
   align-content: start;
 }
 
+.hero-home .hero-copy,
+.hero-home .hero-preview {
+  height: 100%;
+}
+
 .hero-preview {
   background: #f8f3ec;
   min-width: 0;
   overflow: hidden;
+  padding: 28px 30px 24px;
+  gap: 18px;
 }
 
 .hero-preview > * {
@@ -613,15 +625,22 @@ button:focus-visible {
 }
 
 .hero-preview .section-heading {
-  max-width: 11ch;
-  font-size: clamp(1.7rem, 3vw, 2.3rem);
-  line-height: 1.02;
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(1.95rem, 2.9vw, 3rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
   text-wrap: balance;
 }
 
 .hero-lede {
   max-width: 44rem;
   font-size: 1.08rem;
+}
+
+.hero-preview p {
+  max-width: 34ch;
+  margin: 0;
 }
 
 .hero-preview img {
@@ -634,7 +653,7 @@ button:focus-visible {
 }
 
 .hero-preview-note {
-  margin: 0;
+  align-self: end;
 }
 
 .feature-list {
