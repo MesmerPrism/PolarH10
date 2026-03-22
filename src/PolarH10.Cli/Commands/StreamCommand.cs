@@ -11,7 +11,8 @@ internal static class StreamCommand
     {
         var deviceOption = new Option<string>(
             "--device",
-            "Bluetooth address of the Polar H10") { IsRequired = true };
+            "Bluetooth address of the Polar H10")
+        { IsRequired = true };
 
         var jsonOption = new Option<bool>(
             "--json",
@@ -103,7 +104,9 @@ internal static class StreamCommand
                         Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
                         {
                             ts_ns = f.SensorTimestampNs,
-                            x = s.X, y = s.Y, z = s.Z,
+                            x = s.X,
+                            y = s.Y,
+                            z = s.Z,
                         }));
                     else
                         Console.WriteLine($"{f.SensorTimestampNs}\t{s.X}\t{s.Y}\t{s.Z}");

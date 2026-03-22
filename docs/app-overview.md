@@ -1,7 +1,7 @@
 ---
 title: App Overview
 description: Learn what the WPF operator surface is for before you read protocol internals or lower-level transport code.
-summary: The app is the fastest way to see what the repo actually does in practice: scan, connect, inspect live data, review derived coherence, HRV, and breathing metrics, and capture sessions.
+summary: "The app is the fastest way to see what the repo actually does in practice: scan, connect, inspect live data, review derived coherence, HRV, and breathing metrics, and capture sessions."
 nav_label: App Overview
 nav_group: Start Here
 nav_order: 20

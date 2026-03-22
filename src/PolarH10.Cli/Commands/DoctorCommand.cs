@@ -11,7 +11,8 @@ internal static class DoctorCommand
     {
         var deviceOption = new Option<string>(
             "--device",
-            "Bluetooth address of the Polar H10") { IsRequired = true };
+            "Bluetooth address of the Polar H10")
+        { IsRequired = true };
 
         var transportOption = CliTransportOptions.CreateTransportOption();
         var syntheticPipeOption = CliTransportOptions.CreateSyntheticPipeOption();

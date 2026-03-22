@@ -37,13 +37,13 @@ dotnet run --project src/PolarH10.Cli -- monitor --device <ADDRESS>
 dotnet run --project src/PolarH10.Cli -- record --device <ADDRESS> --out ./my-session
 ```
 
-## Quick start with the GUI
+## Quick start with the WPF app
 
 ```powershell
 dotnet run --project src/PolarH10.App
 ```
 
-The GUI provides:
+The WPF app provides:
 1. **Device rail** — scan nearby straps, assign aliases, and choose the current control target
 2. **Live** tab — real-time HR, RR, ECG, and ACC with a tracked-device dropdown for parallel charting
 3. **Live tab views** — raw telemetry plus coherence, HRV, and breathing-dynamics tabs for focused review
@@ -98,12 +98,6 @@ Use the `HRV` tab once heart rate and RR intervals are already updating.
 
 For the full operator checklist, see [HRV Workflow](hrv-workflow.md).
 
-If you are testing through the sibling `SyntheticBio` harness, the synthetic
-transport now exposes PMD ECG alongside the HRS RR stream. Coherence and HRV
-still solve from RR, but the synthetic ECG pane should now track the same beat
-schedule instead of staying blank. Synthetic breathing remains a direct
-telemetry feed rather than PMD ACC emulation.
-
 ## Canonical workspace desktop build
 
 If you want a stable repo-local executable instead of `dotnet run`, build the
@@ -114,9 +108,9 @@ powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
 .\out\workspace-app\PolarH10.App.exe
 ```
 
-`SyntheticBio` and the WPF preview capture script both target this
-`out\workspace-app\PolarH10.App.exe` path so they cannot drift to an older
-`src\PolarH10.App\bin\...` executable.
+The WPF preview capture script also targets this
+`out\workspace-app\PolarH10.App.exe` path so local automation and manual runs do
+not drift to an older `src\PolarH10.App\bin\...` executable.
 
 ## Manual breathing-dynamics test
 

@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parse as parseYaml } from 'yaml';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,11 @@ async function main() {
     const raw = await fs.readFile(filePath, 'utf8');
     if (placeholderPattern.test(raw)) {
       issues.push(`${relativeRepoPath(filePath)} contains a placeholder value like <your-...>.`);
+    }
+
+    const frontmatterError = validateFrontmatter(raw, filePath);
+    if (frontmatterError) {
+      issues.push(frontmatterError);
     }
   }
 
@@ -136,6 +142,28 @@ async function validateHref(filePath, href) {
   }
 
   return `${relativeRepoPath(filePath)} links to missing local target ${href}.`;
+}
+
+function validateFrontmatter(raw, filePath) {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match) {
+    return null;
+  }
+
+  try {
+    const parsed = parseYaml(match[1]);
+    if (parsed === null || parsed === undefined) {
+      return null;
+    }
+
+    if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return `${relativeRepoPath(filePath)} has invalid front matter: top-level front matter must be key/value pairs.`;
+    }
+
+    return null;
+  } catch (error) {
+    return `${relativeRepoPath(filePath)} has invalid front matter: ${error.message}`;
+  }
 }
 
 function extractMarkdownHrefs(markdown) {

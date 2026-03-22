@@ -7,7 +7,7 @@ nav_group: Start Here
 nav_order: 10
 ---
 
-# PolarH10 App + Protocol Reference
+# PolarH10 Developer Reference
 
 Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect
 live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and
@@ -99,3 +99,11 @@ dotnet run --project src/PolarH10.Cli -- scan
 - [ACC Frame Format](protocol/acc-format.md)
 - [Heart Rate Measurement Decoding](protocol/hr-measurement.md)
 - [Citations & References](references.md)
+
+## Feedback and Contributions
+
+Use GitHub Issues for onboarding friction, device compatibility notes, protocol
+questions, and doc fixes.
+
+- [Open an issue](https://github.com/MesmerPrism/PolarH10/issues)
+- [Read the contributing guide](https://github.com/MesmerPrism/PolarH10/blob/main/CONTRIBUTING.md)

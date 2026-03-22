@@ -258,7 +258,7 @@ public partial class MainWindow
         if (string.IsNullOrWhiteSpace(address))
         {
             _coherenceWindow.SelectedDeviceTextBlock.Text = "No device selected";
-            _coherenceWindow.SummaryTextBlock.Text = "RR-derived coherence uses The Coherent Heart peak-window method and also exposes the Astral-compatible normalized score used by the app.";
+            _coherenceWindow.SummaryTextBlock.Text = "RR-derived coherence uses The Coherent Heart peak-window method and also exposes the normalized operator-facing score used by the app.";
             _coherenceWindow.CoherenceValueTextBlock.Text = "--";
             _coherenceWindow.CoherenceStateValueTextBlock.Text = "Unavailable";
             _coherenceWindow.CoherenceTrackingValueTextBlock.Text = "Awaiting device selection";
@@ -297,7 +297,7 @@ public partial class MainWindow
         PolarCoherenceTelemetry telemetry = state.HasTelemetry ? state.LastTelemetry : state.Tracker.GetTelemetry();
         _coherenceWindow.Title = $"Polar H10 // Coherence // {CompactDisplayName(address)}";
         _coherenceWindow.SelectedDeviceTextBlock.Text = DisplayName(address);
-        _coherenceWindow.SummaryTextBlock.Text = "The headline and chart use the Astral-compatible normalized score; the detail panel also shows the raw paper-defined ratio from The Coherent Heart.";
+        _coherenceWindow.SummaryTextBlock.Text = "The headline and chart use the normalized operator-facing score; the detail panel also shows the raw paper-defined ratio from The Coherent Heart.";
         _coherenceWindow.CoherenceValueTextBlock.Text = telemetry.HasCoherenceSample ? $"{telemetry.CurrentCoherence01:0.00}" : "--";
         _coherenceWindow.CoherenceStateValueTextBlock.Text = FormatCoherenceDisplayState(telemetry);
         _coherenceWindow.CoherenceTrackingValueTextBlock.Text = BuildCoherenceTrackingLine(telemetry);

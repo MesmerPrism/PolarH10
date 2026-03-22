@@ -26,8 +26,8 @@ The app keeps these paper-defined constants fixed:
 - integrate total power across `0.0033-0.4 Hz`
 - compute the paper ratio as `(Peak Power / (Total Power - Peak Power))^2`
 
-The app also keeps the AstralKarateDojo-compatible normalized score that is used
-for the headline readout and summary charts:
+The app also keeps an operator-facing normalized score for the headline readout
+and summary charts:
 
 - normalized score = `Peak Power / Total Power`, clamped to `0..1`
 

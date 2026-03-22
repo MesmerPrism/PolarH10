@@ -3,8 +3,8 @@ using System.Diagnostics;
 namespace PolarH10.Protocol;
 
 /// <summary>
-/// RR-interval coherence tracker that preserves AstralKarateDojo's normalized 0..1
-/// publication behavior while exposing the raw paper-defined coherence ratio and
+/// RR-interval coherence tracker that preserves the app's normalized 0..1
+/// operator-facing behavior while exposing the raw paper-defined coherence ratio and
 /// spectral telemetry for inspection.
 /// </summary>
 public sealed class PolarCoherenceTracker

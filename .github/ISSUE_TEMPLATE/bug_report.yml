@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible app, CLI, BLE, docs, or site problem.
+title: "[bug] "
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the bug and the outcome you expected.
+      placeholder: The app connected, but the live tab never showed RR values.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Repro steps
+      description: List the shortest path that reproduces the issue.
+      placeholder: |
+        1. Run ...
+        2. Connect ...
+        3. Open ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Windows version, Bluetooth adapter, H10 firmware if known, and whether you used the WPF app or CLI.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots
+      description: Paste logs or describe the relevant files, screenshots, or session exports.

@@ -1,12 +1,14 @@
 # PolarH10
 
-> **Unofficial** Windows-first Polar H10 toolkit for .NET.
+> **Unofficial** Windows-first Polar H10 telemetry toolkit for .NET.
 > Not affiliated with or endorsed by Polar Electro.
 
-Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect
-live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and
-breathing-dynamics entropy, compare multiple active straps, and record reusable
-sessions from a WPF app or CLI.
+Capture, inspect, and record Polar H10 telemetry on Windows without the Polar
+SDK. Use the WPF app for live monitoring and derived metrics, or the CLI for
+scan, doctor, record, replay, and protocol inspection.
+
+Start with [Docs Home](docs/index.md) or the live
+[Pages site](https://mesmerprism.github.io/PolarH10/).
 
 ## What It Gives You
 
@@ -61,21 +63,17 @@ HRV, calibrate breathing, review breathing-dynamics entropy, compare multiple
 straps, and record sessions from the desktop surface.
 
 The coherence workflow follows the fixed spectral method described in McCraty et
-al., *The Coherent Heart* (2006), while also preserving the normalized
-AstralKarateDojo-compatible score used for the app's headline and chart surfaces.
+al., *The Coherent Heart* (2006), while also surfacing a normalized
+operator-facing score on the app's headline and chart surfaces.
 
 The HRV workflow follows the short-term time-domain guidance summarized by
 Shaffer and Ginsberg, *An Overview of Heart Rate Variability Metrics and Norms*
 (2017), using RMSSD as the headline value from a rolling accepted RR window.
 
 In a real H10 session, that RR stream comes from the strap's own beat timing,
-which is device-derived from ECG. The sibling `SyntheticBio` harness now mirrors
-that operator path by emitting synthetic PMD ECG frames that stay synchronized
-with the same synthetic RR schedule, while synthetic breathing still arrives on
-its dedicated telemetry path instead of PMD ACC.
-
-The ACC breathing-volume tracker is repository-specific, not yet externally
-validated, and is currently being prepared for a dedicated validation study.
+which is device-derived from ECG. The ACC breathing-volume tracker is
+repository-specific and should be treated as an operator aid rather than an
+externally validated method.
 
 Read next:
 
@@ -88,9 +86,8 @@ Read next:
 - [Breathing Dynamics Workflow](docs/breathing-dynamics-workflow.md)
 - [Formula Sheets](docs/formula-sheets.md)
 
-If you want the canonical repo-local desktop build that the Pages preview
-pipeline and sibling `SyntheticBio` launcher both use, build it into
-`out/workspace-app`:
+If you want a stable repo-local desktop build instead of `dotnet run`, build it
+into `out/workspace-app`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\app\Build-Workspace-App.ps1
@@ -173,6 +170,18 @@ control-point commands, frame layouts, or code architecture.
 - [Protocol Overview](docs/protocol/overview.md)
 - [References](docs/references.md)
 - [Diagrams](docs/diagrams/)
+
+## Feedback and contributions
+
+PolarH10 is shaped by real device sessions, Windows BLE edge cases, and actual
+onboarding friction. Feedback is useful even if you are not sending code.
+
+Open an issue if you hit setup friction, device compatibility quirks, confusing
+docs, protocol questions, or unexpected data behavior. Repro steps, adapter
+details, logs, and small doc fixes are especially useful.
+
+- [Open an issue](https://github.com/MesmerPrism/PolarH10/issues)
+- [Read the contributing guide](CONTRIBUTING.md)
 
 ## GitHub Pages
 

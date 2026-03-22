@@ -11,7 +11,8 @@ internal static class RecordCommand
     {
         var deviceOption = new Option<string>(
             "--device",
-            "Bluetooth address of the Polar H10") { IsRequired = true };
+            "Bluetooth address of the Polar H10")
+        { IsRequired = true };
 
         var outOption = new Option<string>(
             "--out",

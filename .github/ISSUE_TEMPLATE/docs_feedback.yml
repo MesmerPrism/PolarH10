@@ -1,0 +1,24 @@
+name: Docs feedback
+description: Report unclear onboarding, search, docs, or diagram issues.
+title: "[docs] "
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page or file
+      description: Link the doc page, README section, or generated site page that needs work.
+      placeholder: docs/getting-started.md or https://mesmerprism.github.io/PolarH10/reference/getting-started.html
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What was confusing?
+      description: Describe the friction, missing context, or incorrect information.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What would help?
+      description: Suggest a wording change, missing example, search term, or navigation improvement.

@@ -5,7 +5,7 @@ namespace PolarH10.Protocol;
 /// <summary>
 /// Rolling IBI coherence estimator aligned to the fixed spectral constants described in
 /// McCraty et al., <c>The Coherent Heart</c> (2006), while also retaining the normalized
-/// 0..1 adaptation published by AstralKarateDojo for UI-facing signals.
+/// 0..1 operator-facing adaptation used by the app.
 /// </summary>
 internal sealed class PolarCoherenceRrWindowCalculator
 {

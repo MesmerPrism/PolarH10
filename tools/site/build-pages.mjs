@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import katex from 'katex';
 import { marked } from 'marked';
+import { parse as parseYaml } from 'yaml';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,24 +16,25 @@ const referenceMarkdownRoot = path.join(siteRoot, 'assets', 'reference-markdown'
 const diagramsSource = path.join(docsRoot, 'diagrams');
 const diagramManifestPath = path.join(diagramsSource, 'manifest.json');
 const katexDistSource = path.join(repoRoot, 'node_modules', 'katex', 'dist');
-const assetVersion = '20260321-pages-18';
+const assetVersion = '20260322-pages-19';
 const searchPagePath = 'reference/search.html';
 
 const siteConfig = {
   repoUrl: 'https://github.com/MesmerPrism/PolarH10',
   baseUrl: 'https://mesmerprism.github.io/PolarH10/',
   siteName: 'PolarH10',
-  homeTitle: 'PolarH10 Unofficial Open-Source Telemetry Toolkit',
-  referenceTitle: 'PolarH10 Unofficial Open-Source Reference',
-  sharedPromise: 'Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and breathing-dynamics entropy, compare multiple active straps, and record reusable sessions from a WPF app or CLI.',
-  defaultDescription: 'Unofficial open-source PolarH10 docs, onboarding guides, protocol reference, and Mermaid system diagrams. Not endorsed by or affiliated with Polar Electro Oy.',
+  brandTagline: 'Windows-first telemetry toolkit',
+  homeTitle: 'Windows-first Polar H10 telemetry toolkit',
+  referenceTitle: 'PolarH10 Developer Reference',
+  sharedPromise: 'Capture, inspect, and record Polar H10 telemetry on Windows without the Polar SDK. Use the WPF app for live monitoring and derived metrics, or the CLI for scan, doctor, record, replay, and protocol inspection.',
+  defaultDescription: 'Windows-first Polar H10 docs, onboarding guides, protocol reference, and Mermaid system diagrams. Unofficial project; not endorsed by or affiliated with Polar Electro Oy.',
   socialImage: 'assets/brutal-tdr-preview.png',
   favicon: 'assets/polarh10-stripe-mark.png',
   themeColor: '#f3eee6',
   navGroups: ['Start Here', 'Task Guides', 'Troubleshooting', 'Internals'],
   diagramViewerLabel: 'Diagram Viewer',
   diagramViewerDescription: 'Browse onboarding, runtime, and architecture Mermaid diagrams.',
-  searchTitle: 'Search the PolarH10 reference',
+  searchTitle: 'Search the PolarH10 docs',
   searchDescription: 'Find the page that explains a term, metric, command, file format, workflow, or diagram topic across the published GitHub Pages site.'
 };
 
@@ -97,7 +99,7 @@ async function loadDocs() {
     const sourceRel = path.relative(docsRoot, filePath).replace(/\\/g, '/');
     const raw = await fs.readFile(filePath, 'utf8');
     const stat = await fs.stat(filePath);
-    const { data, body } = parseFrontmatter(raw);
+    const { data, body } = parseFrontmatter(raw, sourceRel);
     const { heading, markdown } = stripLeadingH1(body);
     const title = heading ?? normalizeString(data.title) ?? deriveTitle(sourceRel);
     const summary = normalizeString(data.summary);
@@ -216,7 +218,7 @@ ${renderHead({
         ${sidebar}
       </aside>
       <main class="panel content-panel">
-        <div class="page-marker">Unofficial Open-Source Reference</div>
+        <div class="page-marker">PolarH10 Developer Reference</div>
         <h1 class="page-title" data-pagefind-meta="title">${escapeHtml(doc.title)}</h1>
         ${doc.summary ? `<p class="page-intro">${escapeHtml(doc.summary)}</p>` : ''}
         <article class="prose" data-pagefind-body>
@@ -251,8 +253,8 @@ ${renderHead({
     <main data-pagefind-body>
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
-        <div class="page-marker">Windows-first Polar H10 toolkit</div>
-        <h1>Scan.<br />Link.<br />Inspect.<br />Record.</h1>
+        <div class="page-marker">Windows-first Polar H10 telemetry toolkit</div>
+        <h1>From strap to telemetry on Windows.</h1>
         <p>${escapeHtml(siteConfig.sharedPromise)}</p>
         <div class="action-row">
           <a class="button primary" href="reference/app-overview.html">Use the WPF app</a>
@@ -355,6 +357,15 @@ ${renderHead({
     </section>
 
     <section class="section panel section-panel">
+      <h2 class="section-heading">Feedback and contributions</h2>
+      <p class="section-subtitle">Issues are the public path for onboarding friction, device compatibility quirks, protocol questions, and small doc fixes.</p>
+      <div class="action-row">
+        <a class="button primary" href="${siteConfig.repoUrl}/issues">Open an issue</a>
+        <a class="button" href="${siteConfig.repoUrl}/blob/main/CONTRIBUTING.md">Read contributing guide</a>
+      </div>
+    </section>
+
+    <section class="section panel section-panel">
       <h2 class="section-heading">Diagram Viewer</h2>
       <p class="section-subtitle">Use the onboarding diagrams first, then move into the runtime and architecture maps when you need deeper internals.</p>
       <div class="preview-grid">
@@ -410,7 +421,7 @@ ${renderHead({
     <section class="panel section-panel search-section">
       <div class="page-marker">Search results</div>
       <h1 class="page-title">Find where a term is documented.</h1>
-      <p class="page-intro">Use the header search to jump here from anywhere on the site. This page keeps the full result list, excerpts, and follow-on refinement tools in one place.</p>
+      <p class="page-intro">Use the header search to jump here from anywhere on the site. This page keeps the full result list, excerpts, and follow-on refinement tools in one place. Try <code>doctor</code>, <code>RR</code>, <code>protocol.jsonl</code>, or <code>PMD</code>.</p>
       ${renderSearchPanel({
         title: 'Results',
         description: 'Use the header search to change the query. The list below updates to the pages that best match it.',
@@ -583,13 +594,13 @@ function renderHeader(topNav, homeHref, searchHref) {
   return `<header class="site-header" data-pagefind-ignore>
     <a class="brand" href="${homeHref}">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-copy"><strong>${siteConfig.siteName}</strong><span>Unofficial Open-Source Toolkit</span></span>
+      <span class="brand-copy"><strong>${siteConfig.siteName}</strong><span>${siteConfig.brandTagline}</span></span>
     </a>
     <div class="header-tools">
       <form class="header-search" action="${searchHref}" method="get" role="search" data-header-search-form>
         <label class="sr-only" for="site-search-input">Search the site</label>
-        <input id="site-search-input" class="header-search-input" data-header-search-input type="search" name="q" placeholder="Search site" autocomplete="off" />
-        <button class="header-search-button" type="submit">Find</button>
+        <input id="site-search-input" class="header-search-input" data-header-search-input type="search" name="q" placeholder="Search docs" autocomplete="off" />
+        <button class="header-search-button" type="submit">Search</button>
       </form>
       <nav class="top-nav" aria-label="Primary">${topNav}</nav>
     </div>
@@ -597,7 +608,7 @@ function renderHeader(topNav, homeHref, searchHref) {
 }
 
 function renderFooter() {
-  return `<footer class="footer" data-pagefind-ignore>PolarH10 WPF monitor, CLI capture tooling, protocol docs, and Mermaid system maps. Unofficial open-source reference build; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
+  return `<footer class="footer" data-pagefind-ignore>PolarH10 WPF app, CLI capture tooling, protocol docs, and Mermaid diagrams. Unofficial project; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
 }
 
 function renderArt() {
@@ -695,30 +706,13 @@ function renderSearchBoot(asset) {
 
     const getInput = () => mount.querySelector('.pagefind-ui__search-input');
     const queryKey = mount.dataset.searchQueryParam;
-    let initialQuery = '';
+    let observer = null;
 
-    requestAnimationFrame(() => {
-      const input = getInput();
-      if (!input) {
-        return;
+    const syncHeader = (value) => {
+      if (headerInput && headerInput.value !== value) {
+        headerInput.value = value;
       }
-
-      if (queryKey) {
-        const value = new URLSearchParams(window.location.search).get(queryKey);
-        initialQuery = value ? value.trim() : '';
-        if (initialQuery) {
-          input.value = initialQuery;
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          if (headerInput) {
-            headerInput.value = initialQuery;
-          }
-        }
-      }
-
-      if (mount.dataset.searchAutofocus === 'true') {
-        input.focus({ preventScroll: true });
-      }
-    });
+    };
 
     const syncUrl = (value) => {
       if (!queryKey) {
@@ -735,17 +729,59 @@ function renderSearchBoot(asset) {
       history.replaceState(null, '', nextUrl);
     };
 
+    const applyQuery = (input, value) => {
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    const bindInputWhenReady = (callback) => {
+      const input = getInput();
+      if (input) {
+        callback(input);
+        return;
+      }
+
+      if (observer) {
+        observer.disconnect();
+      }
+
+      observer = new MutationObserver(() => {
+        const nextInput = getInput();
+        if (!nextInput) {
+          return;
+        }
+
+        observer.disconnect();
+        observer = null;
+        callback(nextInput);
+      });
+      observer.observe(mount, { childList: true, subtree: true });
+    };
+
+    bindInputWhenReady((input) => {
+      if (queryKey) {
+        const initialQuery = new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? '';
+        if (initialQuery) {
+          applyQuery(input, initialQuery);
+        }
+        syncHeader(initialQuery);
+      }
+
+      if (mount.dataset.searchAutofocus === 'true') {
+        input.focus({ preventScroll: true });
+      }
+    });
+
     if (headerForm && headerInput) {
       headerForm.addEventListener('submit', (event) => {
-        event.preventDefault();
         const input = getInput();
         const nextQuery = headerInput.value.trim();
         if (!input) {
           return;
         }
 
-        input.value = nextQuery;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
+        event.preventDefault();
+        applyQuery(input, nextQuery);
         syncUrl(nextQuery);
       });
     }
@@ -756,9 +792,7 @@ function renderSearchBoot(asset) {
         return;
       }
 
-      if (headerInput && headerInput.value !== target.value) {
-        headerInput.value = target.value;
-      }
+      syncHeader(target.value);
       syncUrl(target.value.trim());
     });
   });
@@ -936,7 +970,7 @@ function relativeHref(fromDir, targetPath) {
   return href.replace(/\\/g, '/');
 }
 
-function parseFrontmatter(raw) {
+function parseFrontmatter(raw, sourceLabel = 'document') {
   if (!raw.startsWith('---\n') && !raw.startsWith('---\r\n')) {
     return { data: {}, body: raw };
   }
@@ -946,20 +980,18 @@ function parseFrontmatter(raw) {
     return { data: {}, body: raw };
   }
 
-  const data = {};
-  for (const line of match[1].split(/\r?\n/)) {
-    if (!line.trim() || line.trimStart().startsWith('#')) {
-      continue;
+  let data = {};
+  try {
+    const parsed = parseYaml(match[1]);
+    if (parsed === null || parsed === undefined) {
+      data = {};
+    } else if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+      data = parsed;
+    } else {
+      throw new Error('front matter must be a mapping of key/value pairs.');
     }
-
-    const separator = line.indexOf(':');
-    if (separator === -1) {
-      continue;
-    }
-
-    const key = line.slice(0, separator).trim();
-    const rawValue = line.slice(separator + 1).trim();
-    data[key] = parseFrontmatterValue(rawValue);
+  } catch (error) {
+    throw new Error(`Invalid front matter in ${sourceLabel}: ${error.message}`);
   }
 
   return {
@@ -970,26 +1002,6 @@ function parseFrontmatter(raw) {
 
 function containsMath(markdown) {
   return /```latex\b/i.test(markdown);
-}
-
-function parseFrontmatterValue(rawValue) {
-  if (!rawValue) {
-    return '';
-  }
-
-  if ((rawValue.startsWith('"') && rawValue.endsWith('"')) || (rawValue.startsWith("'") && rawValue.endsWith("'"))) {
-    return rawValue.slice(1, -1);
-  }
-
-  if (/^(true|false)$/i.test(rawValue)) {
-    return rawValue.toLowerCase() === 'true';
-  }
-
-  if (/^-?\d+(\.\d+)?$/.test(rawValue)) {
-    return Number(rawValue);
-  }
-
-  return rawValue;
 }
 
 function stripLeadingH1(markdown) {

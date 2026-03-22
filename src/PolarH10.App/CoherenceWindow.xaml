@@ -112,7 +112,7 @@
                                FontWeight="Bold"
                                Margin="0,0,0,4" />
                     <TextBlock x:Name="CoherenceWindowSummaryText"
-                               Text="RR-derived coherence follows The Coherent Heart peak-window method and also shows the Astral-compatible normalized score used by the app."
+                               Text="RR-derived coherence follows The Coherent Heart peak-window method and also shows the normalized operator-facing score used by the app."
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource GraphiteBrush}" />
