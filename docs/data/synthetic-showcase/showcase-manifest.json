@@ -1,6 +1,6 @@
 {
   "presetId": "showcase-v1",
-  "generatedAtUtc": "2026-03-22T14:20:51.0591595+00:00",
+  "generatedAtUtc": "2026-03-22T22:01:17.5340380Z",
   "durationSeconds": 360,
   "generatorVersion": "1.0.0.0",
   "trackerSettings": {
@@ -164,7 +164,7 @@
           "name": "ecg.csv",
           "path": "data/synthetic-showcase/scenarios/coherence_low/ecg.csv",
           "sizeBytes": 1095807,
-          "lastWriteTimeUtc": "2026-03-22T14:20:46.4129160Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:46.412916Z",
           "sha256": "fb478bbf92b678e1dad3ce74061405510fdc42f744f2a98c7b1ad99509e9065f"
         },
         {
@@ -329,7 +329,7 @@
           "name": "scenario.json",
           "path": "data/synthetic-showcase/scenarios/entropy_rising/scenario.json",
           "sizeBytes": 1326,
-          "lastWriteTimeUtc": "2026-03-22T14:20:47.1913870Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.191387Z",
           "sha256": "1ec8b80de134a290a174b31ffe871b4174de72dbf4a17d0574c7751c3828e426"
         },
         {
@@ -356,7 +356,7 @@
           "name": "ecg.csv",
           "path": "data/synthetic-showcase/scenarios/flat_breathing/ecg.csv",
           "sizeBytes": 1091350,
-          "lastWriteTimeUtc": "2026-03-22T14:20:47.3751270Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.375127Z",
           "sha256": "7f5c38502f18f56aedc5929b7919f2d3403d431bcad8398329cdde386833cbb5"
         },
         {
@@ -384,7 +384,7 @@
           "name": "session.json",
           "path": "data/synthetic-showcase/scenarios/flat_breathing/session.json",
           "sizeBytes": 478,
-          "lastWriteTimeUtc": "2026-03-22T14:20:47.3751270Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.375127Z",
           "sha256": "775e9d913f440ceec08402a7a9dfdb2b48e071d155f5fbcd341d386c58e1fb8e"
         }
       ]
@@ -466,7 +466,7 @@
           "name": "hr_rr.csv",
           "path": "data/synthetic-showcase/scenarios/hrv_low/hr_rr.csv",
           "sizeBytes": 18900,
-          "lastWriteTimeUtc": "2026-03-22T14:20:47.9336350Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:47.933635Z",
           "sha256": "5b6099fd11b11f66ed82843553f09b688c64d848c9182d8c395902a3af689f28"
         },
         {
@@ -493,7 +493,7 @@
           "name": "analysis.json",
           "path": "data/synthetic-showcase/scenarios/irregular_rr/analysis.json",
           "sizeBytes": 512229,
-          "lastWriteTimeUtc": "2026-03-22T14:20:48.1115120Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.111512Z",
           "sha256": "775858efff35f672e9601c86f71a46a6f7dea255082114867cb48c7c0113cb6b"
         },
         {
@@ -514,7 +514,7 @@
           "name": "hr_rr.csv",
           "path": "data/synthetic-showcase/scenarios/irregular_rr/hr_rr.csv",
           "sizeBytes": 18704,
-          "lastWriteTimeUtc": "2026-03-22T14:20:48.1115120Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.111512Z",
           "sha256": "8cd6cb67ca6111aef6557b45914b07e5c418f73c04a48895f14f50f4a4991d04"
         },
         {
@@ -528,7 +528,7 @@
           "name": "session.json",
           "path": "data/synthetic-showcase/scenarios/irregular_rr/session.json",
           "sizeBytes": 448,
-          "lastWriteTimeUtc": "2026-03-22T14:20:48.1182280Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.118228Z",
           "sha256": "cb30622d5e1ea90ae2576962c800886424aea7a91f394969540c5030856aedb1"
         }
       ]
@@ -569,7 +569,7 @@
           "name": "scenario.json",
           "path": "data/synthetic-showcase/scenarios/jittered_breathing/scenario.json",
           "sizeBytes": 822,
-          "lastWriteTimeUtc": "2026-03-22T14:20:48.2828400Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:48.28284Z",
           "sha256": "fab3f46d2ef195e6fc46159e6903c57ff27d5e3a4b82b003d935bc12beab4a3b"
         },
         {
@@ -699,7 +699,7 @@
           "name": "ground_truth.json",
           "path": "data/synthetic-showcase/scenarios/off_18bpm/ground_truth.json",
           "sizeBytes": 2434308,
-          "lastWriteTimeUtc": "2026-03-22T14:20:49.0523360Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.052336Z",
           "sha256": "fc4e697d1afaf227e7a45978b5f6ed7c5e41766a78976ef7ab5cbb9698f3e0e4"
         },
         {
@@ -768,7 +768,7 @@
           "name": "session.json",
           "path": "data/synthetic-showcase/scenarios/off_24bpm/session.json",
           "sizeBytes": 443,
-          "lastWriteTimeUtc": "2026-03-22T14:20:49.7192880Z",
+          "lastWriteTimeUtc": "2026-03-22T14:20:49.719288Z",
           "sha256": "597d53f7e7b384adad10da537557743062356ad7be5826c87064217c9f4d3bb5"
         }
       ]
@@ -877,9 +877,9 @@
       "format": "png",
       "title": "Coherence appendix figure (PNG)",
       "path": "assets/synthetic-showcase/coherence-appendix.png",
-      "sizeBytes": 36695,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7755006Z",
-      "sha256": "7cafd2612e2166a52a548bf0e96da5581e82dc07348cdeb9a4c278f755064dd1"
+      "sizeBytes": 36601,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9653036Z",
+      "sha256": "ce31815eee8973d2dbe7d3e965bb4fccee57b031a5fa31d83f251dc36a0eac98"
     },
     {
       "id": "coherence-appendix-svg",
@@ -887,9 +887,9 @@
       "format": "svg",
       "title": "Coherence appendix figure (SVG)",
       "path": "assets/synthetic-showcase/coherence-appendix.svg",
-      "sizeBytes": 6007,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7604358Z",
-      "sha256": "80dc19586975fdfe236c5e9817b9279cab052f93dcc929281b88caa0b56340e7"
+      "sizeBytes": 6921,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9553145Z",
+      "sha256": "6733b041a80257f6541050e7e961085ab9bbb7d01e2ac6b17be917c7571c3c45"
     },
     {
       "id": "coherence-derivation-png",
@@ -897,9 +897,9 @@
       "format": "png",
       "title": "Coherence derivation figure (PNG)",
       "path": "assets/synthetic-showcase/coherence-derivation.png",
-      "sizeBytes": 56228,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7028313Z",
-      "sha256": "cbfad37ce5385c86b219a35c91ddd75e005b021defd8c8c9a972f51781968fd5"
+      "sizeBytes": 54171,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9078034Z",
+      "sha256": "b620a85ffeee276c621b3f338eef72f9c747b4987c23d2d77b3386936d007594"
     },
     {
       "id": "coherence-derivation-svg",
@@ -907,9 +907,9 @@
       "format": "svg",
       "title": "Coherence derivation figure (SVG)",
       "path": "assets/synthetic-showcase/coherence-derivation.svg",
-      "sizeBytes": 12518,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.6907603Z",
-      "sha256": "83a124455df10cdd8013fb399fad67ff0aebfee24c6ae2b7a3d10578c783b003"
+      "sizeBytes": 13501,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.8958003Z",
+      "sha256": "9e989632ca8a7cfe813ac137cc501e7bfa92296c67a1521e1d6f59abea2128b4"
     },
     {
       "id": "dynamics-appendix-png",
@@ -917,9 +917,9 @@
       "format": "png",
       "title": "Dynamics appendix figure (PNG)",
       "path": "assets/synthetic-showcase/dynamics-appendix.png",
-      "sizeBytes": 32095,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7931271Z",
-      "sha256": "995c782889e1f82ea15be8da755275639fa493830f8f23e0a9effe5f51379f14"
+      "sizeBytes": 32130,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9783066Z",
+      "sha256": "279a232210c8055640108461fbed15975d2f90e2670d7811f3448e145588953b"
     },
     {
       "id": "dynamics-appendix-svg",
@@ -927,9 +927,9 @@
       "format": "svg",
       "title": "Dynamics appendix figure (SVG)",
       "path": "assets/synthetic-showcase/dynamics-appendix.svg",
-      "sizeBytes": 4767,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7830607Z",
-      "sha256": "489155bc164ec50b8ef0457d14695605c301d5c9a672589853df00234f0c30e3"
+      "sizeBytes": 5341,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9693058Z",
+      "sha256": "3b987ec7ed294feb2bca09d19a698d0539f6ea95fcf5da9d3bab542a64fe99e1"
     },
     {
       "id": "dynamics-derivation-png",
@@ -937,9 +937,9 @@
       "format": "png",
       "title": "Breathing-dynamics derivation figure (PNG)",
       "path": "assets/synthetic-showcase/dynamics-derivation.png",
-      "sizeBytes": 64549,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7548786Z",
-      "sha256": "1e0b9080937ef9c13865161786175ecfa8de4841aa96ca9652b8f8dbd578937c"
+      "sizeBytes": 63819,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9508033Z",
+      "sha256": "ab07add44560355a66de30c1717e444f26c4201d0acec0ac4b9f1e37c2c122d7"
     },
     {
       "id": "dynamics-derivation-svg",
@@ -947,9 +947,9 @@
       "format": "svg",
       "title": "Breathing-dynamics derivation figure (SVG)",
       "path": "assets/synthetic-showcase/dynamics-derivation.svg",
-      "sizeBytes": 30421,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7423114Z",
-      "sha256": "cf2f9b07e58db0b6cb516880da5e15b91e0b9ae1f43325e442107e65225c3d3a"
+      "sizeBytes": 31749,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9378034Z",
+      "sha256": "d2514acda4a9ba3edf56d03e12742ae1ff611cd9f001258e31cd1ab5d8d2d433"
     },
     {
       "id": "figure-pack-pdf",
@@ -957,9 +957,9 @@
       "format": "pdf",
       "title": "Synthetic showcase supplementary figure pack (PDF)",
       "path": "assets/synthetic-showcase/synthetic-showcase-figure-pack.pdf",
-      "sizeBytes": 648036,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.8919883Z",
-      "sha256": "e54f72fa10b01aa1e8510fff5fcd050b0f789b3614c97c34ab62bfb4fb8bf7e3"
+      "sizeBytes": 624045,
+      "lastWriteTimeUtc": "2026-03-22T21:59:49.0651875Z",
+      "sha256": "6f07e950058e549549410f04d2b7a293ea18f6d83eb1d1dbe51207e83778065c"
     },
     {
       "id": "hrv-derivation-png",
@@ -967,9 +967,9 @@
       "format": "png",
       "title": "HRV derivation figure (PNG)",
       "path": "assets/synthetic-showcase/hrv-derivation.png",
-      "sizeBytes": 53974,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7299944Z",
-      "sha256": "4deda9cb4bff056bee4d20cd811c3da9b7d4b538d6367de8ba5dbc9843e216ea"
+      "sizeBytes": 51702,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9268003Z",
+      "sha256": "b3c62cddab0aeef80dfdf684d929d228f75c852687d02000842168f71c762326"
     },
     {
       "id": "hrv-derivation-svg",
@@ -977,9 +977,9 @@
       "format": "svg",
       "title": "HRV derivation figure (SVG)",
       "path": "assets/synthetic-showcase/hrv-derivation.svg",
-      "sizeBytes": 17892,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.7108983Z",
-      "sha256": "d634736a57855c8428e81d0a0f8945f11705bfd078df3b435fd6acc91976d2fb"
+      "sizeBytes": 18866,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.9148007Z",
+      "sha256": "026fe4f36b35955076d70889881caecf163eec29ab377f4897475dcb73339b81"
     },
     {
       "id": "showcase-overview-png",
@@ -988,7 +988,7 @@
       "title": "Synthetic showcase matrix (PNG)",
       "path": "assets/synthetic-showcase/showcase-overview.png",
       "sizeBytes": 65543,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.6832173Z",
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.8878026Z",
       "sha256": "e5f8d8eb2531a5770f401e7fad25e9bac111941810f5aa9b6a87995d0aa1ec80"
     },
     {
@@ -997,9 +997,9 @@
       "format": "svg",
       "title": "Synthetic showcase matrix (SVG)",
       "path": "assets/synthetic-showcase/showcase-overview.svg",
-      "sizeBytes": 10182,
-      "lastWriteTimeUtc": "2026-03-22T14:20:50.5187046Z",
-      "sha256": "02e9c67e2aa7ae3ec4a95c0aeaea48d312ed9416c989d9fedd2c894d436d4113"
+      "sizeBytes": 12402,
+      "lastWriteTimeUtc": "2026-03-22T21:59:48.8445148Z",
+      "sha256": "6ee28a68123c4643ef342743f5cb1da30de932e2eb6f0195143352718cdedab2"
     }
   ],
   "dataRootPath": "data/synthetic-showcase"
