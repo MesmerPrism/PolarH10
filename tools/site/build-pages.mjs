@@ -638,10 +638,12 @@ function renderSearchPanel({ title, description, standalone = false, autofocus =
   }
 
   return `<section class="${className}">
-    <h2>${escapeHtml(title)}</h2>
-    <p>${escapeHtml(description)}</p>
-    <div id="pagefind-search"${attrs.length ? ` ${attrs.join(' ')}` : ''}></div>
-  </section>`;
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(description)}</p>
+      <p class="search-status" data-search-status hidden></p>
+      <div id="pagefind-search"${attrs.length ? ` ${attrs.join(' ')}` : ''}></div>
+      <noscript><p class="search-status" data-state="error">Search needs JavaScript. If you are using Brave Shields or a script blocker, allow scripts for this site and reload.</p></noscript>
+    </section>`;
 }
 
 function renderHeaderBoot() {
@@ -690,24 +692,64 @@ function renderSearchBoot(asset) {
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     const mount = document.getElementById('pagefind-search');
+    const status = document.querySelector('[data-search-status]');
     const headerForm = document.querySelector('[data-header-search-form]');
     const headerInput = document.querySelector('[data-header-search-input]');
-    if (!mount || typeof window.PagefindUI !== 'function') {
+    const showStatus = (message, state = 'pending') => {
+      if (!status) {
+        return;
+      }
+
+      status.hidden = false;
+      status.dataset.state = state;
+      status.textContent = message;
+    };
+
+    const clearStatus = () => {
+      if (!status) {
+        return;
+      }
+
+      status.hidden = true;
+      status.textContent = '';
+      delete status.dataset.state;
+    };
+
+    if (!mount) {
       return;
     }
 
-    new window.PagefindUI({
-      element: '#pagefind-search',
-      bundlePath: ${JSON.stringify(bundlePath)},
-      showImages: false,
-      resetStyles: false,
-      excerptLength: 18,
-      showSubResults: true
-    });
+    showStatus('Loading search index…');
+
+    if (typeof window.PagefindUI !== 'function') {
+      showStatus('Search could not start. If you are using Brave Shields, a script blocker, or disabled JavaScript for this site, allow scripts and reload.', 'error');
+      return;
+    }
+
+    try {
+      new window.PagefindUI({
+        element: '#pagefind-search',
+        bundlePath: ${JSON.stringify(bundlePath)},
+        showImages: false,
+        resetStyles: false,
+        excerptLength: 18,
+        showSubResults: true
+      });
+    } catch (error) {
+      console.error(error);
+      showStatus('Search failed to initialize. If you are using Brave Shields, a script blocker, or disabled JavaScript for this site, allow scripts and reload.', 'error');
+      return;
+    }
 
     const getInput = () => mount.querySelector('.pagefind-ui__search-input');
     const queryKey = mount.dataset.searchQueryParam;
     let observer = null;
+    let ready = false;
+    const readyTimeout = window.setTimeout(() => {
+      if (!ready) {
+        showStatus('Search is still unavailable in this browser. If you are using Brave Shields, a script blocker, or disabled JavaScript for this site, allow scripts and reload.', 'error');
+      }
+    }, 3000);
 
     const syncHeader = (value) => {
       if (headerInput && headerInput.value !== value) {
@@ -760,6 +802,10 @@ function renderSearchBoot(asset) {
     };
 
     bindInputWhenReady((input) => {
+      ready = true;
+      window.clearTimeout(readyTimeout);
+      clearStatus();
+
       if (queryKey) {
         const initialQuery = new URLSearchParams(window.location.search).get(queryKey)?.trim() ?? '';
         if (initialQuery) {

@@ -774,6 +774,25 @@ button:focus-visible {
   margin-top: 20px;
 }
 
+.search-status {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-2);
+  color: var(--ink-muted);
+}
+
+.search-status[hidden] {
+  display: none;
+}
+
+.search-status[data-state='error'] {
+  border-style: solid;
+  background: #fff1ed;
+  color: var(--ink);
+}
+
 #pagefind-search {
   min-width: 0;
 }
