@@ -604,6 +604,19 @@ button:focus-visible {
 
 .hero-preview {
   background: #f8f3ec;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.hero-preview > * {
+  min-width: 0;
+}
+
+.hero-preview .section-heading {
+  max-width: 11ch;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
 .hero-lede {

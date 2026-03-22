@@ -25,7 +25,7 @@ const siteConfig = {
   brandTagline: 'Windows-first telemetry toolkit',
   homeTitle: 'Windows-first Polar H10 telemetry toolkit',
   referenceTitle: 'PolarH10 Developer Reference',
-  sharedPromise: 'Capture, inspect, and record Polar H10 telemetry on Windows without the Polar SDK. Use the WPF app for live monitoring and derived metrics, or the CLI for scan, doctor, record, replay, and protocol inspection.',
+  sharedPromise: 'Academic-friendly Windows-first Polar H10 telemetry toolkit for HR, RR, ECG, ACC, multi-device comparison, and ACC-based breathing views without the Polar SDK.',
   defaultDescription: 'Windows-first Polar H10 docs, onboarding guides, protocol reference, and Mermaid system diagrams. Unofficial project; not endorsed by or affiliated with Polar Electro Oy.',
   socialImage: 'assets/brutal-tdr-preview.png',
   favicon: 'assets/polarh10-stripe-mark.png',
@@ -252,21 +252,21 @@ ${renderHead({
     <main data-pagefind-body>
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
-        <div class="page-marker">Unofficial Windows-first Polar H10 telemetry toolkit</div>
-        <h1>Use a Polar H10 on Windows without the Polar SDK.</h1>
-        <p class="hero-lede">Capture, inspect, and record Polar H10 telemetry on Windows from one repo. PolarH10 combines a WPF app for live monitoring, a CLI for diagnostics and repeatable capture, and docs that explain the computed values, saved files, protocol internals, and code structure.</p>
+        <div class="page-marker">Unofficial Windows-first Polar H10 toolkit for academic workflows</div>
+        <h1>Record and compare Polar H10 telemetry on Windows.</h1>
+        <p class="hero-lede">PolarH10 is designed first for academics who need a practical Windows workflow without the Polar SDK. Use the WPF app or CLI to inspect HR, RR, ECG, and ACC live, track multiple H10 devices in parallel, record reusable sessions, and review derived views such as coherence, short-term HRV, ACC-based breathing-volume approximation, and breathing-dynamics features.</p>
         <div class="stats">
           <div class="stat">
-            <strong>WPF app</strong>
-            <span>Scan nearby straps, inspect live HR, ECG, and ACC, then open coherence, HRV, or breathing views once the data is ready.</span>
+            <strong>Parallel live monitoring</strong>
+            <span>Track one device or compare multiple active straps in the same live workspace when you need side-by-side research sessions.</span>
           </div>
           <div class="stat">
-            <strong>CLI tooling</strong>
-            <span>Run <code>scan</code>, <code>doctor</code>, <code>monitor</code>, <code>record</code>, <code>replay</code>, and <code>sessions</code> when you need a direct terminal workflow.</span>
+            <strong>Cardiac plus breathing views</strong>
+            <span>Review HR, RR, ECG, ACC, and ACC-based breathing output within the same session instead of splitting those signals across separate tools.</span>
           </div>
           <div class="stat">
-            <strong>Reference docs</strong>
-            <span>Read the method notes, file formats, protocol overview, and Mermaid diagrams when you need to understand how the outputs and internals fit together.</span>
+            <strong>Methods and implementation notes</strong>
+            <span>Read the workflow guides, formula sheets, output formats, protocol reference, and diagrams when validation or extension matters.</span>
           </div>
         </div>
         <div class="action-row">
@@ -277,44 +277,47 @@ ${renderHead({
         </div>
       </div>
       <aside class="panel hero-preview">
-        <h2 class="section-heading">What this site helps with</h2>
-        <p>You can use this docs surface to get a strap working on Windows, understand the math behind the computed values, or trace the implementation behind BLE transport, recordings, and protocol decoding.</p>
-        <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview" />
-        <p class="hero-preview-note">If you already know the term you need, search the site for <code>doctor</code>, <code>RR</code>, <code>PMD</code>, or <code>protocol.jsonl</code> and jump straight into the matching guide.</p>
+        <h2 class="section-heading">For studies, methods, and implementation</h2>
+        <p>This site is organized around three common academic tasks: running a Windows collection session, checking how derived values are computed, and tracing the implementation when reproducibility or extension matters.</p>
+        <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview with multiple tracked devices" />
+        <p class="hero-preview-note">The preview shows parallel device tracking in the live workspace. If you already know the term you need, search for <code>doctor</code>, <code>RR</code>, <code>breathing</code>, or <code>protocol.jsonl</code> and jump straight to the matching guide.</p>
       </aside>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">Start with the part you need</h2>
-      <p class="section-subtitle">Most people arrive here for one of three reasons: they want to use the app, verify the formulas, or understand the implementation.</p>
+      <h2 class="section-heading">Start with your research task</h2>
+      <p class="section-subtitle">Most visitors need one of three things: a reliable collection workflow, a readable method reference for derived measures, or implementation detail for validation and extension.</p>
       <div class="audience-grid">
         <article class="audience-card tone-cool">
-          <h3>Using the app or CLI</h3>
-          <p>Start here if you want to connect a strap, inspect live telemetry, record a session, or get a Windows capture workflow working reliably.</p>
+          <h3>Running sessions and comparing devices</h3>
+          <p>Start here if you need to connect straps, monitor live telemetry, compare multiple active H10 units, or collect reusable Windows sessions for later analysis.</p>
           <ul class="audience-link-list">
             <li><a class="audience-link" href="reference/getting-started.html"><strong>Getting started</strong><span>Clone, build, and reach a safe first run.</span></a></li>
             <li><a class="audience-link" href="reference/first-recording.html"><strong>First recording</strong><span>Run the first end-to-end session and save reusable output.</span></a></li>
+            <li><a class="audience-link" href="reference/app-overview.html"><strong>App overview</strong><span>See the tracked-device workflow, live views, and operator-facing surfaces.</span></a></li>
             <li><a class="audience-link" href="reference/cli.html"><strong>CLI guide</strong><span>Use the terminal workflow for scan, doctor, record, and replay.</span></a></li>
             <li><a class="audience-link" href="reference/troubleshooting.html"><strong>Troubleshooting</strong><span>Fix the common Windows BLE and device-discovery failures first.</span></a></li>
           </ul>
         </article>
         <article class="audience-card tone-signal">
-          <h3>Understanding the computed values</h3>
-          <p>Start here if you want the math and workflow context behind coherence, HRV, breathing from ACC, or breathing-dynamics metrics.</p>
+          <h3>Reading the derived measures</h3>
+          <p>Start here if you need the method context behind coherence, short-term HRV, ACC-based breathing-volume approximation, or the breathing-dynamics feature family.</p>
           <ul class="audience-link-list">
             <li><a class="audience-link" href="reference/formula-sheets.html"><strong>Formula sheets</strong><span>Download the Markdown and PDF method notes.</span></a></li>
-            <li><a class="audience-link" href="reference/coherence-workflow.html"><strong>Coherence workflow</strong><span>See the RR warmup, confidence handling, and expected caveats.</span></a></li>
             <li><a class="audience-link" href="reference/hrv-workflow.html"><strong>HRV workflow</strong><span>Read RMSSD, SDNN, and pNN50 in the context of a short-term window.</span></a></li>
+            <li><a class="audience-link" href="reference/coherence-workflow.html"><strong>Coherence workflow</strong><span>See the RR warmup, confidence handling, and expected caveats.</span></a></li>
+            <li><a class="audience-link" href="reference/breathing-workflow.html"><strong>Breathing workflow</strong><span>Follow the ACC breathing calibration flow and inspect live breathing output.</span></a></li>
+            <li><a class="audience-link" href="reference/breathing-formulas.html"><strong>Breathing from ACC formula sheet</strong><span>Review the repository-specific breathing-volume approximation and its limits.</span></a></li>
             <li><a class="audience-link" href="reference/breathing-dynamics-workflow.html"><strong>Breathing dynamics</strong><span>Understand when the entropy views are valid and how calibration affects them.</span></a></li>
           </ul>
         </article>
         <article class="audience-card tone-violet">
-          <h3>Working on the implementation</h3>
-          <p>Start here if you need repo structure, record formats, protocol details, or the diagrams that map the code and runtime flow.</p>
+          <h3>Validating or extending the implementation</h3>
+          <p>Start here if you need repo structure, saved record formats, protocol details, or the diagrams that explain how the Windows BLE and analysis pipeline fits together.</p>
           <ul class="audience-link-list">
-            <li><a class="audience-link" href="reference/app-overview.html"><strong>App overview</strong><span>Read the runtime surfaces and the major operator-facing pieces.</span></a></li>
             <li><a class="audience-link" href="reference/protocol/overview.html"><strong>Protocol overview</strong><span>Map PMD, GATT, decoding, and the lower-level data path.</span></a></li>
             <li><a class="audience-link" href="reference/output-formats.html"><strong>Output formats</strong><span>Inspect the session files, manifests, and recorded artifacts.</span></a></li>
+            <li><a class="audience-link" href="reference/references.html"><strong>References and provenance</strong><span>Trace the source material and repo-specific adaptation notes.</span></a></li>
             <li><a class="audience-link" href="diagrams/viewer.html#code-architecture"><strong>Diagram viewer</strong><span>Open the onboarding, runtime, and architecture maps.</span></a></li>
           </ul>
         </article>
@@ -323,12 +326,12 @@ ${renderHead({
 
     <section class="section panel section-panel">
       <h2 class="section-heading">Typical session flow</h2>
-      <p class="section-subtitle">If you are here to capture data on Windows, this is the order of operations that keeps the session trustworthy.</p>
+      <p class="section-subtitle">If you are collecting lab data on Windows, this is the order of operations that keeps the session trustworthy.</p>
       <div class="step-grid">
         <div class="step-card tone-cool">
           <div class="step-no">01</div>
-          <h3>Choose the device and tool</h3>
-          <p>Find the intended H10, confirm the Bluetooth address, and decide whether the session belongs in the WPF app or the CLI.</p>
+          <h3>Choose the devices and tool</h3>
+          <p>Find the intended H10 units, confirm the Bluetooth addresses, and decide whether the session belongs in the WPF app or the CLI.</p>
         </div>
         <div class="step-card tone-violet">
           <div class="step-no">02</div>
@@ -337,8 +340,8 @@ ${renderHead({
         </div>
         <div class="step-card tone-signal">
           <div class="step-no">03</div>
-          <h3>Inspect the live stream</h3>
-          <p>Check HR, ECG, and ACC first, then open coherence or HRV once RR is stable and breathing dynamics only after calibration is already live.</p>
+          <h3>Inspect cardiac and breathing signals</h3>
+          <p>Check HR, RR, ECG, and ACC first, enable multi-device comparison if needed, and open the breathing view once the ACC calibration is ready.</p>
         </div>
         <div class="step-card tone-warm">
           <div class="step-no">04</div>
