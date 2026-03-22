@@ -252,106 +252,99 @@ ${renderHead({
     <main data-pagefind-body>
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
-        <div class="page-marker">Windows-first Polar H10 telemetry toolkit</div>
-        <h1>From strap to telemetry on Windows.</h1>
-        <p>${escapeHtml(siteConfig.sharedPromise)}</p>
+        <div class="page-marker">Unofficial Windows-first Polar H10 telemetry toolkit</div>
+        <h1>Use a Polar H10 on Windows without the Polar SDK.</h1>
+        <p class="hero-lede">Capture, inspect, and record Polar H10 telemetry on Windows from one repo. PolarH10 combines a WPF app for live monitoring, a CLI for diagnostics and repeatable capture, and docs that explain the computed values, saved files, protocol internals, and code structure.</p>
+        <div class="stats">
+          <div class="stat">
+            <strong>WPF app</strong>
+            <span>Scan nearby straps, inspect live HR, ECG, and ACC, then open coherence, HRV, or breathing views once the data is ready.</span>
+          </div>
+          <div class="stat">
+            <strong>CLI tooling</strong>
+            <span>Run <code>scan</code>, <code>doctor</code>, <code>monitor</code>, <code>record</code>, <code>replay</code>, and <code>sessions</code> when you need a direct terminal workflow.</span>
+          </div>
+          <div class="stat">
+            <strong>Reference docs</strong>
+            <span>Read the method notes, file formats, protocol overview, and Mermaid diagrams when you need to understand how the outputs and internals fit together.</span>
+          </div>
+        </div>
         <div class="action-row">
-          <a class="button primary" href="reference/app-overview.html">Use the WPF app</a>
-          <a class="button primary" href="reference/cli.html">Use the CLI</a>
-          <a class="button" href="reference/first-recording.html">First recording</a>
-          <a class="button" href="reference/protocol/overview.html">Protocol guide</a>
+          <a class="button primary" href="reference/getting-started.html">Get started</a>
+          <a class="button" href="reference/first-recording.html">Record a first session</a>
+          <a class="button" href="reference/formula-sheets.html">Read the formulas</a>
+          <a class="button" href="reference/protocol/overview.html">Browse internals</a>
         </div>
       </div>
       <aside class="panel hero-preview">
-        <h2 class="section-heading">Choose your path</h2>
-        <ul class="note-list feature-list">
-          <li>
-            <strong>WPF operator flow</strong>
-            <p>Scan nearby straps, connect one or more devices, inspect live telemetry, review coherence, short-term HRV, or breathing-dynamics entropy when ready, and capture a reusable session from the desktop app.</p>
-          </li>
-          <li>
-            <strong>CLI diagnostics</strong>
-            <p>Run <code>scan</code>, <code>doctor</code>, <code>monitor</code>, <code>record</code>, <code>replay</code>, and <code>sessions</code> when you want a direct, scriptable path without the UI.</p>
-          </li>
-          <li>
-            <strong>Library + protocol study</strong>
-            <p>Use the protocol reference, diagrams, and transport notes when you need to understand PMD, GATT, decoding, and recording internals.</p>
-          </li>
-        </ul>
+        <h2 class="section-heading">What this site helps with</h2>
+        <p>You can use this docs surface to get a strap working on Windows, understand the math behind the computed values, or trace the implementation behind BLE transport, recordings, and protocol decoding.</p>
         <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview" />
+        <p class="hero-preview-note">If you already know the term you need, search the site for <code>doctor</code>, <code>RR</code>, <code>PMD</code>, or <code>protocol.jsonl</code> and jump straight into the matching guide.</p>
       </aside>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">First Session Path</h2>
-      <p class="section-subtitle">The shortest route from a strap on your desk to saved telemetry on Windows.</p>
-      <div class="step-grid">
-        <div class="step-card tone-cool">
-          <div class="step-no">01</div>
-          <h3>Scan nearby straps</h3>
-          <p>Find the intended H10, confirm the Bluetooth address, and decide whether you want the WPF app or the CLI for the session.</p>
-        </div>
-        <div class="step-card tone-violet">
-          <div class="step-no">02</div>
-          <h3>Connect and validate</h3>
-          <p>Open the BLE/GATT link, confirm HR plus ACC are live, and use the diagnostics path before you trust a long capture.</p>
-        </div>
-        <div class="step-card tone-signal">
-          <div class="step-no">03</div>
-          <h3>Inspect the live stream</h3>
-          <p>Check HR, ECG, and ACC in the app or terminal, open coherence or HRV once RR is stable, and open breathing dynamics only after breathing calibration is already live.</p>
-        </div>
-        <div class="step-card tone-warm">
-          <div class="step-no">04</div>
-          <h3>Record and replay</h3>
-          <p>Write <code>session.json</code>, CSV sensor output, and <code>protocol.jsonl</code>, then replay or review the capture without hardware attached.</p>
-        </div>
+      <h2 class="section-heading">Start with the part you need</h2>
+      <p class="section-subtitle">Most people arrive here for one of three reasons: they want to use the app, verify the formulas, or understand the implementation.</p>
+      <div class="audience-grid">
+        <article class="audience-card tone-cool">
+          <h3>Using the app or CLI</h3>
+          <p>Start here if you want to connect a strap, inspect live telemetry, record a session, or get a Windows capture workflow working reliably.</p>
+          <ul class="audience-link-list">
+            <li><a class="audience-link" href="reference/getting-started.html"><strong>Getting started</strong><span>Clone, build, and reach a safe first run.</span></a></li>
+            <li><a class="audience-link" href="reference/first-recording.html"><strong>First recording</strong><span>Run the first end-to-end session and save reusable output.</span></a></li>
+            <li><a class="audience-link" href="reference/cli.html"><strong>CLI guide</strong><span>Use the terminal workflow for scan, doctor, record, and replay.</span></a></li>
+            <li><a class="audience-link" href="reference/troubleshooting.html"><strong>Troubleshooting</strong><span>Fix the common Windows BLE and device-discovery failures first.</span></a></li>
+          </ul>
+        </article>
+        <article class="audience-card tone-signal">
+          <h3>Understanding the computed values</h3>
+          <p>Start here if you want the math and workflow context behind coherence, HRV, breathing from ACC, or breathing-dynamics metrics.</p>
+          <ul class="audience-link-list">
+            <li><a class="audience-link" href="reference/formula-sheets.html"><strong>Formula sheets</strong><span>Download the Markdown and PDF method notes.</span></a></li>
+            <li><a class="audience-link" href="reference/coherence-workflow.html"><strong>Coherence workflow</strong><span>See the RR warmup, confidence handling, and expected caveats.</span></a></li>
+            <li><a class="audience-link" href="reference/hrv-workflow.html"><strong>HRV workflow</strong><span>Read RMSSD, SDNN, and pNN50 in the context of a short-term window.</span></a></li>
+            <li><a class="audience-link" href="reference/breathing-dynamics-workflow.html"><strong>Breathing dynamics</strong><span>Understand when the entropy views are valid and how calibration affects them.</span></a></li>
+          </ul>
+        </article>
+        <article class="audience-card tone-violet">
+          <h3>Working on the implementation</h3>
+          <p>Start here if you need repo structure, record formats, protocol details, or the diagrams that map the code and runtime flow.</p>
+          <ul class="audience-link-list">
+            <li><a class="audience-link" href="reference/app-overview.html"><strong>App overview</strong><span>Read the runtime surfaces and the major operator-facing pieces.</span></a></li>
+            <li><a class="audience-link" href="reference/protocol/overview.html"><strong>Protocol overview</strong><span>Map PMD, GATT, decoding, and the lower-level data path.</span></a></li>
+            <li><a class="audience-link" href="reference/output-formats.html"><strong>Output formats</strong><span>Inspect the session files, manifests, and recorded artifacts.</span></a></li>
+            <li><a class="audience-link" href="diagrams/viewer.html#code-architecture"><strong>Diagram viewer</strong><span>Open the onboarding, runtime, and architecture maps.</span></a></li>
+          </ul>
+        </article>
       </div>
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">Docs That Matter First</h2>
-      <div class="card-grid">
-        <a class="path-card tone-cool" href="reference/getting-started.html">
-          <h3>Getting Started</h3>
-          <p>Real clone URL, prerequisites, first build, and the safest path to a successful local run.</p>
-        </a>
-        <a class="path-card tone-cool" href="reference/first-recording.html">
-          <h3>First Recording</h3>
-          <p>The first end-to-end WPF and CLI session, including what to save and how to verify the result.</p>
-        </a>
-        <a class="path-card tone-cool" href="reference/coherence-workflow.html">
-          <h3>Coherence Workflow</h3>
-          <p>Use the RR-derived coherence window, understand the warmup phase, and read confidence instead of trusting a raw number too early.</p>
-        </a>
-        <a class="path-card tone-cool" href="reference/hrv-workflow.html">
-          <h3>HRV Workflow</h3>
-          <p>Use the short-term HRV tab, let the RR window fill, and read RMSSD with SDNN and pNN50 instead of assuming a five-minute solve is instant.</p>
-        </a>
-        <a class="path-card tone-violet" href="reference/breathing-dynamics-workflow.html">
-          <h3>Breathing Dynamics Workflow</h3>
-          <p>Use the dedicated interval and amplitude entropy window once breathing calibration is already stable.</p>
-        </a>
-        <a class="path-card tone-signal" href="reference/formula-sheets.html">
-          <h3>Formula Sheets</h3>
-          <p>Download the Markdown and PDF method sheets for coherence, HRV, breathing from ACC, and breathing-dynamics entropy.</p>
-        </a>
-        <a class="path-card tone-violet" href="reference/output-formats.html">
-          <h3>Output Formats</h3>
-          <p>What each capture file contains, how session folders are named, and when <code>run.json</code> appears.</p>
-        </a>
-        <a class="path-card tone-warm" href="reference/troubleshooting.html">
-          <h3>Troubleshooting</h3>
-          <p>Fix the common failure cases first: hidden devices, Windows BLE access issues, stale streams, and blocked app launch.</p>
-        </a>
-        <a class="path-card tone-signal" href="reference/cli.html">
-          <h3>CLI Guide</h3>
-          <p>Command-focused workflows for scanning, recording, replaying, and doctor-style validation.</p>
-        </a>
-        <a class="path-card tone-violet" href="reference/protocol/overview.html">
-          <h3>Protocol Internals</h3>
-          <p>PMD service layout, measurement formats, and lower-level notes once the operator path already makes sense.</p>
-        </a>
+      <h2 class="section-heading">Typical session flow</h2>
+      <p class="section-subtitle">If you are here to capture data on Windows, this is the order of operations that keeps the session trustworthy.</p>
+      <div class="step-grid">
+        <div class="step-card tone-cool">
+          <div class="step-no">01</div>
+          <h3>Choose the device and tool</h3>
+          <p>Find the intended H10, confirm the Bluetooth address, and decide whether the session belongs in the WPF app or the CLI.</p>
+        </div>
+        <div class="step-card tone-violet">
+          <div class="step-no">02</div>
+          <h3>Connect and validate</h3>
+          <p>Open the BLE/GATT link, confirm HR plus ACC are live, and use the diagnostics path before you trust a long recording.</p>
+        </div>
+        <div class="step-card tone-signal">
+          <div class="step-no">03</div>
+          <h3>Inspect the live stream</h3>
+          <p>Check HR, ECG, and ACC first, then open coherence or HRV once RR is stable and breathing dynamics only after calibration is already live.</p>
+        </div>
+        <div class="step-card tone-warm">
+          <div class="step-no">04</div>
+          <h3>Record and review</h3>
+          <p>Write <code>session.json</code>, CSV sensor output, and <code>protocol.jsonl</code>, then replay or inspect the capture without hardware attached.</p>
+        </div>
       </div>
     </section>
 
@@ -365,17 +358,17 @@ ${renderHead({
     </section>
 
     <section class="section panel section-panel">
-      <h2 class="section-heading">Diagram Viewer</h2>
-      <p class="section-subtitle">Use the onboarding diagrams first, then move into the runtime and architecture maps when you need deeper internals.</p>
+      <h2 class="section-heading">Onboarding and architecture diagrams</h2>
+      <p class="section-subtitle">Use the diagrams when you want the shortest visual explanation of the workflows, records, and code layout.</p>
       <div class="preview-grid">
         <a class="preview-card tone-cool" href="diagrams/viewer.html#choose-your-path">
-          <div class="meta">Onboarding</div>
-          <h3>Choose your path</h3>
-          <p>Pick the WPF, CLI, or protocol route based on whether you need raw telemetry only or the derived coherence, HRV, and entropy views.</p>
-          <img src="diagrams/choose-your-path.svg" alt="Choose your path diagram" />
+          <div class="meta">Orientation</div>
+          <h3>App, formulas, or internals</h3>
+          <p>Use the audience map when you need to decide whether to start with capture workflows, metric explanations, or implementation details.</p>
+          <img src="diagrams/choose-your-path.svg" alt="Audience map diagram" />
         </a>
         <a class="preview-card tone-warm" href="diagrams/viewer.html#first-session-flow">
-          <div class="meta">Onboarding</div>
+          <div class="meta">Workflow</div>
           <h3>First session flow</h3>
           <p>See the scan, connect, inspect, record, and replay loop before you drop into code or protocol details.</p>
           <img src="diagrams/first-session-flow.svg" alt="First session flow diagram" />
