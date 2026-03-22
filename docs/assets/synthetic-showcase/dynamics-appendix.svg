@@ -4,9 +4,9 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 </style>
 <rect x='0' y='0' width='1600' height='960' fill='#f7f2ea' />
 <text x='48.0' y='52.0' font-size='34' fill='#1f2226' text-anchor='start'>Dynamics appendix</text>
-<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Entropy variants and edge states stay visible for supplementary comparisons.</text>
+<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Entropy variants and tracker edge states are retained in the supplementary bundle for comparison and failure-mode reporting.</text>
 <rect x='40.0' y='120.0' width='1520.0' height='460.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Entropy variants</text>
+<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>A. Sample entropy across comparison scenarios</text>
 <line x1='118.0' y1='514.0' x2='1530.0' y2='514.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='118.0' y1='204.0' x2='118.0' y2='514.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='112.0' y1='514.0' x2='118.0' y2='514.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
@@ -21,35 +21,35 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <text x='106.0' y='208.0' font-size='12' fill='#626a72' text-anchor='end'>1.23</text>
 <rect x='130.0' y='503.0' width='158.5' height='11.0' rx='6' ry='6' fill='#258acb' stroke='#258acb' stroke-width='1' />
 <rect x='294.5' y='476.6' width='158.5' height='37.4' rx='6' ry='6' fill='#4d9c5b' stroke='#4d9c5b' stroke-width='1' />
-<text x='294.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>low</text>
+<text x='294.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>Low</text>
 <rect x='483.0' y='289.8' width='158.5' height='224.2' rx='6' ry='6' fill='#258acb' stroke='#258acb' stroke-width='1' />
 <rect x='647.5' y='401.9' width='158.5' height='112.1' rx='6' ry='6' fill='#4d9c5b' stroke='#4d9c5b' stroke-width='1' />
-<text x='647.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>rising</text>
+<text x='647.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>Rising</text>
 <rect x='836.0' y='204.0' width='158.5' height='310.0' rx='6' ry='6' fill='#258acb' stroke='#258acb' stroke-width='1' />
 <rect x='1000.5' y='406.6' width='158.5' height='107.4' rx='6' ry='6' fill='#4d9c5b' stroke='#4d9c5b' stroke-width='1' />
-<text x='1000.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>high</text>
+<text x='1000.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>High</text>
 <rect x='1189.0' y='218.0' width='158.5' height='296.0' rx='6' ry='6' fill='#258acb' stroke='#258acb' stroke-width='1' />
 <rect x='1353.5' y='406.6' width='158.5' height='107.4' rx='6' ry='6' fill='#4d9c5b' stroke='#4d9c5b' stroke-width='1' />
-<text x='1353.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>jittered</text>
+<text x='1353.5' y='538.0' font-size='12' fill='#626a72' text-anchor='middle'>Jittered</text>
 <line x1='1360.0' y1='148.0' x2='1378.0' y2='148.0' stroke='#258acb' stroke-width='3' stroke-linecap='round' />
-<text x='1386.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>interval</text>
+<text x='1386.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>Interval SampEn</text>
 <line x1='1360.0' y1='166.0' x2='1378.0' y2='166.0' stroke='#4d9c5b' stroke-width='3' stroke-linecap='round' />
-<text x='1386.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>amplitude</text>
+<text x='1386.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>Amplitude SampEn</text>
 <text x='60.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Sample entropy</text>
 <rect x='40.0' y='620.0' width='1520.0' height='220.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='654.0' font-size='20' fill='#1f2226' text-anchor='start'>Edge-state checks</text>
+<text x='60.0' y='654.0' font-size='20' fill='#1f2226' text-anchor='start'>B. Edge-state summary</text>
 <text x='60.0' y='690.0' font-size='14' fill='#626a72' text-anchor='start'>Scenario</text>
-<text x='424.8' y='690.0' font-size='14' fill='#626a72' text-anchor='start'>State</text>
-<text x='841.6' y='690.0' font-size='14' fill='#626a72' text-anchor='start'>Int SampEn</text>
-<text x='1258.4' y='690.0' font-size='14' fill='#626a72' text-anchor='start'>Amp SampEn</text>
+<text x='424.8' y='690.0' font-size='14' fill='#626a72' text-anchor='start'>Tracking state</text>
+<text x='1246.4' y='690.0' font-size='14' fill='#626a72' text-anchor='end'>Interval SampEn</text>
+<text x='1520.0' y='690.0' font-size='14' fill='#626a72' text-anchor='end'>Amplitude SampEn</text>
 <line x1='60.0' y1='702.0' x2='1536.0' y2='702.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='718.0' font-size='14' fill='#1f2226' text-anchor='start'>flat</text>
-<text x='424.8' y='718.0' font-size='14' fill='#1f2226' text-anchor='start'>2</text>
-<text x='841.6' y='718.0' font-size='14' fill='#1f2226' text-anchor='start'>--</text>
-<text x='1258.4' y='718.0' font-size='14' fill='#1f2226' text-anchor='start'>--</text>
+<text x='60.0' y='718.0' font-size='14' fill='#1f2226' text-anchor='start'>Flat breathing</text>
+<text x='424.8' y='718.0' font-size='14' fill='#1f2226' text-anchor='start'>Waiting for breathing tracking</text>
+<text x='1246.4' y='718.0' font-size='14' fill='#1f2226' text-anchor='end'>--</text>
+<text x='1520.0' y='718.0' font-size='14' fill='#1f2226' text-anchor='end'>--</text>
 <line x1='60.0' y1='730.0' x2='1536.0' y2='730.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='746.0' font-size='14' fill='#1f2226' text-anchor='start'>pause</text>
-<text x='424.8' y='746.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
-<text x='841.6' y='746.0' font-size='14' fill='#1f2226' text-anchor='start'>0.569</text>
-<text x='1258.4' y='746.0' font-size='14' fill='#1f2226' text-anchor='start'>0.349</text>
+<text x='60.0' y='746.0' font-size='14' fill='#1f2226' text-anchor='start'>Breathing pause</text>
+<text x='424.8' y='746.0' font-size='14' fill='#1f2226' text-anchor='start'>Stale</text>
+<text x='1246.4' y='746.0' font-size='14' fill='#1f2226' text-anchor='end'>0.569</text>
+<text x='1520.0' y='746.0' font-size='14' fill='#1f2226' text-anchor='end'>0.349</text>
 </svg>

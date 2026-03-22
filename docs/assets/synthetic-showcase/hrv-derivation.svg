@@ -4,9 +4,9 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 </style>
 <rect x='0' y='0' width='1600' height='960' fill='#f7f2ea' />
 <text x='48.0' y='52.0' font-size='34' fill='#1f2226' text-anchor='start'>HRV derivation</text>
-<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Accepted RR intervals produce adjacent RR deltas, which then determine RMSSD, SDNN, pNN50, and lnRMSSD.</text>
+<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Accepted RR intervals are differenced beat-to-beat and summarized with short-term time-domain HRV metrics following the Shaffer-Ginsberg framing.</text>
 <rect x='40.0' y='120.0' width='740.0' height='360.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Accepted RR window</text>
+<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>A. Accepted RR interval window</text>
 <line x1='118.0' y1='414.0' x2='750.0' y2='414.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='118.0' y1='204.0' x2='118.0' y2='414.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='112.0' y1='414.0' x2='118.0' y2='414.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
@@ -30,11 +30,11 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <line x1='750.0' y1='414.0' x2='750.0' y2='420.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <text x='750.0' y='438.0' font-size='12' fill='#626a72' text-anchor='middle'>360</text>
 <text x='434.0' y='470.0' font-size='12' fill='#626a72' text-anchor='middle'>Time (s)</text>
-<text x='60.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>RR (ms)</text>
+<text x='60.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>RR interval (ms)</text>
 <line x1='560.0' y1='148.0' x2='578.0' y2='148.0' stroke='#4d9c5b' stroke-width='3' stroke-linecap='round' />
-<text x='588.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>hrv_high</text>
+<text x='588.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>High HRV</text>
 <line x1='560.0' y1='166.0' x2='578.0' y2='166.0' stroke='#d5822b' stroke-width='3' stroke-linecap='round' />
-<text x='588.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>hrv_low</text>
+<text x='588.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>Low HRV</text>
 <polyline points='122.5,270.6 127.4,377.3 131.8,344.2 136.4,231.2 141.3,298.2 146.1,392.7 150.5,303.4 155.2,214.5 160.2,309.9 164.9,377.7 169.3,257.3 174.2,238.8 179.1,349.0 183.7,354.1 188.2,218.5 193.2,258.4 198.1,380.1 202.5,327.0 207.1,223.9 212.1,302.7 216.8,390.4 221.2,285.9 226.0,234.2 230.9,351.4 235.5,402.6 239.8,270.5 244.7,259.2 249.5,374.9 254.0,379.1 258.4,249.5 263.3,294.2 268.1,409.7 272.4,358.7 276.9,236.4 281.9,304.0 286.6,406.9 290.9,319.2 295.6,239.5 300.5,338.1 305.1,400.5 309.5,268.8 314.3,231.7 319.2,351.4 323.8,375.8 328.3,236.6 333.2,260.2 338.0,371.7 342.5,325.5 347.1,204.0 352.2,288.6 357.0,390.1 361.4,288.1 366.1,217.8 371.1,324.6 375.8,374.7 380.2,244.9 385.1,249.4 390.0,376.4 394.5,366.7 399.0,230.3 403.9,280.3 408.7,393.5 413.1,337.1 417.7,239.3 422.6,329.3 427.3,414.0 431.6,306.0 436.3,240.0 441.2,349.5 445.8,408.9 450.1,285.3 454.9,265.3 459.7,373.7 464.2,380.2 468.6,243.5 473.5,273.0 478.3,389.0 482.8,354.8 487.3,230.9 492.2,291.5 497.0,382.8 501.4,293.5 506.2,219.9 511.2,321.7 515.8,383.8 520.2,255.5 525.1,230.6 530.1,341.4 534.7,350.1 539.2,225.0 544.2,271.3 549.0,378.5 553.4,321.8 558.1,216.0 563.1,300.7 567.8,390.5 572.2,295.0 577.0,245.2 581.9,346.7 586.4,391.5 590.8,263.1 595.7,262.4 600.5,379.5 605.0,386.9 609.4,260.9 614.2,289.7 619.0,392.7 623.4,351.5 627.9,241.1 632.9,314.2 637.5,411.1 641.9,328.0 646.5,237.4 651.4,321.0 656.1,390.5 660.5,276.4 665.3,244.9 670.2,353.0 674.7,375.8 679.2,236.6 684.1,246.6 689.0,363.6 693.5,333.6 698.1,220.2 703.1,286.3 707.9,380.4 712.3,286.3 717.1,211.1 722.1,320.0 726.8,384.7 731.2,259.1 736.1,245.8 741.0,358.9 745.5,362.1 750.0,232.2' fill='none' stroke='#4d9c5b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
 <circle cx='122.5' cy='270.6' r='3.0' fill='#4d9c5b' />
 <circle cx='174.2' cy='238.8' r='3.0' fill='#4d9c5b' />
@@ -64,7 +64,7 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <circle cx='665.9' cy='358.2' r='3.0' fill='#d5822b' />
 <circle cx='715.6' cy='352.2' r='3.0' fill='#d5822b' />
 <rect x='820.0' y='120.0' width='740.0' height='360.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='840.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Adjacent RR deltas</text>
+<text x='840.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>B. Successive RR differences</text>
 <line x1='898.0' y1='414.0' x2='1530.0' y2='414.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='898.0' y1='204.0' x2='898.0' y2='414.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='892.0' y1='414.0' x2='898.0' y2='414.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
@@ -88,11 +88,11 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <line x1='1530.0' y1='414.0' x2='1530.0' y2='420.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <text x='1530.0' y='438.0' font-size='12' fill='#626a72' text-anchor='middle'>360</text>
 <text x='1214.0' y='470.0' font-size='12' fill='#626a72' text-anchor='middle'>Time (s)</text>
-<text x='840.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Delta RR (ms)</text>
+<text x='840.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Successive difference (ms)</text>
 <line x1='1340.0' y1='148.0' x2='1358.0' y2='148.0' stroke='#4d9c5b' stroke-width='3' stroke-linecap='round' />
-<text x='1368.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>hrv_high</text>
+<text x='1368.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>High HRV</text>
 <line x1='1340.0' y1='166.0' x2='1358.0' y2='166.0' stroke='#d5822b' stroke-width='3' stroke-linecap='round' />
-<text x='1368.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>hrv_low</text>
+<text x='1368.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>Low HRV</text>
 <polyline points='902.9,398.0 907.3,287.7 911.9,224.7 916.9,366.7 921.7,388.4 926.1,243.4 930.9,243.6 935.9,389.1 940.6,367.3 945.1,218.9 950.0,299.2 955.0,400.8 959.6,317.9 964.1,206.8 969.2,345.3 974.1,409.9 978.5,271.9 983.2,232.5 988.2,376.0 993.0,383.0 997.4,231.4 1002.2,273.1 1007.2,406.3 1011.8,354.2 1016.2,209.6 1021.0,305.0 1025.9,405.1 1030.4,317.1 1034.9,211.6 1039.8,349.1 1044.6,405.0 1049.0,273.6 1053.5,217.4 1058.5,367.1 1063.2,395.0 1067.6,244.7 1072.3,250.9 1077.3,391.7 1081.9,363.0 1086.3,209.9 1091.1,284.6 1096.1,408.2 1100.7,333.1 1105.2,204.0 1110.2,332.4 1115.1,401.8 1119.6,277.4 1124.2,218.0 1129.3,380.6 1134.1,393.9 1138.6,233.4 1143.4,258.3 1148.4,398.1 1153.1,353.4 1157.6,211.4 1162.5,317.5 1167.4,414.0 1171.9,306.2 1176.4,206.2 1181.4,353.3 1186.3,403.1 1190.7,269.3 1195.3,236.6 1200.3,384.9 1204.9,380.6 1209.3,228.6 1214.0,261.8 1219.0,400.2 1223.6,360.7 1227.9,216.3 1232.7,298.1 1237.6,399.4 1242.1,319.0 1246.6,205.9 1251.5,337.2 1256.4,405.4 1260.8,286.8 1265.4,216.1 1270.4,361.6 1275.2,385.9 1279.6,243.4 1284.4,255.8 1289.4,394.2 1294.1,362.8 1298.6,212.6 1303.5,294.2 1308.5,401.3 1313.1,320.7 1317.7,215.1 1322.7,350.4 1327.5,398.4 1332.0,269.1 1336.7,230.4 1341.7,380.7 1346.5,384.7 1350.9,238.5 1355.7,274.6 1360.7,393.9 1365.2,349.2 1369.7,212.5 1374.6,313.3 1379.4,406.2 1383.9,319.7 1388.4,214.4 1393.3,336.6 1398.1,395.1 1402.5,281.3 1407.1,226.7 1412.0,371.6 1416.7,390.2 1421.1,248.3 1425.7,242.4 1430.7,379.9 1435.4,368.7 1439.8,223.8 1444.7,289.0 1449.6,399.1 1454.2,331.8 1458.7,204.0 1463.7,321.7 1468.6,406.2 1473.1,290.1 1477.8,224.4 1482.8,365.9 1487.6,388.1 1492.1,239.6 1496.9,254.5 1501.9,399.7 1506.6,364.9 1511.1,214.7 1516.0,303.4 1520.9,403.0 1525.5,316.4 1530.0,211.4' fill='none' stroke='#4d9c5b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
 <circle cx='902.9' cy='398.0' r='3.0' fill='#4d9c5b' />
 <circle cx='955.0' cy='400.8' r='3.0' fill='#4d9c5b' />
@@ -122,23 +122,23 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <circle cx='1449.8' cy='312.0' r='3.0' fill='#d5822b' />
 <circle cx='1499.9' cy='310.3' r='3.0' fill='#d5822b' />
 <rect x='40.0' y='520.0' width='1520.0' height='340.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='554.0' font-size='20' fill='#1f2226' text-anchor='start'>Time-domain summary</text>
+<text x='60.0' y='554.0' font-size='20' fill='#1f2226' text-anchor='start'>C. Time-domain HRV summary</text>
 <text x='60.0' y='590.0' font-size='14' fill='#626a72' text-anchor='start'>Scenario</text>
-<text x='424.8' y='590.0' font-size='14' fill='#626a72' text-anchor='start'>RMSSD</text>
-<text x='702.7' y='590.0' font-size='14' fill='#626a72' text-anchor='start'>SDNN</text>
-<text x='980.5' y='590.0' font-size='14' fill='#626a72' text-anchor='start'>pNN50</text>
-<text x='1258.4' y='590.0' font-size='14' fill='#626a72' text-anchor='start'>lnRMSSD</text>
+<text x='690.7' y='590.0' font-size='14' fill='#626a72' text-anchor='end'>RMSSD (ms)</text>
+<text x='968.5' y='590.0' font-size='14' fill='#626a72' text-anchor='end'>SDNN (ms)</text>
+<text x='1246.4' y='590.0' font-size='14' fill='#626a72' text-anchor='end'>pNN50 (%)</text>
+<text x='1520.0' y='590.0' font-size='14' fill='#626a72' text-anchor='end'>ln(RMSSD)</text>
 <line x1='60.0' y1='602.0' x2='1536.0' y2='602.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='618.0' font-size='14' fill='#1f2226' text-anchor='start'>High</text>
-<text x='424.8' y='618.0' font-size='14' fill='#1f2226' text-anchor='start'>58.5</text>
-<text x='702.7' y='618.0' font-size='14' fill='#1f2226' text-anchor='start'>40.0</text>
-<text x='980.5' y='618.0' font-size='14' fill='#1f2226' text-anchor='start'>59.0</text>
-<text x='1258.4' y='618.0' font-size='14' fill='#1f2226' text-anchor='start'>4.069</text>
+<text x='60.0' y='618.0' font-size='14' fill='#1f2226' text-anchor='start'>High HRV</text>
+<text x='690.7' y='618.0' font-size='14' fill='#1f2226' text-anchor='end'>58.5</text>
+<text x='968.5' y='618.0' font-size='14' fill='#1f2226' text-anchor='end'>40.0</text>
+<text x='1246.4' y='618.0' font-size='14' fill='#1f2226' text-anchor='end'>59.0</text>
+<text x='1520.0' y='618.0' font-size='14' fill='#1f2226' text-anchor='end'>4.069</text>
 <line x1='60.0' y1='630.0' x2='1536.0' y2='630.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='646.0' font-size='14' fill='#1f2226' text-anchor='start'>Low</text>
-<text x='424.8' y='646.0' font-size='14' fill='#1f2226' text-anchor='start'>3.0</text>
-<text x='702.7' y='646.0' font-size='14' fill='#1f2226' text-anchor='start'>4.1</text>
-<text x='980.5' y='646.0' font-size='14' fill='#1f2226' text-anchor='start'>0.0</text>
-<text x='1258.4' y='646.0' font-size='14' fill='#1f2226' text-anchor='start'>1.108</text>
-<text x='64.0' y='884.0' font-size='14' fill='#626a72' text-anchor='start'>The showcase preset uses a 120 s / 32 RR preview window so the examples stay deterministic and documentation-friendly.</text>
+<text x='60.0' y='646.0' font-size='14' fill='#1f2226' text-anchor='start'>Low HRV</text>
+<text x='690.7' y='646.0' font-size='14' fill='#1f2226' text-anchor='end'>3.0</text>
+<text x='968.5' y='646.0' font-size='14' fill='#1f2226' text-anchor='end'>4.1</text>
+<text x='1246.4' y='646.0' font-size='14' fill='#1f2226' text-anchor='end'>0.0</text>
+<text x='1520.0' y='646.0' font-size='14' fill='#1f2226' text-anchor='end'>1.108</text>
+<text x='64.0' y='884.0' font-size='14' fill='#626a72' text-anchor='start'>These traces are intended as reproducible short-term examples. They are not substitutes for 24 h norms or clinical artifact adjudication.</text>
 </svg>

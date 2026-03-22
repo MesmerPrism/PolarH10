@@ -4,9 +4,9 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 </style>
 <rect x='0' y='0' width='1600' height='960' fill='#f7f2ea' />
 <text x='48.0' y='52.0' font-size='34' fill='#1f2226' text-anchor='start'>Breathing-dynamics derivation</text>
-<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Breathing waveform samples become accepted extrema, interval/amplitude series, and then entropy-oriented feature bundles.</text>
+<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>An ACC-derived breathing waveform is converted to accepted extrema, breath-interval and breath-amplitude series, and entropy-oriented summary statistics.</text>
 <rect x='40.0' y='120.0' width='740.0' height='250.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Waveform input</text>
+<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>A. Breathing waveform</text>
 <line x1='118.0' y1='304.0' x2='750.0' y2='304.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='118.0' y1='204.0' x2='118.0' y2='304.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='112.0' y1='304.0' x2='118.0' y2='304.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
@@ -30,11 +30,11 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <line x1='750.0' y1='304.0' x2='750.0' y2='310.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <text x='750.0' y='328.0' font-size='12' fill='#626a72' text-anchor='middle'>360</text>
 <text x='434.0' y='360.0' font-size='12' fill='#626a72' text-anchor='middle'>Time (s)</text>
-<text x='60.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Volume01</text>
+<text x='60.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Normalized amplitude (a.u.)</text>
 <line x1='560.0' y1='148.0' x2='578.0' y2='148.0' stroke='#c85454' stroke-width='3' stroke-linecap='round' />
-<text x='588.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>entropy_high</text>
+<text x='588.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>High entropy</text>
 <line x1='560.0' y1='166.0' x2='578.0' y2='166.0' stroke='#258acb' stroke-width='3' stroke-linecap='round' />
-<text x='588.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>entropy_low</text>
+<text x='588.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>Low entropy</text>
 <polyline points='118.0,227.2 120.0,260.4 121.9,282.5 123.9,246.1 125.9,228.5 127.8,244.3 129.8,282.5 131.8,272.2 133.7,230.3 135.7,230.8 137.7,268.9 139.6,280.6 141.6,252.5 143.6,227.7 145.5,249.9 147.5,283.8 149.5,276.7 151.4,228.8 153.4,238.5 155.4,270.7 157.3,282.0 159.3,252.4 161.3,230.9 163.2,253.7 165.2,283.0 167.2,275.0 169.1,225.5 171.1,241.9 173.1,265.1 175.0,281.3 177.0,241.2 179.0,232.8 180.9,250.6 182.9,283.5 184.9,264.1 186.8,227.6 188.8,241.0 190.8,263.9 192.7,276.9 194.7,233.5 196.6,229.0 198.6,248.4 200.6,284.4 202.5,253.7 204.5,228.8 206.5,240.8 208.4,271.7 210.4,271.1 212.4,236.7 214.3,228.1 216.3,255.2 218.3,282.0 220.2,254.7 222.2,228.3 224.2,244.6 226.1,278.2 228.1,273.0 230.1,241.0 232.0,233.3 234.0,263.9 236.0,282.3 237.9,259.2 239.9,227.4 241.9,251.5 243.8,278.0 245.8,276.3 247.8,234.2 249.7,239.4 251.7,263.3 253.7,282.0 255.6,252.8 257.6,228.5 259.6,253.6 261.5,275.6 263.5,272.0 265.5,228.2 267.4,240.6 269.4,259.1 271.4,281.6 273.3,238.9 275.3,226.8 277.3,249.5 279.2,277.6 281.2,259.7 283.2,229.2 285.1,238.8 287.1,262.6 289.1,280.5 291.0,234.3 293.0,224.2 295.0,250.3 296.9,281.5 298.9,253.7 300.9,230.6 302.8,238.4 304.8,272.2 306.8,279.5 308.7,238.9 310.7,225.5 312.7,259.4 314.6,282.3 316.6,259.3 318.6,229.7 320.5,242.5 322.5,277.4 324.5,282.4 326.4,238.9 328.4,229.5 330.4,264.7 332.3,281.3 334.3,262.8 336.3,227.6 338.2,247.4 340.2,276.7 342.1,283.5 344.1,230.7 346.1,233.9 348.0,260.7 350.0,279.6 352.0,253.5 353.9,227.2 355.9,245.2 357.9,275.7 359.8,279.4 361.8,228.2 363.8,234.7 365.7,257.9 367.7,282.1 369.7,242.4 371.6,224.9 373.6,240.7 375.6,279.2 377.5,269.1 379.5,229.6 381.5,233.7 383.4,263.2 385.4,282.6 387.4,243.8 389.3,224.4 391.3,244.6 393.3,282.3 395.2,267.0 397.2,230.9 399.2,234.6 401.1,271.0 403.1,282.3 405.1,250.8 407.0,226.6 409.0,253.6 411.0,282.5 412.9,272.2 414.9,229.7 416.9,240.3 418.8,273.1 420.8,284.0 422.8,247.5 424.7,231.3 426.7,255.3 428.7,280.3 430.6,270.8 432.6,227.4 434.6,244.0 436.5,270.0 438.5,283.7 440.5,237.2 442.4,235.2 444.4,251.3 446.4,279.7 448.3,258.3 450.3,225.4 452.3,240.4 454.2,269.0 456.2,276.0 458.2,234.0 460.1,234.9 462.1,251.8 464.1,283.1 466.0,249.4 468.0,223.9 470.0,239.2 471.9,274.3 473.9,266.2 475.9,236.4 477.8,233.5 479.8,258.6 481.8,283.5 483.7,253.0 485.7,225.2 487.6,247.2 489.6,278.8 491.6,268.0 493.5,238.8 495.5,235.8 497.5,265.8 499.4,284.4 501.4,255.9 503.4,225.6 505.3,255.1 507.3,277.4 509.3,272.5 511.2,233.9 513.2,241.5 515.2,266.9 517.1,285.5 519.1,246.8 521.1,228.4 523.0,254.2 525.0,273.1 527.0,266.9 528.9,227.5 530.9,241.2 532.9,264.3 534.8,285.4 536.8,236.3 538.8,230.8 540.7,251.4 542.7,276.0 544.7,254.5 546.6,224.8 548.6,235.9 550.6,266.7 552.5,279.1 554.5,234.4 556.5,230.1 558.4,254.2 560.4,283.2 562.4,251.7 564.3,226.2 566.3,237.2 568.3,274.7 570.2,274.8 572.2,237.2 574.2,229.0 576.1,261.5 578.1,285.1 580.1,258.5 582.0,226.5 584.0,245.4 586.0,278.5 587.9,278.5 589.9,237.6 591.9,231.8 593.8,266.7 595.8,284.6 597.8,259.3 599.7,225.3 601.7,249.3 603.7,275.4 605.6,279.8 607.6,231.0 609.6,235.7 611.5,265.0 613.5,285.1 615.5,249.3 617.4,228.8 619.4,246.6 621.4,273.2 623.3,274.0 625.3,225.9 627.3,232.8 629.2,261.7 631.2,285.3 633.2,241.2 635.1,230.5 637.1,245.1 639.0,279.3 641.0,265.7 643.0,225.0 644.9,230.0 646.9,265.7 648.9,279.3 650.8,242.2 652.8,229.3 654.8,248.4 656.7,284.5 658.7,267.0 660.7,227.6 662.6,235.2 664.6,273.2 666.6,277.7 668.5,247.8 670.5,229.4 672.5,254.7 674.4,284.8 676.4,271.7 678.4,226.2 680.3,243.5 682.3,273.6 684.3,280.4 686.2,245.7 688.2,234.2 690.2,257.6 692.1,284.7 694.1,267.6 696.1,225.6 698.0,245.7 700.0,267.9 702.0,278.7 703.9,235.1 705.9,235.8 707.9,254.3 709.8,285.5 711.8,254.8 713.8,228.5 715.7,244.0 717.7,268.0 719.7,270.6 721.6,229.6 723.6,231.4 725.6,253.5 727.5,284.1 729.5,246.6 731.5,228.9 733.4,244.7 735.4,276.4 737.4,264.2 739.3,232.8 741.3,231.0 743.3,261.3 745.2,279.9 747.2,248.9 749.2,227.8 750.0,233.7' fill='none' stroke='#c85454' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
 <circle cx='118.0' cy='227.2' r='3.0' fill='#c85454' />
 <circle cx='169.1' cy='225.5' r='3.0' fill='#c85454' />
@@ -64,7 +64,7 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <circle cx='680.3' cy='243.2' r='3.0' fill='#258acb' />
 <circle cx='731.5' cy='270.8' r='3.0' fill='#258acb' />
 <rect x='820.0' y='120.0' width='740.0' height='250.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='840.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Derived interval series</text>
+<text x='840.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>B. Breath-interval series</text>
 <line x1='898.0' y1='304.0' x2='1530.0' y2='304.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='898.0' y1='204.0' x2='898.0' y2='304.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='892.0' y1='304.0' x2='898.0' y2='304.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
@@ -88,11 +88,11 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <line x1='1530.0' y1='304.0' x2='1530.0' y2='310.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <text x='1530.0' y='328.0' font-size='12' fill='#626a72' text-anchor='middle'>142</text>
 <text x='1214.0' y='360.0' font-size='12' fill='#626a72' text-anchor='middle'>Breath index</text>
-<text x='840.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Seconds</text>
+<text x='840.0' y='178.0' font-size='12' fill='#626a72' text-anchor='start'>Interval (s)</text>
 <line x1='1340.0' y1='148.0' x2='1358.0' y2='148.0' stroke='#c85454' stroke-width='3' stroke-linecap='round' />
-<text x='1368.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>entropy_high</text>
+<text x='1368.0' y='152.0' font-size='12' fill='#626a72' text-anchor='start'>High entropy</text>
 <line x1='1340.0' y1='166.0' x2='1358.0' y2='166.0' stroke='#258acb' stroke-width='3' stroke-linecap='round' />
-<text x='1368.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>entropy_low</text>
+<text x='1368.0' y='170.0' font-size='12' fill='#626a72' text-anchor='start'>Low entropy</text>
 <polyline points='898.0,270.7 902.5,237.3 907.0,287.3 911.4,254.0 915.9,237.3 920.4,287.3 924.9,254.0 929.4,270.7 933.9,220.7 938.3,287.3 942.8,254.0 947.3,254.0 951.8,270.7 956.3,270.7 960.8,270.7 965.2,254.0 969.7,287.3 974.2,254.0 978.7,270.7 983.2,220.7 987.6,270.7 992.1,254.0 996.6,254.0 1001.1,254.0 1005.6,254.0 1010.1,270.7 1014.5,237.3 1019.0,287.3 1023.5,237.3 1028.0,270.7 1032.5,254.0 1037.0,287.3 1041.4,270.7 1045.9,254.0 1050.4,270.7 1054.9,270.7 1059.4,270.7 1063.8,204.0 1068.3,287.3 1072.8,254.0 1077.3,254.0 1081.8,254.0 1086.3,287.3 1090.7,270.7 1095.2,220.7 1099.7,287.3 1104.2,254.0 1108.7,270.7 1113.1,237.3 1117.6,304.0 1122.1,254.0 1126.6,270.7 1131.1,287.3 1135.6,287.3 1140.0,270.7 1144.5,237.3 1149.0,287.3 1153.5,254.0 1158.0,287.3 1162.5,220.7 1166.9,287.3 1171.4,254.0 1175.9,254.0 1180.4,254.0 1184.9,270.7 1189.3,287.3 1193.8,220.7 1198.3,270.7 1202.8,237.3 1207.3,270.7 1211.8,254.0 1216.2,287.3 1220.7,270.7 1225.2,254.0 1229.7,270.7 1234.2,254.0 1238.7,270.7 1243.1,220.7 1247.6,287.3 1252.1,254.0 1256.6,270.7 1261.1,237.3 1265.5,254.0 1270.0,270.7 1274.5,237.3 1279.0,270.7 1283.5,254.0 1288.0,270.7 1292.4,237.3 1296.9,287.3 1301.4,254.0 1305.9,270.7 1310.4,270.7 1314.9,287.3 1319.3,270.7 1323.8,237.3 1328.3,270.7 1332.8,254.0 1337.3,270.7 1341.7,220.7 1346.2,287.3 1350.7,254.0 1355.2,254.0 1359.7,270.7 1364.2,270.7 1368.6,270.7 1373.1,220.7 1377.6,304.0 1382.1,237.3 1386.6,270.7 1391.0,270.7 1395.5,287.3 1400.0,254.0 1404.5,270.7 1409.0,304.0 1413.5,270.7 1417.9,270.7 1422.4,220.7 1426.9,304.0 1431.4,254.0 1435.9,254.0 1440.4,237.3 1444.8,287.3 1449.3,254.0 1453.8,237.3 1458.3,287.3 1462.8,237.3 1467.2,270.7 1471.7,237.3 1476.2,270.7 1480.7,254.0 1485.2,270.7 1489.7,270.7 1494.1,270.7 1498.6,270.7 1503.1,237.3 1507.6,270.7 1512.1,254.0 1516.6,270.7 1521.0,220.7 1525.5,287.3 1530.0,254.0' fill='none' stroke='#c85454' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
 <circle cx='898.0' cy='270.7' r='3.0' fill='#c85454' />
 <circle cx='947.3' cy='254.0' r='3.0' fill='#c85454' />
@@ -122,7 +122,7 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <circle cx='1440.4' cy='270.7' r='3.0' fill='#258acb' />
 <circle cx='1489.7' cy='254.0' r='3.0' fill='#258acb' />
 <rect x='40.0' y='400.0' width='740.0' height='250.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='434.0' font-size='20' fill='#1f2226' text-anchor='start'>Derived amplitude series</text>
+<text x='60.0' y='434.0' font-size='20' fill='#1f2226' text-anchor='start'>C. Breath-amplitude series</text>
 <line x1='118.0' y1='584.0' x2='750.0' y2='584.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='118.0' y1='484.0' x2='118.0' y2='584.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <line x1='112.0' y1='584.0' x2='118.0' y2='584.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
@@ -146,11 +146,11 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <line x1='750.0' y1='584.0' x2='750.0' y2='590.0' stroke='#515860' stroke-width='1' stroke-linecap='round' />
 <text x='750.0' y='608.0' font-size='12' fill='#626a72' text-anchor='middle'>143</text>
 <text x='434.0' y='640.0' font-size='12' fill='#626a72' text-anchor='middle'>Breath index</text>
-<text x='60.0' y='458.0' font-size='12' fill='#626a72' text-anchor='start'>Excursion</text>
+<text x='60.0' y='458.0' font-size='12' fill='#626a72' text-anchor='start'>Amplitude (a.u.)</text>
 <line x1='560.0' y1='428.0' x2='578.0' y2='428.0' stroke='#c85454' stroke-width='3' stroke-linecap='round' />
-<text x='588.0' y='432.0' font-size='12' fill='#626a72' text-anchor='start'>entropy_high</text>
+<text x='588.0' y='432.0' font-size='12' fill='#626a72' text-anchor='start'>High entropy</text>
 <line x1='560.0' y1='446.0' x2='578.0' y2='446.0' stroke='#258acb' stroke-width='3' stroke-linecap='round' />
-<text x='588.0' y='450.0' font-size='12' fill='#626a72' text-anchor='start'>entropy_low</text>
+<text x='588.0' y='450.0' font-size='12' fill='#626a72' text-anchor='start'>Low entropy</text>
 <polyline points='118.0,528.3 122.5,517.4 126.9,489.4 131.4,506.3 135.8,524.8 140.3,507.3 144.7,490.2 149.2,511.4 153.6,530.8 158.1,504.2 162.5,486.3 167.0,517.9 171.4,525.5 175.9,489.1 180.3,497.2 184.8,529.4 189.2,504.9 193.7,485.7 198.1,522.3 202.6,525.1 207.0,488.4 211.5,498.4 215.9,526.2 220.4,509.3 224.8,489.0 229.3,507.9 233.7,524.4 238.2,504.5 242.6,487.7 247.1,512.1 251.5,528.2 256.0,497.0 260.4,491.5 264.9,527.5 269.3,517.0 273.8,484.8 278.2,512.9 282.7,530.7 287.1,491.6 291.6,491.8 296.0,529.1 300.5,514.7 304.9,487.6 309.4,509.0 313.8,527.6 318.3,505.1 322.7,489.8 327.2,513.7 331.6,529.8 336.1,504.1 340.5,487.7 345.0,517.2 349.4,525.6 353.9,493.1 358.3,501.3 362.8,530.7 367.2,505.3 371.7,486.1 376.1,520.7 380.6,523.8 385.0,489.1 389.5,499.2 393.9,526.8 398.4,510.7 402.8,489.6 407.3,507.8 411.7,527.6 416.2,507.5 420.6,486.1 425.1,510.8 429.5,529.2 434.0,497.2 438.5,490.2 442.9,526.8 447.4,517.8 451.8,484.3 456.3,509.4 460.7,529.0 465.2,492.2 469.6,490.1 474.1,526.8 478.5,517.2 483.0,488.6 487.4,504.3 491.9,524.1 496.3,504.8 500.8,488.4 505.2,510.9 509.7,527.9 514.1,502.4 518.6,486.8 523.0,517.8 527.5,524.7 531.9,490.3 536.4,501.5 540.8,532.5 545.3,505.5 549.7,486.0 554.2,523.5 558.6,523.9 563.1,487.4 567.5,501.2 572.0,528.0 576.4,508.5 580.9,489.5 585.3,512.0 589.8,527.2 594.2,505.1 598.7,487.8 603.1,512.2 607.6,529.4 612.0,500.0 616.5,490.7 620.9,522.4 625.4,516.0 629.8,486.8 634.3,511.4 638.7,528.9 643.2,493.9 647.6,492.9 652.1,528.7 656.5,516.7 661.0,488.6 665.4,505.3 669.9,524.4 674.3,507.1 678.8,490.7 683.2,509.8 687.7,528.9 692.1,504.2 696.6,484.9 701.0,516.6 705.5,525.4 709.9,489.4 714.4,498.4 718.8,530.8 723.3,504.1 727.7,484.0 732.2,521.3 736.6,523.5 741.1,486.4 745.5,499.4 750.0,527.4' fill='none' stroke='#c85454' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />
 <circle cx='118.0' cy='528.3' r='3.0' fill='#c85454' />
 <circle cx='167.0' cy='517.9' r='3.0' fill='#c85454' />
@@ -180,23 +180,23 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 <circle cx='656.5' cy='581.3' r='3.0' fill='#258acb' />
 <circle cx='705.5' cy='582.3' r='3.0' fill='#258acb' />
 <rect x='820.0' y='400.0' width='740.0' height='340.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='840.0' y='434.0' font-size='20' fill='#1f2226' text-anchor='start'>Entropy summary</text>
+<text x='840.0' y='434.0' font-size='20' fill='#1f2226' text-anchor='start'>D. Entropy and variability summary</text>
 <text x='840.0' y='470.0' font-size='14' fill='#626a72' text-anchor='start'>Scenario</text>
-<text x='1017.6' y='470.0' font-size='14' fill='#626a72' text-anchor='start'>Int SampEn</text>
-<text x='1144.7' y='470.0' font-size='14' fill='#626a72' text-anchor='start'>Amp SampEn</text>
-<text x='1271.7' y='470.0' font-size='14' fill='#626a72' text-anchor='start'>Int CV</text>
-<text x='1398.8' y='470.0' font-size='14' fill='#626a72' text-anchor='start'>Amp CV</text>
+<text x='1132.7' y='470.0' font-size='14' fill='#626a72' text-anchor='end'>Interval SampEn</text>
+<text x='1259.7' y='470.0' font-size='14' fill='#626a72' text-anchor='end'>Amplitude SampEn</text>
+<text x='1386.8' y='470.0' font-size='14' fill='#626a72' text-anchor='end'>Interval CV</text>
+<text x='1520.0' y='470.0' font-size='14' fill='#626a72' text-anchor='end'>Amplitude CV</text>
 <line x1='840.0' y1='482.0' x2='1536.0' y2='482.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
 <text x='840.0' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>High</text>
-<text x='1017.6' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>1.230</text>
-<text x='1144.7' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>0.426</text>
-<text x='1271.7' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>0.020</text>
-<text x='1398.8' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>0.034</text>
+<text x='1132.7' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>1.230</text>
+<text x='1259.7' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>0.426</text>
+<text x='1386.8' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>0.020</text>
+<text x='1520.0' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>0.034</text>
 <line x1='840.0' y1='510.0' x2='1536.0' y2='510.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
 <text x='840.0' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>Low</text>
-<text x='1017.6' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>0.044</text>
-<text x='1144.7' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>0.148</text>
-<text x='1271.7' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>0.008</text>
-<text x='1398.8' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>0.002</text>
-<text x='64.0' y='884.0' font-size='14' fill='#626a72' text-anchor='start'>The exported analysis includes the accepted extrema and derived series so supplementary figures can trace the metric path directly.</text>
+<text x='1132.7' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>0.044</text>
+<text x='1259.7' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>0.148</text>
+<text x='1386.8' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>0.008</text>
+<text x='1520.0' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>0.002</text>
+<text x='64.0' y='884.0' font-size='14' fill='#626a72' text-anchor='start'>SampEn settings: m = 2, delay = 1, r = 0.2 * SD. The waveform source is the repo's calibrated ACC breathing signal rather than a respiration belt.</text>
 </svg>

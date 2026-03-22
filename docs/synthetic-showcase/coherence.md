@@ -9,9 +9,12 @@ nav_order: 76
 
 # Coherence Showcase
 
-This page pairs `coherence_high` and `coherence_low` with the appendix sweep so
-the published figures can show exactly how the accepted RR window and spectral
-shape drive the normalized coherence score.
+This page pairs `coherence_high` and `coherence_low` so the published figure
+set can show how accepted RR intervals produce a narrowband spectral peak and,
+in turn, higher coherence telemetry. The computation framing follows the
+McCraty et al. coherence method documented in the
+[coherence formula sheet](../coherence-formulas.md), while also separating the
+paper-defined ratio from the app-facing `0..1` values exposed in `PolarH10`.
 
 <p>
   <a class="button primary" href="../coherence-formulas.md">Open formula sheet</a>
@@ -21,7 +24,18 @@ shape drive the normalized coherence score.
 
 ![Coherence derivation](../assets/synthetic-showcase/coherence-derivation.png)
 
-## Canonical Pair
+## Suggested Caption
+
+*Accepted RR intervals from deterministic high- and low-coherence synthetic
+scenarios are converted to a resampled tachogram and power spectral density.
+Following the McCraty et al. spectral framing, the dominant peak is searched in
+`0.04-0.26 Hz`, integrated in a `0.030 Hz` window, and compared against total
+power in `0.0033-0.4 Hz`. The figure reports both the paper coherence ratio and
+the app-facing normalized/displayed `0..1` scores so the publication panel
+matches the software telemetry while keeping the methodological distinction
+explicit.*
+
+## Source Files
 
 - [coherence_high RR window](../data/synthetic-showcase/scenarios/coherence_high/hr_rr.csv)
 - [coherence_high analysis](../data/synthetic-showcase/scenarios/coherence_high/analysis.json)
@@ -35,7 +49,7 @@ AcceptedRrSamples
 -> ResampledTachogram
 -> PowerSpectrum
 -> PeakBandPower / TotalBandPower
--> CurrentCoherence01
+-> PaperCoherenceRatio / NormalizedCoherence01 / CurrentCoherence01
 ```
 
 - `Coherence.Diagnostics.AcceptedRrSamples` exposes the accepted RR window used
@@ -45,13 +59,28 @@ AcceptedRrSamples
 - `Coherence.Diagnostics.PowerSpectrum`, `PeakWindowLowerHz`,
   `PeakWindowUpperHz`, `PeakBandPower`, and `TotalBandPower` expose the peak
   search and integral terms.
-- `Coherence.Telemetry.CurrentCoherence01`, `PeakFrequencyHz`, and
-  `PaperCoherenceRatio` expose the final downstream values surfaced by the app.
+- `Coherence.Telemetry.PaperCoherenceRatio` is the method-facing ratio described
+  in the reference monograph.
+- `Coherence.Telemetry.NormalizedCoherence01` is the app's bounded
+  `PeakBandPower / TotalBandPower` value.
+- `Coherence.Telemetry.CurrentCoherence01` is the displayed coherence value
+  surfaced by the app UI and exported here for figure parity with the
+  application.
+
+## Interpretation Notes
+
+- The power spectral density is plotted in arbitrary units because the figure is
+  meant to expose the computational path and relative separation between
+  scenarios, not absolute spectral calibration.
+- The figure is deterministic by design. It is an explanatory supplement, not a
+  claim that these synthetic traces define normative coherence ranges.
 
 ## Appendix Sweep
 
 The appendix figure keeps the resonance and off-resonance comparison visible in
-the same publication bundle.
+the same publication bundle so authors can show that the strongest coherence
+separation occurs near the resonance-like condition while still documenting the
+intermediate off-resonance cases.
 
 - [resonance_010hz analysis](../data/synthetic-showcase/scenarios/resonance_010hz/analysis.json)
 - [off_10bpm analysis](../data/synthetic-showcase/scenarios/off_10bpm/analysis.json)
@@ -67,4 +96,5 @@ the same publication bundle.
 - [Synthetic Showcase Overview](index.md)
 - [Coherence Formula Sheet](../coherence-formulas.md)
 - [Coherence Workflow](../coherence-workflow.md)
+- [References](../references.md)
 - [Formula Sheets](../formula-sheets.md)

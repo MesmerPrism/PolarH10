@@ -11,7 +11,11 @@ nav_order: 78
 
 This page uses `entropy_high` and `entropy_low` as the canonical pair for
 showing how the breathing waveform becomes accepted extrema, derived interval
-and amplitude series, and then the published entropy-oriented telemetry.
+and amplitude series, and then the published entropy-oriented telemetry. The
+feature family follows the breathing-dynamics framing described by
+[Goheen et al. (2025)](https://doi.org/10.1111/psyp.70149), while remaining
+explicit that this repository applies those features to the repo's calibrated
+ACC-derived breathing waveform rather than to a respiration belt signal.
 
 <p>
   <a class="button primary" href="../breathing-dynamics-formulas.md">Open formula sheet</a>
@@ -22,7 +26,18 @@ and amplitude series, and then the published entropy-oriented telemetry.
 
 ![Breathing dynamics derivation](../assets/synthetic-showcase/dynamics-derivation.png)
 
-## Canonical Pair
+## Suggested Caption
+
+*A deterministic high- versus low-entropy breathing pair is shown from the
+normalized breathing waveform through accepted extrema, derived breath-interval
+and breath-amplitude series, and the downstream sample-entropy summary used by
+the app. The feature family follows Goheen et al. (2025), but the present
+implementation applies it to the calibrated ACC-derived breathing waveform
+available in `PolarH10`. Sample entropy is shown with the repository defaults
+`m = 2`, `delay = 1`, and `r = 0.2 * SD`, so the figure can be reproduced
+directly from `analysis.json`.*
+
+## Source Files
 
 - [entropy_high summary](../data/synthetic-showcase/scenarios/entropy_high/ground_truth.json)
 - [entropy_high analysis](../data/synthetic-showcase/scenarios/entropy_high/analysis.json)
@@ -48,6 +63,14 @@ WaveformSamples
   `Dynamics.Telemetry.Amplitude.SampleEntropy`, and `TrackingState` expose the
   final downstream values and edge states published by the app.
 
+## Interpretation Notes
+
+- The waveform plotted here is a normalized ACC-derived breathing signal, so the
+  amplitude axis is intentionally reported in arbitrary units.
+- The feature family is methodologically aligned to the cited breathing-dynamics
+  paper, but the signal source is an app-specific adaptation and should be
+  described that way in manuscripts.
+
 ## Appendix And Edge States
 
 The appendix figure keeps the extra publication cases in the same bundle:
@@ -68,4 +91,5 @@ after the waveform stops updating near the end of the scenario.
 - [Synthetic Showcase Overview](index.md)
 - [Breathing Dynamics Formula Sheet](../breathing-dynamics-formulas.md)
 - [Breathing Dynamics Workflow](../breathing-dynamics-workflow.md)
+- [References](../references.md)
 - [Formula Sheets](../formula-sheets.md)

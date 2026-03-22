@@ -4,132 +4,132 @@ text { fill: #1f2226; font-family: 'Bahnschrift', 'Segoe UI', Arial, sans-serif;
 </style>
 <rect x='0' y='0' width='1600' height='960' fill='#f7f2ea' />
 <text x='48.0' y='52.0' font-size='34' fill='#1f2226' text-anchor='start'>Synthetic showcase matrix</text>
-<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Deterministic scenarios exported from SyntheticBio using showcase-v1.</text>
+<text x='48.0' y='92.0' font-size='16' fill='#626a72' text-anchor='start'>Deterministic showcase-v1 scenarios with publication-facing summary telemetry exported from SyntheticBio.</text>
 <rect x='40.0' y='120.0' width='1520.0' height='760.0' rx='18' ry='18' fill='#fffdf9' stroke='#515860' stroke-width='1' />
-<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Scenario summary</text>
+<text x='60.0' y='154.0' font-size='20' fill='#1f2226' text-anchor='start'>Scenario overview</text>
 <text x='60.0' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>Scenario</text>
-<text x='424.8' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>Coherence</text>
-<text x='633.2' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>RMSSD</text>
-<text x='841.6' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>Int SampEn</text>
-<text x='1050.0' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>Amp SampEn</text>
-<text x='1258.4' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>State</text>
+<text x='621.2' y='190.0' font-size='14' fill='#626a72' text-anchor='end'>Coherence (0-1)</text>
+<text x='829.6' y='190.0' font-size='14' fill='#626a72' text-anchor='end'>RMSSD (ms)</text>
+<text x='1038.0' y='190.0' font-size='14' fill='#626a72' text-anchor='end'>Interval SampEn</text>
+<text x='1246.4' y='190.0' font-size='14' fill='#626a72' text-anchor='end'>Amplitude SampEn</text>
+<text x='1258.4' y='190.0' font-size='14' fill='#626a72' text-anchor='start'>Primary state</text>
 <line x1='60.0' y1='202.0' x2='1536.0' y2='202.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>breathing_pause</text>
-<text x='424.8' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>0.310</text>
-<text x='633.2' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>9.6</text>
-<text x='841.6' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>0.569</text>
-<text x='1050.0' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>0.349</text>
-<text x='1258.4' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>Breathing pause</text>
+<text x='621.2' y='218.0' font-size='14' fill='#1f2226' text-anchor='end'>0.310</text>
+<text x='829.6' y='218.0' font-size='14' fill='#1f2226' text-anchor='end'>9.6</text>
+<text x='1038.0' y='218.0' font-size='14' fill='#1f2226' text-anchor='end'>0.569</text>
+<text x='1246.4' y='218.0' font-size='14' fill='#1f2226' text-anchor='end'>0.349</text>
+<text x='1258.4' y='218.0' font-size='14' fill='#1f2226' text-anchor='start'>Stale</text>
 <line x1='60.0' y1='230.0' x2='1536.0' y2='230.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>coherence_high</text>
-<text x='424.8' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>0.517</text>
-<text x='633.2' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>27.5</text>
-<text x='841.6' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>0.000</text>
-<text x='1050.0' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>--</text>
-<text x='1258.4' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>Coherence high</text>
+<text x='621.2' y='246.0' font-size='14' fill='#1f2226' text-anchor='end'>0.517</text>
+<text x='829.6' y='246.0' font-size='14' fill='#1f2226' text-anchor='end'>27.5</text>
+<text x='1038.0' y='246.0' font-size='14' fill='#1f2226' text-anchor='end'>0.000</text>
+<text x='1246.4' y='246.0' font-size='14' fill='#1f2226' text-anchor='end'>--</text>
+<text x='1258.4' y='246.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='258.0' x2='1536.0' y2='258.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>coherence_low</text>
-<text x='424.8' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>0.286</text>
-<text x='633.2' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>130.8</text>
-<text x='841.6' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>0.991</text>
-<text x='1050.0' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>1.099</text>
-<text x='1258.4' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>Coherence low</text>
+<text x='621.2' y='274.0' font-size='14' fill='#1f2226' text-anchor='end'>0.286</text>
+<text x='829.6' y='274.0' font-size='14' fill='#1f2226' text-anchor='end'>130.8</text>
+<text x='1038.0' y='274.0' font-size='14' fill='#1f2226' text-anchor='end'>0.991</text>
+<text x='1246.4' y='274.0' font-size='14' fill='#1f2226' text-anchor='end'>1.099</text>
+<text x='1258.4' y='274.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='286.0' x2='1536.0' y2='286.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>entropy_high</text>
-<text x='424.8' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>0.300</text>
-<text x='633.2' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>13.8</text>
-<text x='841.6' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>1.230</text>
-<text x='1050.0' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>0.426</text>
-<text x='1258.4' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>Entropy high</text>
+<text x='621.2' y='302.0' font-size='14' fill='#1f2226' text-anchor='end'>0.300</text>
+<text x='829.6' y='302.0' font-size='14' fill='#1f2226' text-anchor='end'>13.8</text>
+<text x='1038.0' y='302.0' font-size='14' fill='#1f2226' text-anchor='end'>1.230</text>
+<text x='1246.4' y='302.0' font-size='14' fill='#1f2226' text-anchor='end'>0.426</text>
+<text x='1258.4' y='302.0' font-size='14' fill='#1f2226' text-anchor='start'>Stale</text>
 <line x1='60.0' y1='314.0' x2='1536.0' y2='314.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>entropy_low</text>
-<text x='424.8' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>0.327</text>
-<text x='633.2' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>8.5</text>
-<text x='841.6' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>0.044</text>
-<text x='1050.0' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>0.148</text>
-<text x='1258.4' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>Entropy low</text>
+<text x='621.2' y='330.0' font-size='14' fill='#1f2226' text-anchor='end'>0.327</text>
+<text x='829.6' y='330.0' font-size='14' fill='#1f2226' text-anchor='end'>8.5</text>
+<text x='1038.0' y='330.0' font-size='14' fill='#1f2226' text-anchor='end'>0.044</text>
+<text x='1246.4' y='330.0' font-size='14' fill='#1f2226' text-anchor='end'>0.148</text>
+<text x='1258.4' y='330.0' font-size='14' fill='#1f2226' text-anchor='start'>Stale</text>
 <line x1='60.0' y1='342.0' x2='1536.0' y2='342.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>entropy_rising</text>
-<text x='424.8' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>0.324</text>
-<text x='633.2' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>13.3</text>
-<text x='841.6' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>0.890</text>
-<text x='1050.0' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>0.445</text>
-<text x='1258.4' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>Entropy rising</text>
+<text x='621.2' y='358.0' font-size='14' fill='#1f2226' text-anchor='end'>0.324</text>
+<text x='829.6' y='358.0' font-size='14' fill='#1f2226' text-anchor='end'>13.3</text>
+<text x='1038.0' y='358.0' font-size='14' fill='#1f2226' text-anchor='end'>0.890</text>
+<text x='1246.4' y='358.0' font-size='14' fill='#1f2226' text-anchor='end'>0.445</text>
+<text x='1258.4' y='358.0' font-size='14' fill='#1f2226' text-anchor='start'>Stale</text>
 <line x1='60.0' y1='370.0' x2='1536.0' y2='370.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>flat_breathing</text>
-<text x='424.8' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>0.268</text>
-<text x='633.2' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>3.3</text>
-<text x='841.6' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>--</text>
-<text x='1050.0' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>--</text>
-<text x='1258.4' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>2</text>
+<text x='60.0' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>Flat breathing</text>
+<text x='621.2' y='386.0' font-size='14' fill='#1f2226' text-anchor='end'>0.268</text>
+<text x='829.6' y='386.0' font-size='14' fill='#1f2226' text-anchor='end'>3.3</text>
+<text x='1038.0' y='386.0' font-size='14' fill='#1f2226' text-anchor='end'>--</text>
+<text x='1246.4' y='386.0' font-size='14' fill='#1f2226' text-anchor='end'>--</text>
+<text x='1258.4' y='386.0' font-size='14' fill='#1f2226' text-anchor='start'>Waiting for breathing tracking</text>
 <line x1='60.0' y1='398.0' x2='1536.0' y2='398.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>hrv_high</text>
-<text x='424.8' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>0.107</text>
-<text x='633.2' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>58.5</text>
-<text x='841.6' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>0.514</text>
-<text x='1050.0' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>0.938</text>
-<text x='1258.4' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>HRV high</text>
+<text x='621.2' y='414.0' font-size='14' fill='#1f2226' text-anchor='end'>0.107</text>
+<text x='829.6' y='414.0' font-size='14' fill='#1f2226' text-anchor='end'>58.5</text>
+<text x='1038.0' y='414.0' font-size='14' fill='#1f2226' text-anchor='end'>0.514</text>
+<text x='1246.4' y='414.0' font-size='14' fill='#1f2226' text-anchor='end'>0.938</text>
+<text x='1258.4' y='414.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='426.0' x2='1536.0' y2='426.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>hrv_low</text>
-<text x='424.8' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>0.335</text>
-<text x='633.2' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>3.0</text>
-<text x='841.6' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>0.015</text>
-<text x='1050.0' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>0.189</text>
-<text x='1258.4' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>HRV low</text>
+<text x='621.2' y='442.0' font-size='14' fill='#1f2226' text-anchor='end'>0.335</text>
+<text x='829.6' y='442.0' font-size='14' fill='#1f2226' text-anchor='end'>3.0</text>
+<text x='1038.0' y='442.0' font-size='14' fill='#1f2226' text-anchor='end'>0.015</text>
+<text x='1246.4' y='442.0' font-size='14' fill='#1f2226' text-anchor='end'>0.189</text>
+<text x='1258.4' y='442.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='454.0' x2='1536.0' y2='454.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>irregular_rr</text>
-<text x='424.8' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>0.200</text>
-<text x='633.2' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>186.0</text>
-<text x='841.6' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>1.429</text>
-<text x='1050.0' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>0.301</text>
-<text x='1258.4' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>Irregular RR</text>
+<text x='621.2' y='470.0' font-size='14' fill='#1f2226' text-anchor='end'>0.200</text>
+<text x='829.6' y='470.0' font-size='14' fill='#1f2226' text-anchor='end'>186.0</text>
+<text x='1038.0' y='470.0' font-size='14' fill='#1f2226' text-anchor='end'>1.429</text>
+<text x='1246.4' y='470.0' font-size='14' fill='#1f2226' text-anchor='end'>0.301</text>
+<text x='1258.4' y='470.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='482.0' x2='1536.0' y2='482.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>jittered_breathing</text>
-<text x='424.8' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>0.257</text>
-<text x='633.2' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>13.3</text>
-<text x='841.6' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>1.174</text>
-<text x='1050.0' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>0.426</text>
-<text x='1258.4' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>Entropy jittered</text>
+<text x='621.2' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>0.257</text>
+<text x='829.6' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>13.3</text>
+<text x='1038.0' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>1.174</text>
+<text x='1246.4' y='498.0' font-size='14' fill='#1f2226' text-anchor='end'>0.426</text>
+<text x='1258.4' y='498.0' font-size='14' fill='#1f2226' text-anchor='start'>Stale</text>
 <line x1='60.0' y1='510.0' x2='1536.0' y2='510.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>off_10bpm</text>
-<text x='424.8' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>0.502</text>
-<text x='633.2' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>22.8</text>
-<text x='841.6' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>0.000</text>
-<text x='1050.0' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>1.303</text>
-<text x='1258.4' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>10 bpm</text>
+<text x='621.2' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>0.502</text>
+<text x='829.6' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>22.8</text>
+<text x='1038.0' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>0.000</text>
+<text x='1246.4' y='526.0' font-size='14' fill='#1f2226' text-anchor='end'>1.303</text>
+<text x='1258.4' y='526.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='538.0' x2='1536.0' y2='538.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>off_12bpm</text>
-<text x='424.8' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>0.445</text>
-<text x='633.2' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>17.3</text>
-<text x='841.6' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>0.625</text>
-<text x='1050.0' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>0.393</text>
-<text x='1258.4' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>12 bpm</text>
+<text x='621.2' y='554.0' font-size='14' fill='#1f2226' text-anchor='end'>0.445</text>
+<text x='829.6' y='554.0' font-size='14' fill='#1f2226' text-anchor='end'>17.3</text>
+<text x='1038.0' y='554.0' font-size='14' fill='#1f2226' text-anchor='end'>0.625</text>
+<text x='1246.4' y='554.0' font-size='14' fill='#1f2226' text-anchor='end'>0.393</text>
+<text x='1258.4' y='554.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='566.0' x2='1536.0' y2='566.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>off_18bpm</text>
-<text x='424.8' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>0.181</text>
-<text x='633.2' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>11.6</text>
-<text x='841.6' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>0.537</text>
-<text x='1050.0' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>1.217</text>
-<text x='1258.4' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>18 bpm</text>
+<text x='621.2' y='582.0' font-size='14' fill='#1f2226' text-anchor='end'>0.181</text>
+<text x='829.6' y='582.0' font-size='14' fill='#1f2226' text-anchor='end'>11.6</text>
+<text x='1038.0' y='582.0' font-size='14' fill='#1f2226' text-anchor='end'>0.537</text>
+<text x='1246.4' y='582.0' font-size='14' fill='#1f2226' text-anchor='end'>1.217</text>
+<text x='1258.4' y='582.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='594.0' x2='1536.0' y2='594.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>off_24bpm</text>
-<text x='424.8' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>0.265</text>
-<text x='633.2' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>6.6</text>
-<text x='841.6' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>0.379</text>
-<text x='1050.0' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>0.823</text>
-<text x='1258.4' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>24 bpm</text>
+<text x='621.2' y='610.0' font-size='14' fill='#1f2226' text-anchor='end'>0.265</text>
+<text x='829.6' y='610.0' font-size='14' fill='#1f2226' text-anchor='end'>6.6</text>
+<text x='1038.0' y='610.0' font-size='14' fill='#1f2226' text-anchor='end'>0.379</text>
+<text x='1246.4' y='610.0' font-size='14' fill='#1f2226' text-anchor='end'>0.823</text>
+<text x='1258.4' y='610.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='622.0' x2='1536.0' y2='622.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>regular</text>
-<text x='424.8' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>0.322</text>
-<text x='633.2' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>9.7</text>
-<text x='841.6' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>0.190</text>
-<text x='1050.0' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>0.422</text>
-<text x='1258.4' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>Regular</text>
+<text x='621.2' y='638.0' font-size='14' fill='#1f2226' text-anchor='end'>0.322</text>
+<text x='829.6' y='638.0' font-size='14' fill='#1f2226' text-anchor='end'>9.7</text>
+<text x='1038.0' y='638.0' font-size='14' fill='#1f2226' text-anchor='end'>0.190</text>
+<text x='1246.4' y='638.0' font-size='14' fill='#1f2226' text-anchor='end'>0.422</text>
+<text x='1258.4' y='638.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 <line x1='60.0' y1='650.0' x2='1536.0' y2='650.0' stroke='#d7d2cb' stroke-width='1' stroke-linecap='round' />
-<text x='60.0' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>resonance_010hz</text>
-<text x='424.8' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>0.516</text>
-<text x='633.2' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>27.5</text>
-<text x='841.6' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>0.000</text>
-<text x='1050.0' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>3.135</text>
-<text x='1258.4' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>4</text>
+<text x='60.0' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>Resonance (0.10 Hz)</text>
+<text x='621.2' y='666.0' font-size='14' fill='#1f2226' text-anchor='end'>0.516</text>
+<text x='829.6' y='666.0' font-size='14' fill='#1f2226' text-anchor='end'>27.5</text>
+<text x='1038.0' y='666.0' font-size='14' fill='#1f2226' text-anchor='end'>0.000</text>
+<text x='1246.4' y='666.0' font-size='14' fill='#1f2226' text-anchor='end'>3.135</text>
+<text x='1258.4' y='666.0' font-size='14' fill='#1f2226' text-anchor='start'>Tracking</text>
 </svg>

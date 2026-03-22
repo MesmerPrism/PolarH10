@@ -10,8 +10,12 @@ nav_order: 77
 # HRV Showcase
 
 This page uses `hrv_high` and `hrv_low` as the canonical pair for explaining
-how the accepted RR window becomes adjacent RR deltas and then the published
-time-domain HRV metrics.
+how accepted RR intervals become successive RR differences and then the
+short-term time-domain HRV metrics surfaced by the app. The framing is aligned
+to the short-term HRV guidance summarized by
+[Shaffer and Ginsberg (2017)](https://doi.org/10.3389/fpubh.2017.00258), while
+remaining explicit that this repository publishes short-term RR-derived
+telemetry rather than clinical `24 h` norms.
 
 <p>
   <a class="button primary" href="../hrv-formulas.md">Open formula sheet</a>
@@ -21,7 +25,17 @@ time-domain HRV metrics.
 
 ![HRV derivation](../assets/synthetic-showcase/hrv-derivation.png)
 
-## Canonical Pair
+## Suggested Caption
+
+*Accepted RR intervals from deterministic high- and low-HRV synthetic scenarios
+are converted to successive RR differences and summarized with the standard
+short-term time-domain metrics `RMSSD`, `SDNN`, `pNN50`, and `ln(RMSSD)`.
+Consistent with the short-term HRV framing reviewed by Shaffer and Ginsberg
+(2017), the figure is intended to document how differences in beat-to-beat
+variability propagate into the downstream metrics exposed by `PolarH10`, rather
+than to provide clinical normative interpretation.*
+
+## Source Files
 
 - [hrv_high RR window](../data/synthetic-showcase/scenarios/hrv_high/hr_rr.csv)
 - [hrv_high analysis](../data/synthetic-showcase/scenarios/hrv_high/analysis.json)
@@ -43,6 +57,14 @@ AcceptedRrSamples
 - `Hrv.Telemetry.CurrentRmssdMs`, `SdnnMs`, `Pnn50Percent`, and `LnRmssd`
   expose the final documentation values shown in the figure.
 
+## Interpretation Notes
+
+- The tracker uses accepted RR intervals rather than a clinically edited Holter
+  NN series, so the figures should be described as short-term RR-derived
+  telemetry.
+- `ln(RMSSD)` is included because many papers report the log-transformed form to
+  reduce skew and improve comparability across sessions.
+
 ## Showcase Preset
 
 The `showcase-v1` preset keeps the HRV tracker on a deterministic `120 s`
@@ -55,4 +77,5 @@ docs.
 - [Synthetic Showcase Overview](index.md)
 - [HRV Formula Sheet](../hrv-formulas.md)
 - [HRV Workflow](../hrv-workflow.md)
+- [References](../references.md)
 - [Formula Sheets](../formula-sheets.md)

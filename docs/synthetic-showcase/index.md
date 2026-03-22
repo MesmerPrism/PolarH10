@@ -13,6 +13,9 @@ nav_order: 75
 this repo. The exported data and rendered figures are committed under
 `docs/data/synthetic-showcase` and `docs/assets/synthetic-showcase` so GitHub
 Pages can publish them without a sibling checkout or CI-time generation step.
+The intent is not just internal documentation. This bundle is written so a
+research group can cite the scenario preset, inspect the intermediate traces,
+and reuse the rendered figures or source files in supplementary material.
 
 <p>
   <a class="button primary" href="../data/synthetic-showcase/showcase-manifest.json">Open manifest</a>
@@ -21,6 +24,17 @@ Pages can publish them without a sibling checkout or CI-time generation step.
 </p>
 
 ![Synthetic showcase matrix](../assets/synthetic-showcase/showcase-overview.png)
+
+## Publication Framing
+
+- The bundle is versioned by preset id. The current published release is
+  `showcase-v1`.
+- Each figure is backed by committed source data so a reviewer can move from
+  the published panel to `analysis.json`, `ground_truth.json`, and the raw
+  exported traces without rerunning the generator.
+- The metric-specific pages below include publication-style framing and
+  manuscript-ready caption language for coherence, short-term HRV, and
+  breathing dynamics.
 
 ## Bundle Contract
 
