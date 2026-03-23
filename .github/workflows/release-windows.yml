@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: windows-latest
+    runs-on: windows-2022
     env:
       PACKAGE_ID: MesmerPrism.PolarH10
       PACKAGE_DISPLAY_NAME: PolarH10
