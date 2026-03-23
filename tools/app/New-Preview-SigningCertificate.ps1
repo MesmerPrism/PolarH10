@@ -15,6 +15,7 @@ param(
     [string]$PfxFileName = 'PolarH10-preview-signing.pfx',
     [string]$CerFileName = 'PolarH10.cer',
     [string]$Base64FileName = 'PolarH10-preview-signing.base64.txt',
+    [string]$PasswordFileName = 'preview-password.txt',
     [SecureString]$Password
 )
 
@@ -44,6 +45,7 @@ $cert = New-SelfSignedCertificate `
 $pfxPath = Join-Path $outputPath $PfxFileName
 $cerPath = Join-Path $outputPath $CerFileName
 $base64Path = Join-Path $outputPath $Base64FileName
+$passwordPath = Join-Path $outputPath $PasswordFileName
 
 Export-PfxCertificate -Cert $cert -FilePath $pfxPath -Password $Password | Out-Null
 Export-Certificate -Cert $cert -FilePath $cerPath | Out-Null
@@ -52,11 +54,16 @@ $pfxBytes = Get-Content -Path $pfxPath -Encoding Byte
 [Convert]::ToBase64String($pfxBytes) | Set-Content -Path $base64Path -Encoding utf8
 
 $plainPassword = [System.Net.NetworkCredential]::new('', $Password).Password
+[System.IO.File]::WriteAllText(
+    $passwordPath,
+    $plainPassword,
+    [System.Text.UTF8Encoding]::new($false))
 
 Write-Host "Created self-signed research preview certificate." -ForegroundColor Green
 Write-Host "PFX : $pfxPath"
 Write-Host "CER : $cerPath"
 Write-Host "B64 : $base64Path"
+Write-Host "PWD : $passwordPath"
 Write-Host ''
 Write-Host 'Configure these GitHub repository secrets:' -ForegroundColor Cyan
 Write-Host "  WINDOWS_PACKAGE_CERTIFICATE_BASE64 = <contents of $base64Path>"

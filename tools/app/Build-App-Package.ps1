@@ -73,6 +73,8 @@ if (-not $Unsigned) {
     if ([string]::IsNullOrWhiteSpace($PackageCertificatePath) -or [string]::IsNullOrWhiteSpace($PackageCertificatePassword)) {
         throw 'Signed package builds require PackageCertificatePath and PackageCertificatePassword.'
     }
+
+    $PackageCertificatePassword = $PackageCertificatePassword.TrimEnd("`r", "`n")
 }
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
