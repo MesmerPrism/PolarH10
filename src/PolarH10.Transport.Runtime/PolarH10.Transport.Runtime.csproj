@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net8.0-windows10.0.19041.0</TargetFrameworks>
     <RootNamespace>PolarH10.Transport.Runtime</RootNamespace>
     <AssemblyName>PolarH10.Transport.Runtime</AssemblyName>
     <Description>Transport-neutral session coordinator for the Polar H10 using abstract BLE adapters.</Description>
