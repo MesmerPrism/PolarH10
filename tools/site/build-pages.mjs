@@ -113,6 +113,7 @@ async function loadDocs() {
       : normalizeString(data.nav_group) ?? inferNavGroup(sourceRel);
     const navOrder = toNumber(data.nav_order) ?? inferNavOrder(sourceRel);
     const hasMath = containsMath(markdown);
+    const fullWidth = toBoolean(data.full_width);
 
     docs.push({
       sourceRel,
@@ -124,6 +125,7 @@ async function loadDocs() {
       navGroup,
       navOrder,
       hasMath,
+      fullWidth,
       downloadMarkdown: buildDownloadMarkdown(body, heading, title),
       renderBody: markdown.trimStart(),
       updatedAt: stat.mtime.toISOString()
@@ -197,8 +199,14 @@ function renderDocPage(doc, docs) {
   const currentDir = path.posix.dirname(doc.outRel);
   const asset = createAssetHelper(currentDir);
   const topNav = renderTopNav('reference', asset('index.html'), asset('reference/index.html'), asset('diagrams/viewer.html'));
-  const sidebar = renderSidebar(doc, docs);
+  const sidebar = doc.fullWidth ? '' : renderSidebar(doc, docs);
   const articleHtml = renderMarkdown(doc.renderBody, doc.sourceRel);
+  const layoutClass = doc.fullWidth ? 'page-layout page-layout-single' : 'page-layout';
+  const sidebarHtml = doc.fullWidth
+    ? ''
+    : `<aside class="panel sidebar" data-pagefind-ignore>
+        ${sidebar}
+      </aside>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -216,10 +224,8 @@ ${renderHead({
   ${renderArt()}
   <div class="site-shell">
     ${renderHeader(topNav, asset('index.html'), asset(searchPagePath))}
-    <div class="page-layout">
-      <aside class="panel sidebar" data-pagefind-ignore>
-        ${sidebar}
-      </aside>
+    <div class="${layoutClass}">
+      ${sidebarHtml}
       <main class="panel content-panel">
         <div class="page-marker">PolarH10 Developer Reference</div>
         <h1 class="page-title" data-pagefind-meta="title">${escapeHtml(doc.title)}</h1>

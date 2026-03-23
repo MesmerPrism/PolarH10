@@ -5,21 +5,50 @@ summary: Download the self-signed research preview certificate, trust it once on
 nav_label: Download & Install
 nav_group: Start Here
 nav_order: 20
+full_width: true
 ---
 
 # Download & Install
 
 Use this page when you want the packaged Windows app instead of building the repo from source.
 
-The current public installer channel is a **Research Preview**. It is signed with the project's own self-signed certificate because this repo does not currently have a paid public CA certificate. That means the first install requires one extra Windows trust step.
+<div class="caption-card">
+  <span class="caption-card-title">Research Preview</span>
+  <p>This installer is meant for research and developer use. It is self-signed, not backed by a public CA, so the first install on each Windows machine needs one extra certificate-trust step before App Installer will accept the package.</p>
+</div>
 
-## Install the latest research preview
+<div class="action-row">
+  <a class="button primary" href="ms-appinstaller:?source=https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">Install with App Installer</a>
+  <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">Download certificate</a>
+  <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">Download appinstaller</a>
+  <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.msix">Download MSIX</a>
+  <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases">Open releases</a>
+</div>
 
-- [Install PolarH10 for Windows](ms-appinstaller:?source=https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller)
-- [Download the preview certificate](https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer)
-- [Download the App Installer file](https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller)
-- [Download the raw MSIX package](https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.msix)
-- [Open the Releases page](https://github.com/MesmerPrism/PolarH10/releases)
+## Fast path
+
+<div class="step-grid">
+  <div class="step-card tone-cool">
+    <div class="step-no">01</div>
+    <h3>Download the certificate</h3>
+    <p>Get <code>PolarH10.cer</code> from the latest release. You only need to trust it once per machine.</p>
+  </div>
+  <div class="step-card tone-violet">
+    <div class="step-no">02</div>
+    <h3>Trust it in Windows</h3>
+    <p>Import the certificate into <code>Local Machine &gt; Trusted People</code>. This step requires local administrator rights.</p>
+  </div>
+  <div class="step-card tone-signal">
+    <div class="step-no">03</div>
+    <h3>Open the installer link</h3>
+    <p>Use the <code>Install with App Installer</code> button, or open the downloaded <code>PolarH10.appinstaller</code> file manually.</p>
+  </div>
+  <div class="step-card tone-warm">
+    <div class="step-no">04</div>
+    <h3>Install and launch</h3>
+    <p>Windows should now trust the package, install the app, and place it in the Start menu like a normal installed app.</p>
+  </div>
+</div>
 
 ## First-time trust step
 
@@ -39,6 +68,27 @@ Windows App Installer checks the machine certificate store when deciding whether
 If the `Install PolarH10 for Windows` link does not launch App Installer from the browser, download `PolarH10.appinstaller` and open it from your Downloads folder after importing `PolarH10.cer`.
 
 If the direct download links return `404`, there is no public preview release yet. Use the source-build path in [Getting Started on Windows](getting-started.md) until the first preview release is published.
+
+## Common install problems
+
+<div class="card-grid">
+  <a class="path-card tone-cool" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">
+    <h3>Browser does not hand off to App Installer</h3>
+    <p>Download <code>PolarH10.appinstaller</code> directly, then open it from the Downloads folder after the certificate import is complete.</p>
+  </a>
+  <a class="path-card tone-signal" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">
+    <h3>Windows says the package is untrusted</h3>
+    <p>Re-import <code>PolarH10.cer</code> into <code>Local Machine &gt; Trusted People</code>. Importing into the current-user store is usually not enough for this flow.</p>
+  </a>
+  <a class="path-card tone-violet" href="getting-started.md">
+    <h3>No preview asset yet or the release link is missing</h3>
+    <p>Use the source-build path from Getting Started on Windows until the next public preview package is published.</p>
+  </a>
+  <a class="path-card tone-warm" href="troubleshooting.md">
+    <h3>The app installed but Bluetooth or device discovery still fails</h3>
+    <p>The package trust step only affects install. For BLE, adapter, and H10 scan issues, move straight to the main troubleshooting guide.</p>
+  </a>
+</div>
 
 ## Requirements
 

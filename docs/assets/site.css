@@ -290,6 +290,12 @@ button:focus-visible {
   grid-template-columns: 320px minmax(0, 1fr);
 }
 
+.page-layout-single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 960px;
+  margin-inline: auto;
+}
+
 .viewer-layout {
   min-height: 74vh;
 }
@@ -1461,6 +1467,7 @@ button:focus-visible {
   }
 
   .header-search {
+    flex: none;
     width: 100%;
   }
 

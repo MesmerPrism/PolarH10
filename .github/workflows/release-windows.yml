@@ -18,6 +18,8 @@ jobs:
   release:
     runs-on: windows-2022
     env:
+      # Keep preview releases as full releases on GitHub. The install/update links use
+      # /releases/latest/download/... and GitHub excludes prereleases from "latest".
       PACKAGE_ID: MesmerPrism.PolarH10
       PACKAGE_DISPLAY_NAME: PolarH10
       PACKAGE_PUBLISHER_DISPLAY_NAME: Mesmer Prism
