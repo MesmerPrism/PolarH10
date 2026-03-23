@@ -28,23 +28,23 @@ Use this page when you want the packaged Windows app instead of building the rep
 
 ## Fast path
 
-<div class="step-grid">
-  <div class="step-card tone-cool">
+<div class="step-grid logo-sequence">
+  <div class="step-card">
     <div class="step-no">01</div>
     <h3>Run guided setup</h3>
     <p>Download <code>PolarH10-Preview-Setup.exe</code> from the latest release and open it like a normal installer helper.</p>
   </div>
-  <div class="step-card tone-violet">
+  <div class="step-card">
     <div class="step-no">02</div>
     <h3>Accept the admin prompt</h3>
     <p>Windows will ask for elevation because the helper needs to trust the preview certificate in <code>Local Machine &gt; Trusted People</code>.</p>
   </div>
-  <div class="step-card tone-signal">
+  <div class="step-card">
     <div class="step-no">03</div>
     <h3>Let it trust the cert and open App Installer</h3>
     <p>The helper downloads the latest <code>PolarH10.cer</code>, imports it into the machine trust store, and then opens the published <code>PolarH10.appinstaller</code> file.</p>
   </div>
-  <div class="step-card tone-warm">
+  <div class="step-card">
     <div class="step-no">04</div>
     <h3>Finish in App Installer</h3>
     <p>App Installer should now show the package as trusted. Complete the install and launch PolarH10 from the Start menu.</p>
@@ -76,20 +76,20 @@ If the direct download links return `404`, there is no public preview release ye
 
 ## Common install problems
 
-<div class="card-grid">
-  <a class="path-card tone-cool" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">
+<div class="card-grid logo-sequence">
+  <a class="path-card" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">
     <h3>Use the guided helper first</h3>
     <p>If you have been using the manual cert path, try <code>PolarH10-Preview-Setup.exe</code> first. It exists specifically to remove the certificate-store browsing step.</p>
   </a>
-  <a class="path-card tone-signal" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">
+  <a class="path-card" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">
     <h3>Windows still says the package is untrusted</h3>
     <p>Re-import <code>PolarH10.cer</code> into <code>Local Machine &gt; Trusted People</code>. Importing into the current-user store is usually not enough for this flow.</p>
   </a>
-  <a class="path-card tone-violet" href="getting-started.md">
+  <a class="path-card" href="getting-started.md">
     <h3>No preview asset yet or the release link is missing</h3>
     <p>Use the source-build path from Getting Started on Windows until the next public preview package is published.</p>
   </a>
-  <a class="path-card tone-warm" href="troubleshooting.md">
+  <a class="path-card" href="troubleshooting.md">
     <h3>The app installed but Bluetooth or device discovery still fails</h3>
     <p>The package trust step only affects install. For BLE, adapter, and H10 scan issues, move straight to the main troubleshooting guide.</p>
   </a>

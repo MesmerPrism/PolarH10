@@ -298,8 +298,8 @@ ${renderHead({
     <section class="section panel section-panel">
       <h2 class="section-heading">Start with your research task</h2>
       <p class="section-subtitle">Most visitors need one of three things: a reliable collection workflow, a readable method reference for derived measures, or implementation detail for validation and extension.</p>
-      <div class="audience-grid">
-        <article class="audience-card tone-cool">
+      <div class="audience-grid logo-sequence">
+        <article class="audience-card">
           <h3>Running sessions and comparing devices</h3>
           <p>Start here if you need to connect straps, monitor live telemetry, compare multiple active H10 units, or collect reusable Windows sessions for later analysis.</p>
           <ul class="audience-link-list">
@@ -311,7 +311,7 @@ ${renderHead({
             <li><a class="audience-link" href="reference/troubleshooting.html"><strong>Troubleshooting</strong><span>Fix the common Windows BLE and device-discovery failures first.</span></a></li>
           </ul>
         </article>
-        <article class="audience-card tone-signal">
+        <article class="audience-card">
           <h3>Reading the derived measures</h3>
           <p>Start here if you need the method context behind coherence, short-term HRV, ACC-based breathing-volume approximation, or the breathing-dynamics feature family.</p>
           <ul class="audience-link-list">
@@ -323,7 +323,7 @@ ${renderHead({
             <li><a class="audience-link" href="reference/breathing-dynamics-workflow.html"><strong>Breathing dynamics</strong><span>Understand when the entropy views are valid and how calibration affects them.</span></a></li>
           </ul>
         </article>
-        <article class="audience-card tone-violet">
+        <article class="audience-card">
           <h3>Validating or extending the implementation</h3>
           <p>Start here if you need repo structure, saved record formats, protocol details, or the diagrams that explain how the Windows BLE and analysis pipeline fits together.</p>
           <ul class="audience-link-list">
@@ -339,23 +339,23 @@ ${renderHead({
     <section class="section panel section-panel">
       <h2 class="section-heading">Typical session flow</h2>
       <p class="section-subtitle">If you are collecting lab data on Windows, this is the order of operations that keeps the session trustworthy.</p>
-      <div class="step-grid">
-        <div class="step-card tone-cool">
+      <div class="step-grid logo-sequence">
+        <div class="step-card">
           <div class="step-no">01</div>
           <h3>Choose the devices and tool</h3>
           <p>Find the intended H10 units, confirm the Bluetooth addresses, and decide whether the session belongs in the WPF app or the CLI.</p>
         </div>
-        <div class="step-card tone-violet">
+        <div class="step-card">
           <div class="step-no">02</div>
           <h3>Connect and validate</h3>
           <p>Open the BLE/GATT link, confirm HR plus ACC are live, and use the diagnostics path before you trust a long recording.</p>
         </div>
-        <div class="step-card tone-signal">
+        <div class="step-card">
           <div class="step-no">03</div>
           <h3>Inspect cardiac and breathing signals</h3>
           <p>Check HR, RR, ECG, and ACC first, enable multi-device comparison if needed, and open the breathing view once the ACC calibration is ready.</p>
         </div>
-        <div class="step-card tone-warm">
+        <div class="step-card">
           <div class="step-no">04</div>
           <h3>Record and review</h3>
           <p>Write <code>session.json</code>, CSV sensor output, and <code>protocol.jsonl</code>, then replay or inspect the capture without hardware attached.</p>
@@ -365,48 +365,48 @@ ${renderHead({
 
     <section class="section panel section-panel">
       <h2 class="section-heading">Docs That Matter First</h2>
-      <div class="card-grid">
-        <a class="path-card tone-cool" href="reference/getting-started.html">
+      <div class="card-grid logo-sequence">
+        <a class="path-card" href="reference/getting-started.html">
           <h3>Getting Started</h3>
           <p>Real clone URL, prerequisites, first build, and the safest path to a successful local run.</p>
         </a>
-        <a class="path-card tone-cool" href="reference/first-recording.html">
+        <a class="path-card" href="reference/first-recording.html">
           <h3>First Recording</h3>
           <p>The first end-to-end WPF and CLI session, including what to save and how to verify the result.</p>
         </a>
-        <a class="path-card tone-cool" href="reference/coherence-workflow.html">
+        <a class="path-card" href="reference/coherence-workflow.html">
           <h3>Coherence Workflow</h3>
           <p>Use the RR-derived coherence window, understand the warmup phase, and read confidence instead of trusting a raw number too early.</p>
         </a>
-        <a class="path-card tone-cool" href="reference/hrv-workflow.html">
+        <a class="path-card" href="reference/hrv-workflow.html">
           <h3>HRV Workflow</h3>
           <p>Use the short-term HRV tab, let the RR window fill, and read RMSSD with SDNN and pNN50 instead of assuming a five-minute solve is instant.</p>
         </a>
-        <a class="path-card tone-violet" href="reference/breathing-dynamics-workflow.html">
+        <a class="path-card" href="reference/breathing-dynamics-workflow.html">
           <h3>Breathing Dynamics Workflow</h3>
           <p>Use the dedicated interval and amplitude entropy window once breathing calibration is already stable.</p>
         </a>
-        <a class="path-card tone-signal" href="reference/formula-sheets.html">
+        <a class="path-card" href="reference/formula-sheets.html">
           <h3>Formula Sheets</h3>
           <p>Download the Markdown and PDF method sheets for coherence, HRV, breathing from ACC, and breathing-dynamics entropy.</p>
         </a>
-        <a class="path-card tone-warm" href="reference/synthetic-showcase/index.html">
+        <a class="path-card" href="reference/synthetic-showcase/index.html">
           <h3>Synthetic Showcase</h3>
           <p>Open the deterministic publication bundle that links raw synthetic RR and breathing traces to the coherence, HRV, and entropy figures published on the site.</p>
         </a>
-        <a class="path-card tone-violet" href="reference/output-formats.html">
+        <a class="path-card" href="reference/output-formats.html">
           <h3>Output Formats</h3>
           <p>What each capture file contains, how session folders are named, and when <code>run.json</code> appears.</p>
         </a>
-        <a class="path-card tone-warm" href="reference/troubleshooting.html">
+        <a class="path-card" href="reference/troubleshooting.html">
           <h3>Troubleshooting</h3>
           <p>Fix the common failure cases first: hidden devices, Windows BLE access issues, stale streams, and blocked app launch.</p>
         </a>
-        <a class="path-card tone-signal" href="reference/cli.html">
+        <a class="path-card" href="reference/cli.html">
           <h3>CLI Guide</h3>
           <p>Command-focused workflows for scanning, recording, replaying, and doctor-style validation.</p>
         </a>
-        <a class="path-card tone-violet" href="reference/protocol/overview.html">
+        <a class="path-card" href="reference/protocol/overview.html">
           <h3>Protocol Internals</h3>
           <p>PMD service layout, measurement formats, and lower-level notes once the operator path already makes sense.</p>
         </a>
@@ -425,20 +425,20 @@ ${renderHead({
     <section class="section panel section-panel">
       <h2 class="section-heading">Onboarding and architecture diagrams</h2>
       <p class="section-subtitle">Use the diagrams when you want the shortest visual explanation of the workflows, records, and code layout.</p>
-      <div class="preview-grid">
-        <a class="preview-card tone-cool" href="diagrams/viewer.html#choose-your-path">
+      <div class="preview-grid logo-sequence">
+        <a class="preview-card" href="diagrams/viewer.html#choose-your-path">
           <div class="meta">Orientation</div>
           <h3>App, formulas, or internals</h3>
           <p>Use the audience map when you need to decide whether to start with capture workflows, metric explanations, or implementation details.</p>
           <img src="diagrams/choose-your-path.svg" alt="Audience map diagram" />
         </a>
-        <a class="preview-card tone-warm" href="diagrams/viewer.html#first-session-flow">
+        <a class="preview-card" href="diagrams/viewer.html#first-session-flow">
           <div class="meta">Workflow</div>
           <h3>First session flow</h3>
           <p>See the scan, connect, inspect, record, and replay loop before you drop into code or protocol details.</p>
           <img src="diagrams/first-session-flow.svg" alt="First session flow diagram" />
         </a>
-        <a class="preview-card tone-violet" href="diagrams/viewer.html#code-architecture">
+        <a class="preview-card" href="diagrams/viewer.html#code-architecture">
           <div class="meta">Architecture</div>
           <h3>Code architecture</h3>
           <p>Map protocol decoders, Windows BLE transport, orchestration, recording, and the operator surfaces.</p>
@@ -489,16 +489,16 @@ ${renderHead({
 
     <section class="section panel section-panel">
       <h2 class="section-heading">What Search Covers</h2>
-      <div class="card-grid">
-        <a class="path-card tone-cool" href="index.html">
+      <div class="card-grid logo-sequence">
+        <a class="path-card" href="index.html">
           <h3>Onboarding and workflows</h3>
           <p>Getting started, first recording, coherence, HRV, breathing, troubleshooting, and output-format guides.</p>
         </a>
-        <a class="path-card tone-signal" href="formula-sheets.html">
+        <a class="path-card" href="formula-sheets.html">
           <h3>Formula sheets</h3>
           <p>Searchable explanations for coherence, HRV, breathing from ACC, and breathing-dynamics metrics.</p>
         </a>
-        <a class="path-card tone-violet" href="../diagrams/viewer.html">
+        <a class="path-card" href="../diagrams/viewer.html">
           <h3>Diagram topics</h3>
           <p>Manifest-backed onboarding, runtime, and architecture diagrams are discoverable through the same site search.</p>
         </a>
