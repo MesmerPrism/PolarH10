@@ -135,9 +135,9 @@ jobs:
         shell: pwsh
         run: |
           $files = @(
-            Join-Path $PWD 'artifacts\windows-installer\PolarH10.msix',
-            Join-Path $PWD 'artifacts\windows-installer\PolarH10.appinstaller',
-            Join-Path $PWD 'artifacts\windows-installer\PolarH10.cer'
+            (Join-Path $PWD 'artifacts\windows-installer\PolarH10.msix'),
+            (Join-Path $PWD 'artifacts\windows-installer\PolarH10.appinstaller'),
+            (Join-Path $PWD 'artifacts\windows-installer\PolarH10.cer')
           )
 
           Get-FileHash -Path $files -Algorithm SHA256 |
