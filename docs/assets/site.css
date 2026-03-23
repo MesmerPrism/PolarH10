@@ -292,8 +292,6 @@ button:focus-visible {
 
 .page-layout-single {
   grid-template-columns: minmax(0, 1fr);
-  max-width: 960px;
-  margin-inline: auto;
 }
 
 .viewer-layout {
