@@ -76,6 +76,7 @@ if (-not $Unsigned) {
 }
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
+$entryProjectPath = Join-Path $repoRoot 'src\PolarH10.App\PolarH10.App.csproj'
 $packageProjectDir = Join-Path $repoRoot 'src\PolarH10.App.Package'
 $packageProjectPath = Join-Path $packageProjectDir 'PolarH10.App.Package.wapproj'
 $manifestPath = Join-Path $packageProjectDir 'Package.appxmanifest'
@@ -85,6 +86,10 @@ $outputPath = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $OutputRelative
 
 if (-not (Test-Path $packageProjectPath)) {
     throw "Packaging project not found at $packageProjectPath"
+}
+
+if (-not (Test-Path $entryProjectPath)) {
+    throw "Entry project not found at $entryProjectPath"
 }
 
 if (-not (Test-Path $manifestPath)) {
@@ -111,6 +116,12 @@ try {
     Set-ManifestValue -Manifest $manifest -XPath '/appx:Package/appx:Properties/appx:PublisherDisplayName/text()' -Value $PublisherDisplayName -NamespaceManager $namespaceManager
     Set-ManifestValue -Manifest $manifest -XPath '/appx:Package/appx:Applications/appx:Application/uap:VisualElements/@DisplayName' -Value $DisplayName -NamespaceManager $namespaceManager
     $manifest.Save($manifestPath)
+
+    Write-Host "Restoring PolarH10.App for win-$Platform runtime packs..." -ForegroundColor Cyan
+    dotnet restore $entryProjectPath -r "win-$Platform" | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet restore failed for $entryProjectPath with exit code $LASTEXITCODE"
+    }
 
     $msbuildPath = Find-MSBuild
     $msbuildArgs = @(
