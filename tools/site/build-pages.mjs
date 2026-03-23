@@ -304,6 +304,7 @@ ${renderHead({
           <p>Start here if you need to connect straps, monitor live telemetry, compare multiple active H10 units, or collect reusable Windows sessions for later analysis.</p>
           <ul class="audience-link-list">
             <li><a class="audience-link" href="reference/download.html"><strong>Download research preview</strong><span>Install the self-signed preview release and follow the first-time trust step.</span></a></li>
+            <li><a class="audience-link" href="reference/synthetic-bio-companion.html"><strong>SyntheticBio companion</strong><span>Run deterministic synthetic telemetry for repeatable PolarH10 demos, fixture export, and same-machine transport tests.</span></a></li>
             <li><a class="audience-link" href="reference/getting-started.html"><strong>Getting started</strong><span>Clone, build, and reach a safe first run.</span></a></li>
             <li><a class="audience-link" href="reference/first-recording.html"><strong>First recording</strong><span>Run the first end-to-end session and save reusable output.</span></a></li>
             <li><a class="audience-link" href="reference/app-overview.html"><strong>App overview</strong><span>See the tracked-device workflow, live views, and operator-facing surfaces.</span></a></li>
