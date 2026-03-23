@@ -24,6 +24,7 @@ jobs:
       PACKAGE_DISPLAY_NAME: PolarH10
       PACKAGE_PUBLISHER_DISPLAY_NAME: Mesmer Prism
       PACKAGE_FILE_NAME: PolarH10.msix
+      PREVIEW_SETUP_FILE_NAME: PolarH10-Preview-Setup.exe
       APPINSTALLER_FILE_NAME: PolarH10.appinstaller
       CERTIFICATE_FILE_NAME: PolarH10.cer
       APPINSTALLER_URI: https://github.com/${{ github.repository }}/releases/latest/download/PolarH10.appinstaller
@@ -133,10 +134,18 @@ jobs:
 
           & powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 @args
 
+      - name: Publish preview setup bootstrapper
+        shell: pwsh
+        run: |
+          & powershell -ExecutionPolicy Bypass -File .\tools\app\Publish-PreviewSetup.ps1 `
+            -Version '${{ steps.version.outputs.package_version }}' `
+            -FileName $env:PREVIEW_SETUP_FILE_NAME
+
       - name: Write SHA256 sums
         shell: pwsh
         run: |
           $files = @(
+            (Join-Path $PWD "artifacts\windows-installer\$env:PREVIEW_SETUP_FILE_NAME"),
             (Join-Path $PWD 'artifacts\windows-installer\PolarH10.msix'),
             (Join-Path $PWD 'artifacts\windows-installer\PolarH10.appinstaller'),
             (Join-Path $PWD 'artifacts\windows-installer\PolarH10.cer')
@@ -160,6 +169,7 @@ jobs:
           $tagName = '${{ steps.version.outputs.tag_name }}'
           $releaseTitle = "PolarH10 Research Preview ${{ steps.version.outputs.package_version }}"
           $assets = @(
+            "artifacts\windows-installer\$env:PREVIEW_SETUP_FILE_NAME",
             'artifacts\windows-installer\PolarH10.msix',
             'artifacts\windows-installer\PolarH10.appinstaller',
             'artifacts\windows-installer\PolarH10.cer',

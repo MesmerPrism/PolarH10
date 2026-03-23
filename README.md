@@ -11,7 +11,7 @@ Start with [Docs Home](docs/index.md) or the live
 [Pages site](https://mesmerprism.github.io/PolarH10/).
 If a public research preview release exists, install it from
 [Download & Install](https://mesmerprism.github.io/PolarH10/reference/download.html).
-The current installer channel is a self-signed Research Preview, so first-time install requires trusting the published `PolarH10.cer` certificate.
+The current installer channel is a self-signed Research Preview. The recommended path is the guided `PolarH10-Preview-Setup.exe` helper, which prompts for admin rights, trusts the published `PolarH10.cer` certificate, and opens App Installer for you.
 
 ## What It Gives You
 
@@ -255,12 +255,13 @@ Optional repository variable:
 
 Then create and push a tag like `v0.1.0`. The release workflow builds and tests
 the solution, packages the WPF app as `PolarH10.msix`, generates
-`PolarH10.appinstaller`, exports `PolarH10.cer`, writes `SHA256SUMS.txt`, and
-uploads them to the GitHub release.
+`PolarH10.appinstaller`, publishes the guided `PolarH10-Preview-Setup.exe`
+bootstrapper, exports `PolarH10.cer`, writes `SHA256SUMS.txt`, and uploads
+them to the GitHub release.
 
-Users must import `PolarH10.cer` into `Local Machine > Trusted People` before
-the first preview install on a given machine. After that, App Installer can use
-the published `.appinstaller` file for install and update checks.
+The guided setup helper imports `PolarH10.cer` into `Local Machine > Trusted
+People` and then opens App Installer automatically. The fully manual fallback
+is still available if users prefer to trust the cert themselves first.
 
 For a local unsigned packaging check, run:
 

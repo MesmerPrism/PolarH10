@@ -41,6 +41,9 @@ jobs:
       - name: Build unsigned Windows package
         run: powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 -Unsigned -Version 0.0.0.0
 
+      - name: Publish preview setup bootstrapper
+        run: powershell -ExecutionPolicy Bypass -File .\tools\app\Publish-PreviewSetup.ps1 -Version 0.0.0.0
+
       - name: Upload unsigned Windows package
         uses: actions/upload-artifact@v4
         with:

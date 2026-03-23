@@ -1,7 +1,7 @@
 ---
 title: Download & Install
-description: Install the PolarH10 Windows research preview from the latest public release, including the first-time certificate trust step required for the self-signed package.
-summary: Download the self-signed research preview certificate, trust it once on the local machine, and then open the published App Installer file or raw MSIX package.
+description: Install the PolarH10 Windows research preview from the latest public release using the guided setup bootstrapper, or fall back to the manual certificate-trust path.
+summary: The recommended path is the guided setup bootstrapper, which prompts for admin rights, trusts the preview certificate, and opens App Installer automatically.
 nav_label: Download & Install
 nav_group: Start Here
 nav_order: 20
@@ -14,11 +14,12 @@ Use this page when you want the packaged Windows app instead of building the rep
 
 <div class="caption-card">
   <span class="caption-card-title">Research Preview</span>
-  <p>This installer is meant for research and developer use. It is self-signed, not backed by a public CA, so the first install on each Windows machine needs one extra certificate-trust step before App Installer will accept the package.</p>
+  <p>This installer is meant for research and developer use. It is self-signed, not backed by a public CA, so Windows still requires an admin-approved trust step. The recommended setup helper now performs that trust step for you and then opens App Installer automatically.</p>
 </div>
 
 <div class="action-row">
-  <a class="button primary" href="ms-appinstaller:?source=https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">Install with App Installer</a>
+  <a class="button primary" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">Guided setup (recommended)</a>
+  <a class="button" href="ms-appinstaller:?source=https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">Install with App Installer</a>
   <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">Download certificate</a>
   <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">Download appinstaller</a>
   <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.msix">Download MSIX</a>
@@ -30,27 +31,31 @@ Use this page when you want the packaged Windows app instead of building the rep
 <div class="step-grid">
   <div class="step-card tone-cool">
     <div class="step-no">01</div>
-    <h3>Download the certificate</h3>
-    <p>Get <code>PolarH10.cer</code> from the latest release. You only need to trust it once per machine.</p>
+    <h3>Run guided setup</h3>
+    <p>Download <code>PolarH10-Preview-Setup.exe</code> from the latest release and open it like a normal installer helper.</p>
   </div>
   <div class="step-card tone-violet">
     <div class="step-no">02</div>
-    <h3>Trust it in Windows</h3>
-    <p>Import the certificate into <code>Local Machine &gt; Trusted People</code>. This step requires local administrator rights.</p>
+    <h3>Accept the admin prompt</h3>
+    <p>Windows will ask for elevation because the helper needs to trust the preview certificate in <code>Local Machine &gt; Trusted People</code>.</p>
   </div>
   <div class="step-card tone-signal">
     <div class="step-no">03</div>
-    <h3>Open the installer link</h3>
-    <p>Use the <code>Install with App Installer</code> button, or open the downloaded <code>PolarH10.appinstaller</code> file manually.</p>
+    <h3>Let it trust the cert and open App Installer</h3>
+    <p>The helper downloads the latest <code>PolarH10.cer</code>, imports it into the machine trust store, and then opens the published <code>PolarH10.appinstaller</code> file.</p>
   </div>
   <div class="step-card tone-warm">
     <div class="step-no">04</div>
-    <h3>Install and launch</h3>
-    <p>Windows should now trust the package, install the app, and place it in the Start menu like a normal installed app.</p>
+    <h3>Finish in App Installer</h3>
+    <p>App Installer should now show the package as trusted. Complete the install and launch PolarH10 from the Start menu.</p>
   </div>
 </div>
 
-## First-time trust step
+The helper still requires admin approval and may still trigger Windows browser or SmartScreen friction because it is not backed by a publicly trusted code-signing certificate. It simply removes the need to browse certificate stores manually.
+
+## Manual fallback
+
+Use this path if the guided setup helper is blocked by your environment or you prefer to import the certificate yourself.
 
 Before the first preview install on a machine:
 
@@ -72,12 +77,12 @@ If the direct download links return `404`, there is no public preview release ye
 ## Common install problems
 
 <div class="card-grid">
-  <a class="path-card tone-cool" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.appinstaller">
-    <h3>Browser does not hand off to App Installer</h3>
-    <p>Download <code>PolarH10.appinstaller</code> directly, then open it from the Downloads folder after the certificate import is complete.</p>
+  <a class="path-card tone-cool" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">
+    <h3>Use the guided helper first</h3>
+    <p>If you have been using the manual cert path, try <code>PolarH10-Preview-Setup.exe</code> first. It exists specifically to remove the certificate-store browsing step.</p>
   </a>
   <a class="path-card tone-signal" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">
-    <h3>Windows says the package is untrusted</h3>
+    <h3>Windows still says the package is untrusted</h3>
     <p>Re-import <code>PolarH10.cer</code> into <code>Local Machine &gt; Trusted People</code>. Importing into the current-user store is usually not enough for this flow.</p>
   </a>
   <a class="path-card tone-violet" href="getting-started.md">
@@ -110,7 +115,7 @@ Repo-local developer builds still default to the repo `session\` folder.
 
 ## Update behavior
 
-The release pipeline publishes `PolarH10.msix`, `PolarH10.appinstaller`, and `PolarH10.cer`. The App Installer file is configured to check for updates on launch and prompt before activation when a newer preview release is available.
+The release pipeline publishes `PolarH10-Preview-Setup.exe`, `PolarH10.msix`, `PolarH10.appinstaller`, and `PolarH10.cer`. The App Installer file is configured to check for updates on launch and prompt before activation when a newer preview release is available.
 
 ## Source-build fallback
 

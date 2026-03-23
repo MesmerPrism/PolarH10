@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolarH10.Transport.Syntheti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolarH10.Transport.Runtime", "src\PolarH10.Transport.Runtime\PolarH10.Transport.Runtime.csproj", "{01DBE82A-50B7-4FC6-95F8-0322635D533D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolarH10.PreviewInstaller", "src\PolarH10.PreviewInstaller\PolarH10.PreviewInstaller.csproj", "{10396B89-D135-4F2A-A2A2-1E8702620B1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +157,18 @@ Global
 		{01DBE82A-50B7-4FC6-95F8-0322635D533D}.Release|x64.Build.0 = Release|Any CPU
 		{01DBE82A-50B7-4FC6-95F8-0322635D533D}.Release|x86.ActiveCfg = Release|Any CPU
 		{01DBE82A-50B7-4FC6-95F8-0322635D533D}.Release|x86.Build.0 = Release|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Debug|x64.Build.0 = Debug|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Release|x64.ActiveCfg = Release|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Release|x64.Build.0 = Release|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,5 +176,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7CB93DD2-7DA5-4917-835A-2BA98C368C27} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{01DBE82A-50B7-4FC6-95F8-0322635D533D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{10396B89-D135-4F2A-A2A2-1E8702620B1D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal
