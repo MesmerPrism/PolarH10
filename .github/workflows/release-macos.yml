@@ -1,0 +1,85 @@
+name: Release macOS Research Preview
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semantic version without the leading v (example: 0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag_name="v$INPUT_VERSION"
+            semver="$INPUT_VERSION"
+          else
+            tag_name="$REF_NAME"
+            semver="${tag_name#v}"
+          fi
+
+          if [[ ! "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a tag like v0.1.0, got $tag_name" >&2
+            exit 1
+          fi
+
+          echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
+          echo "semver=$semver" >> "$GITHUB_OUTPUT"
+
+      - name: Test macOS core
+        run: swift test --package-path macos
+
+      - name: Build Universal macOS app
+        run: bash tools/macos/build-app.sh "${{ steps.version.outputs.semver }}"
+
+      - name: Write SHA256 sum
+        working-directory: artifacts/macos
+        run: shasum -a 256 PolarH10-macOS-universal.zip > PolarH10-macOS-universal.sha256
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PolarH10-macOS-universal
+          path: |
+            artifacts/macos/PolarH10-macOS-universal.zip
+            artifacts/macos/PolarH10-macOS-universal.sha256
+
+      - name: Publish GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.version.outputs.tag_name }}
+          SEMVER: ${{ steps.version.outputs.semver }}
+        run: |
+          assets=(
+            artifacts/macos/PolarH10-macOS-universal.zip
+            artifacts/macos/PolarH10-macOS-universal.sha256
+          )
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "${assets[@]}" --clobber
+          elif ! gh release create "$TAG_NAME" "${assets[@]}" \
+            --title "PolarH10 Research Preview $SEMVER" \
+            --generate-notes \
+            --latest \
+            --target "$GITHUB_SHA"; then
+            # A parallel platform workflow may have created the release first.
+            gh release upload "$TAG_NAME" "${assets[@]}" --clobber
+          fi

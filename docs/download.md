@@ -1,7 +1,7 @@
 ---
 title: Download & Install
-description: Install the PolarH10 Windows research preview from the latest public release using the guided setup bootstrapper, or fall back to the manual certificate-trust path.
-summary: The recommended path is the guided setup bootstrapper, which prompts for admin rights, trusts the preview certificate, and opens App Installer automatically.
+description: Install the PolarH10 research preview on Windows or macOS from the latest public release.
+summary: Choose the guided Windows installer or the Universal macOS app, then complete the platform-specific first-launch trust step.
 nav_label: Download & Install
 nav_group: Start Here
 nav_order: 20
@@ -10,12 +10,66 @@ full_width: true
 
 # Download & Install
 
-Use this page when you want the packaged Windows app instead of building the repo from source.
+Choose your platform. Both desktop apps connect directly to the Polar H10 over
+Bluetooth Low Energy and do not require the Polar SDK.
+
+<div class="card-grid logo-sequence">
+  <div class="path-card">
+    <h3>macOS 13+</h3>
+    <p>Universal SwiftUI app for Apple silicon and Intel Macs. Includes live HR, RR, ECG, ACC, rolling HRV/coherence, and session capture.</p>
+    <div class="action-row">
+      <a class="button primary" href="https://github.com/GeorgeFejer91/PolarH10/releases/latest/download/PolarH10-macOS-universal.zip">Download for Mac</a>
+      <a class="button" href="platform-guides/macos.md">Mac guide</a>
+    </div>
+  </div>
+  <div class="path-card">
+    <h3>Windows 10+</h3>
+    <p>Full WPF operator app with live telemetry, multi-device tracking, derived views, diagnostics, and session capture.</p>
+    <div class="action-row">
+      <a class="button primary" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">Guided Windows setup</a>
+      <a class="button" href="#windows-install">Windows options</a>
+    </div>
+  </div>
+</div>
 
 <div class="caption-card">
   <span class="caption-card-title">Research Preview</span>
-  <p>This installer is meant for research and developer use. It is self-signed, not backed by a public CA, so Windows still requires an admin-approved trust step. The recommended setup helper now performs that trust step for you and then opens App Installer automatically.</p>
+  <p>These builds are intended for research and developer use. The Windows package uses a self-signed preview certificate. The Mac app is ad-hoc signed and is not yet notarized, so both platforms require an explicit first-launch trust decision.</p>
 </div>
+
+## Install on macOS
+
+<div class="step-grid logo-sequence">
+  <div class="step-card">
+    <div class="step-no">01</div>
+    <h3>Download and unzip</h3>
+    <p>Download <code>PolarH10-macOS-universal.zip</code> and double-click it to reveal <code>PolarH10.app</code>.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-no">02</div>
+    <h3>Move to Applications</h3>
+    <p>Drag <code>PolarH10.app</code> into your Applications folder, then Control-click it and choose <strong>Open</strong>.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-no">03</div>
+    <h3>Approve first launch</h3>
+    <p>If macOS blocks the preview, open <strong>System Settings → Privacy &amp; Security</strong> and choose <strong>Open Anyway</strong> for PolarH10.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-no">04</div>
+    <h3>Allow Bluetooth</h3>
+    <p>Accept the Bluetooth prompt. Wear the H10, wet the electrodes, select <strong>Scan</strong>, then click the sensor to connect.</p>
+  </div>
+</div>
+
+The Mac build runs natively on both Apple silicon and Intel. Recordings default
+to `Documents/PolarH10/Sessions`. Read the full [macOS guide](platform-guides/macos.md)
+for source builds, Gatekeeper recovery, permissions, and current feature scope.
+
+## Windows install
+
+The guided setup helper is the recommended Windows path. It prompts for admin
+rights, trusts the published preview certificate, and opens App Installer.
 
 <div class="action-row">
   <a class="button primary" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">Guided setup (recommended)</a>
@@ -26,97 +80,50 @@ Use this page when you want the packaged Windows app instead of building the rep
   <a class="button" href="https://github.com/MesmerPrism/PolarH10/releases">Open releases</a>
 </div>
 
-## Fast path
+### Windows fast path
 
-<div class="step-grid logo-sequence">
-  <div class="step-card">
-    <div class="step-no">01</div>
-    <h3>Run guided setup</h3>
-    <p>Download <code>PolarH10-Preview-Setup.exe</code> from the latest release and open it like a normal installer helper.</p>
-  </div>
-  <div class="step-card">
-    <div class="step-no">02</div>
-    <h3>Accept the admin prompt</h3>
-    <p>Windows will ask for elevation because the helper needs to trust the preview certificate in <code>Local Machine &gt; Trusted People</code>.</p>
-  </div>
-  <div class="step-card">
-    <div class="step-no">03</div>
-    <h3>Let it trust the cert and open App Installer</h3>
-    <p>The helper downloads the latest <code>PolarH10.cer</code>, imports it into the machine trust store, and then opens the published <code>PolarH10.appinstaller</code> file.</p>
-  </div>
-  <div class="step-card">
-    <div class="step-no">04</div>
-    <h3>Finish in App Installer</h3>
-    <p>App Installer should now show the package as trusted. Complete the install and launch PolarH10 from the Start menu.</p>
-  </div>
-</div>
+1. Download and run `PolarH10-Preview-Setup.exe`.
+2. Accept the administrator prompt.
+3. Let the helper trust `PolarH10.cer` in `Local Machine > Trusted People`.
+4. Complete the installation in App Installer and launch PolarH10 from Start.
 
-The helper still requires admin approval and may still trigger Windows browser or SmartScreen friction because it is not backed by a publicly trusted code-signing certificate. It simply removes the need to browse certificate stores manually.
+The helper may still trigger Windows browser or SmartScreen friction because it
+is not backed by a publicly trusted code-signing certificate.
 
-## Manual fallback
+### Windows manual fallback
 
-Use this path if the guided setup helper is blocked by your environment or you prefer to import the certificate yourself.
-
-Before the first preview install on a machine:
+Use this path if the guided setup helper is blocked by your environment.
 
 1. Download [PolarH10.cer](https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer).
-2. Open the certificate file and choose `Install Certificate`.
+2. Open the certificate and choose `Install Certificate`.
 3. Select `Local Machine`.
 4. Choose `Place all certificates in the following store`.
-5. Select `Trusted People`.
-6. Finish the import, then open `PolarH10.appinstaller`.
+5. Select `Trusted People` and finish the import.
+6. Open the downloaded `PolarH10.appinstaller`.
 
-This import path requires local administrator rights on the machine.
-
-Windows App Installer checks the machine certificate store when deciding whether the package is trusted. Until the project has a certificate from a publicly trusted CA, this step is required for the preview installer.
-
-If the `Install PolarH10 for Windows` link does not launch App Installer from the browser, download `PolarH10.appinstaller` and open it from your Downloads folder after importing `PolarH10.cer`.
-
-If the direct download links return `404`, there is no public preview release yet. Use the source-build path in [Getting Started on Windows](getting-started.md) until the first preview release is published.
-
-## Common install problems
-
-<div class="card-grid logo-sequence">
-  <a class="path-card" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10-Preview-Setup.exe">
-    <h3>Use the guided helper first</h3>
-    <p>If you have been using the manual cert path, try <code>PolarH10-Preview-Setup.exe</code> first. It exists specifically to remove the certificate-store browsing step.</p>
-  </a>
-  <a class="path-card" href="https://github.com/MesmerPrism/PolarH10/releases/latest/download/PolarH10.cer">
-    <h3>Windows still says the package is untrusted</h3>
-    <p>Re-import <code>PolarH10.cer</code> into <code>Local Machine &gt; Trusted People</code>. Importing into the current-user store is usually not enough for this flow.</p>
-  </a>
-  <a class="path-card" href="getting-started.md">
-    <h3>No preview asset yet or the release link is missing</h3>
-    <p>Use the source-build path from Getting Started on Windows until the next public preview package is published.</p>
-  </a>
-  <a class="path-card" href="troubleshooting.md">
-    <h3>The app installed but Bluetooth or device discovery still fails</h3>
-    <p>The package trust step only affects install. For BLE, adapter, and H10 scan issues, move straight to the main troubleshooting guide.</p>
-  </a>
-</div>
+This import requires local administrator rights. If an App Installer link does
+not launch from the browser, download the `.appinstaller` file and open it after
+importing the certificate.
 
 ## Requirements
 
-- Windows 10 version 19041 or later
-- Bluetooth Low Energy (BLE) adapter
-- Polar H10 chest strap
+| Platform | Operating system | Hardware | First-launch permission |
+|---|---|---|---|
+| macOS | macOS 13 Ventura or later; Apple silicon or Intel | Bluetooth LE adapter and Polar H10 | Gatekeeper approval for the preview and Bluetooth access |
+| Windows | Windows 10 version 19041 or later | Bluetooth LE adapter and Polar H10 | Admin-approved preview certificate trust |
 
-The packaged app keeps the Bluetooth package identity required for the Windows GATT path used by this repo. The preview certificate trust step is separate from the app itself and only affects whether Windows accepts the package as trusted.
+## Release files and updates
 
-## Default save location
+The release automation publishes these platform assets:
 
-Installed builds default new recordings to:
+- macOS: `PolarH10-macOS-universal.zip` and its SHA-256 checksum
+- Windows: `PolarH10-Preview-Setup.exe`, `PolarH10.msix`,
+  `PolarH10.appinstaller`, `PolarH10.cer`, and checksums
 
-```text
-Documents\PolarH10\Sessions
-```
+The Windows App Installer channel checks for updates at launch. The Mac research
+preview currently uses manual updates: download the latest ZIP and replace the
+old app in Applications.
 
-Repo-local developer builds still default to the repo `session\` folder.
-
-## Update behavior
-
-The release pipeline publishes `PolarH10-Preview-Setup.exe`, `PolarH10.msix`, `PolarH10.appinstaller`, and `PolarH10.cer`. The App Installer file is configured to check for updates on launch and prompt before activation when a newer preview release is available.
-
-## Source-build fallback
-
-If you are validating the code, changing the app, or no preview release is available yet, use [Getting Started on Windows](getting-started.md) and run the repo build directly.
+If a direct link returns `404`, that platform asset has not been attached to a
+public release yet. Use the [Windows source-build guide](getting-started.md) or
+the [Mac source-build guide](platform-guides/macos.md) until the next release.

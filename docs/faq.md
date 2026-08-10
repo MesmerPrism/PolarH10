@@ -11,16 +11,20 @@ nav_order: 20
 
 ## Do I Need The Official Polar SDK?
 
-No. This repo talks to the Polar H10 directly over standard BLE/GATT on Windows.
+No. This repo talks to the Polar H10 directly over standard BLE/GATT on Windows
+and macOS.
 
 ## Is This Project Official?
 
 No. It is an unofficial open-source implementation and is not endorsed by or
 affiliated with Polar Electro Oy.
 
-## What Runs On Windows Right Now?
+## What Runs On Each Desktop Platform?
 
-The repo currently targets a Windows-first workflow:
+On macOS 13+, `PolarH10Mac` provides a native SwiftUI/CoreBluetooth path for
+single-sensor HR, RR, ECG, ACC, HRV/coherence, and session recording.
+
+On Windows:
 
 - `PolarH10.App` for the WPF operator surface
 - `PolarH10.Cli` for direct command-line use
@@ -34,6 +38,9 @@ The repo currently targets a Windows-first workflow:
 - RR-derived coherence and coherence confidence in the WPF app
 - Breath interval entropy and breath amplitude entropy in the WPF app once breathing dynamics is warm
 - Protocol transcript output for control-point and notification debugging
+
+The Mac preview currently covers the core cardiac and motion signals. The
+calibrated breathing and breathing-dynamics surfaces remain Windows-only.
 
 ## Can I Compare More Than One Strap At Once?
 
@@ -60,7 +67,8 @@ ECG morphology.
 
 ## What Should I Read First If I Only Want One Working Session?
 
-Start with:
+On macOS, start with [Getting Started on macOS](platform-guides/macos.md). On
+Windows, start with:
 
 1. [Getting Started on Windows](getting-started.md)
 2. [First Recording](first-recording.md)

@@ -1,9 +1,9 @@
 ---
 title: Platform Guides
-description: Windows BLE transport notes, access pitfalls, and application-control workarounds for this repo.
-summary: Use these notes when the Windows transport behaves differently than expected or local policy blocks the normal app launch path.
+description: Windows and macOS BLE transport notes, access pitfalls, source builds, and application-control workarounds.
+summary: Choose the native macOS/CoreBluetooth guide or the Windows WinRT notes when transport behavior, permissions, or app launch needs platform-specific help.
 nav_label: Platform Guides
-nav_group: Troubleshooting
+nav_group: Platform Guides
 nav_order: 30
 ---
 
@@ -17,11 +17,22 @@ projects implement them.
 
 | Transport                     | Platform              | BLE Stack                    |
 |-------------------------------|-----------------------|------------------------------|
-| `PolarH10.Transport.Windows`  | Windows 10+          | WinRT (Windows.Devices.Bluetooth) |
+| `PolarH10.Transport.Windows`  | Windows 10+           | WinRT (Windows.Devices.Bluetooth) |
+| `PolarH10Mac`                 | macOS 13+             | Apple CoreBluetooth          |
 
-## Writing a New Transport
+## macOS
 
-To add support for a new platform (e.g., Linux/BlueZ, macOS/CoreBluetooth, Android):
+Use [Getting Started on macOS](macos.md) for the Universal download, first-launch
+trust and Bluetooth permissions, source builds, CoreBluetooth identifiers, and
+the current native Mac feature scope.
+
+The Mac client is a native Swift package. It follows the same GATT/PMD protocol
+and output schema, while its CoreBluetooth lifecycle stays in the `macos/`
+target instead of implementing the .NET transport abstractions.
+
+## Writing a New .NET Transport
+
+To add another platform to the .NET CLI/runtime path (for example Linux/BlueZ or Android):
 
 1. Create a new project targeting the appropriate TFM.
 2. Reference `PolarH10.Transport.Abstractions`.

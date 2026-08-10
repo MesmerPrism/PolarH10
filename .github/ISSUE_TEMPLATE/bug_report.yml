@@ -25,7 +25,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include Windows version, Bluetooth adapter, H10 firmware if known, and whether you used the WPF app or CLI.
+      description: Include Windows or macOS version, Mac model or Bluetooth adapter, H10 firmware if known, and whether you used the Mac app, WPF app, or CLI.
     validations:
       required: true
   - type: textarea
