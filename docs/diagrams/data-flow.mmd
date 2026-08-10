@@ -17,16 +17,16 @@ flowchart LR
         DACC["AccDecoder<br/>x / y / z mG"]
     end
 
-    subgraph Session["SESSION EVENTS"]
-        SHR["HeartRateReceived"]
-        SECG["EcgFrameReceived"]
-        SACC["AccFrameReceived"]
+    subgraph Session["DECODED SESSION EVENTS"]
+        SHR["heart rate + RR sample"]
+        SECG["ECG frame"]
+        SACC["ACC frame"]
     end
 
     subgraph Output["CONSUMERS"]
-        REC["PolarSessionRecorder<br/>hr.csv · ecg.csv · acc.csv · protocol.jsonl"]
-        CHART["WaveformChart<br/>live telemetry surfaces"]
-        LOG["Runtime logs<br/>WPF + CLI diagnostics"]
+        REC["Session recorder<br/>hr_rr.csv · ecg.csv · acc.csv · protocol.jsonl"]
+        CHART["WPF / SwiftUI charts<br/>live telemetry surfaces"]
+        LOG["Runtime logs<br/>Mac app · WPF · CLI"]
     end
 
     H10 --> ADV

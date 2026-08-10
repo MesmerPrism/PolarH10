@@ -15,6 +15,11 @@ exercise. The current app shell is built around a real research workflow:
 control the selected strap on the left, then compare one or several tracked
 straps in parallel in the live telemetry surface.
 
+On macOS, the separate native `PolarH10Mac` surface covers the core
+single-sensor scan/connect, HR/RR/ECG/ACC, HRV/coherence, and recording path.
+See [Getting Started on macOS](platform-guides/macos.md) for its install flow
+and current feature scope.
+
 ![PolarH10 WPF monitor preview](assets/brutal-tdr-preview.png)
 
 ## What The App Is For

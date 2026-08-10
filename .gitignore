@@ -55,6 +55,10 @@ node_modules/
 /out/
 /.codex-build/
 
+## Swift Package Manager
+**/.build/
+**/.swiftpm/
+
 ## Local preview and publish scratch
 /artifacts/
 /src/PolarH10.App.Package/AppPackages/

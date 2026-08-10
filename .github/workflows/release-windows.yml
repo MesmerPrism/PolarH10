@@ -182,6 +182,11 @@ jobs:
           }
           else {
             gh release create $tagName $assets --title $releaseTitle --generate-notes --latest --target $env:GITHUB_SHA
+            if ($LASTEXITCODE -ne 0) {
+              # The macOS release job may have created the shared tag release
+              # between the view and create calls.
+              gh release upload $tagName $assets --clobber
+            }
           }
 
       - name: Remove signing certificate
