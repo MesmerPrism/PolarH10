@@ -14,8 +14,8 @@
     heart_rate: { label: "Heart rate", unit: "bpm", rate: 1, color: "#d85151" },
     rr_interval: { label: "RR interval", unit: "ms", rate: 2, color: "#6c62a8" },
     acc_magnitude: { label: "ACC magnitude", unit: "g", rate: 200, color: "#3b78aa" },
-    acc_breathing_waveform: { label: "ACC breathing · curve", unit: "0–1", rate: 200, color: "#3b78aa" },
-    acc_breathing_circle: { label: "ACC breathing · phase circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
+    acc_breathing_waveform: { label: "Breathing magnitude · curve", unit: "0–1", rate: 200, color: "#3b78aa" },
+    acc_breathing_circle: { label: "Breathing phase · circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
     rmssd: { label: "RMSSD", unit: "ms", rate: 1, color: "#168259" },
   };
 

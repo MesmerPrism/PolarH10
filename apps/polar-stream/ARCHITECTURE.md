@@ -98,9 +98,11 @@ not to the lifetime of the recording.
 3. Add its label to the bootstrap catalog in `apps/polar-stream/src/lib.rs`.
 4. Add a visualization definition only if the value should be chartable.
 
-The `acc_breathing` exception produces a two-channel derived stream directly
-from each ACC batch after applying its selected axes, rolling dominant-axis
-projection, smoothing, adaptive normalization, and phase threshold. It remains
-explicitly experimental in both the bootstrap descriptor and the UI.
+The two ACC-breathing outputs are derived once per ACC batch after applying the
+selected axes, rolling dominant-axis projection, smoothing, adaptive
+normalization, and phase threshold. `acc_breathing_magnitude` publishes the
+continuous projection, while `acc_breathing_phase` publishes only the
+three-state result. Both remain explicitly experimental in the bootstrap
+descriptors and the UI.
 
 Raw input and output destinations remain unchanged.

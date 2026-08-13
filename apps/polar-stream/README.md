@@ -66,13 +66,15 @@ accelerometer is `participant_07_rawACC`. Additional metrics follow the same
 rule, for example `participant_07_heartRate`. Spaces and protocol-unsafe
 characters in the user-entered base are collapsed to underscores.
 
-`participant_07_accBreathing` is an explicitly experimental two-channel stream:
-the configured ACC projection is channel one and phase (`1` inhale, `-1`
-exhale, `0` pause/not ready) is channel two. Its selector exposes the included
-axes (X + Z by default), smoothing window, phase sensitivity, 0–1
-normalization, and direction inversion. It is not validated as a respiratory
-measurement and should be checked against a reference sensor before it is
-interpreted.
+ACC breathing is limited to two explicitly experimental, independently
+selectable streams. `participant_07_accBreathingMagnitude` retains the
+continuous configured ACC projection so downstream tools can inspect the curve
+or estimate breathing rate. `participant_07_accBreathingPhase` contains only
+the three-state classifier (`1` inhale, `-1` exhale, `0` pause/not ready). They
+share the same included axes (X + Z by default), smoothing window, phase
+sensitivity, 0–1 normalization, and direction-inversion settings. Neither is
+validated as a respiratory measurement; check both against a reference sensor
+before interpreting them.
 
 - **LSL:** `liblsl` is loaded dynamically. The app still starts if it is absent;
   enabling LSL reports the missing library beside the switch. ECG, ACC, and each
