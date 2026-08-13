@@ -4,7 +4,7 @@ use std::{
 };
 
 use libloading::Library;
-use polar_h10_core::{AccSample, ExperimentalBreathingSample};
+use polar_h10_core::AccSample;
 
 use crate::{MetricSpec, output_stream_name};
 
@@ -225,28 +225,6 @@ impl LslPublisher {
                     f32::from(sample.y_mg),
                     f32::from(sample.z_mg),
                 ],
-                Some(now - backfill),
-            );
-        }
-    }
-
-    pub(crate) fn push_breathing(&mut self, samples: &[ExperimentalBreathingSample]) {
-        let rate = self
-            .outlets
-            .get("acc_breathing")
-            .map_or(0.0, |outlet| outlet.rate_hz);
-        let Some(api) = &self.api else { return };
-        // SAFETY: Function pointer comes from the retained library.
-        let now = unsafe { (api.local_clock)() };
-        for (index, sample) in samples.iter().enumerate() {
-            let backfill = if rate > 0.0 {
-                (samples.len() - index - 1) as f64 / rate
-            } else {
-                0.0
-            };
-            self.push_values(
-                "acc_breathing",
-                &[sample.waveform, f32::from(sample.phase)],
                 Some(now - backfill),
             );
         }

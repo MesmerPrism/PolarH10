@@ -102,12 +102,15 @@ impl MetricDescriptor {
             detail,
             unit,
             raw,
-            family: if matches!(id, "raw_acc" | "acc_magnitude" | "acc_breathing") {
+            family: if matches!(
+                id,
+                "raw_acc" | "acc_magnitude" | "acc_breathing_magnitude" | "acc_breathing_phase"
+            ) {
                 "acc"
             } else {
                 "ecg"
             },
-            experimental: id == "acc_breathing",
+            experimental: matches!(id, "acc_breathing_magnitude" | "acc_breathing_phase"),
         }
     }
 }
@@ -142,10 +145,17 @@ fn get_bootstrap(state: State<'_, Arc<AppState>>) -> Bootstrap {
                 false,
             ),
             MetricDescriptor::new(
-                "acc_breathing",
+                "acc_breathing_magnitude",
+                "Breathing magnitude estimate",
+                "Continuous tunable ACC projection",
+                "normalized / g",
+                false,
+            ),
+            MetricDescriptor::new(
+                "acc_breathing_phase",
                 "Breathing phase classifier",
-                "Tunable ACC projection · waveform + phase",
-                "wave / phase",
+                "Three states · inhale, pause, exhale",
+                "state",
                 false,
             ),
             MetricDescriptor::new("rmssd", "RMSSD", "Rolling 60-beat window", "ms", false),

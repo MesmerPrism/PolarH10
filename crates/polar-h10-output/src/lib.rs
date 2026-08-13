@@ -130,22 +130,47 @@ impl OutputRouter {
                 );
             }
         }
-        if inner.config.includes("acc_breathing") {
+        let publish_breathing_magnitude = inner.config.includes("acc_breathing_magnitude");
+        let publish_breathing_phase = inner.config.includes("acc_breathing_phase");
+        if publish_breathing_magnitude || publish_breathing_phase {
             let breathing_samples: Vec<_> = samples
                 .iter()
                 .copied()
                 .map(|sample| inner.breathing.process(sample))
                 .collect();
-            inner.lsl.push_breathing(&breathing_samples);
-            if let Some(osc) = &inner.osc {
-                osc.send_series(
-                    &inner.config.stream_name,
-                    "acc_breathing",
-                    sensor_timestamp_ns,
+            if publish_breathing_magnitude {
+                inner.lsl.push_scalar_series(
+                    "acc_breathing_magnitude",
+                    breathing_samples.iter().map(|sample| sample.waveform),
+                );
+            }
+            if publish_breathing_phase {
+                inner.lsl.push_scalar_series(
+                    "acc_breathing_phase",
                     breathing_samples
                         .iter()
-                        .flat_map(|sample| [sample.waveform, f32::from(sample.phase)]),
+                        .map(|sample| f32::from(sample.phase)),
                 );
+            }
+            if let Some(osc) = &inner.osc {
+                if publish_breathing_magnitude {
+                    osc.send_series(
+                        &inner.config.stream_name,
+                        "acc_breathing_magnitude",
+                        sensor_timestamp_ns,
+                        breathing_samples.iter().map(|sample| sample.waveform),
+                    );
+                }
+                if publish_breathing_phase {
+                    osc.send_series(
+                        &inner.config.stream_name,
+                        "acc_breathing_phase",
+                        sensor_timestamp_ns,
+                        breathing_samples
+                            .iter()
+                            .map(|sample| f32::from(sample.phase)),
+                    );
+                }
             }
             breathing_samples
         } else {

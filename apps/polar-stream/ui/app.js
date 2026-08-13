@@ -14,7 +14,8 @@
     { id: "rmssd", streamSuffix: "rmssd", label: "RMSSD", detail: "Rolling 60-beat window", unit: "ms", raw: false, family: "ecg" },
     { id: "raw_acc", streamSuffix: "rawACC", label: "Raw accelerometer", detail: "200 Hz · X, Y, Z", unit: "mg", raw: true, family: "acc" },
     { id: "acc_magnitude", streamSuffix: "accMagnitude", label: "ACC magnitude", detail: "√(x² + y² + z²)", unit: "g", raw: false, family: "acc" },
-    { id: "acc_breathing", streamSuffix: "accBreathing", label: "Breathing phase classifier", detail: "Tunable ACC projection · waveform + phase", unit: "wave / phase", raw: false, family: "acc", experimental: true },
+    { id: "acc_breathing_magnitude", streamSuffix: "accBreathingMagnitude", label: "Breathing magnitude estimate", detail: "Continuous tunable ACC projection", unit: "normalized / g", raw: false, family: "acc", experimental: true },
+    { id: "acc_breathing_phase", streamSuffix: "accBreathingPhase", label: "Breathing phase classifier", detail: "Three states · inhale, pause, exhale", unit: "state", raw: false, family: "acc", experimental: true },
   ];
 
   const defaultBreathingConfig = {
@@ -24,6 +25,7 @@
     normalize: true,
     invert: false,
   };
+  const breathingOutputIds = ["acc_breathing_magnitude", "acc_breathing_phase"];
 
   const visualDefinitions = {
     raw_ecg: { label: "Raw ECG", unit: "µV", rate: 130, color: "#d85151", symmetric: true },
@@ -40,8 +42,8 @@
     heart_rate: { label: "Heart rate", unit: "bpm", rate: 1, color: "#d85151" },
     rr_interval: { label: "RR interval", unit: "ms", rate: 2, color: "#6c62a8" },
     acc_magnitude: { label: "ACC magnitude", unit: "g", rate: 200, color: "#3b78aa" },
-    acc_breathing_waveform: { parent: "acc_breathing", label: "ACC breathing · curve", unit: "", rate: 200, color: "#3b78aa" },
-    acc_breathing_circle: { parent: "acc_breathing", label: "ACC breathing · phase circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
+    acc_breathing_waveform: { parent: "acc_breathing_magnitude", label: "Breathing magnitude · curve", unit: "", rate: 200, color: "#3b78aa" },
+    acc_breathing_circle: { parent: "acc_breathing_phase", label: "Breathing phase · circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
     rmssd: { label: "RMSSD", unit: "ms", rate: 1, color: "#168259" },
   };
 
@@ -616,7 +618,7 @@
       buffers.acc_z.push(z);
       buffers.acc_magnitude.push(Math.hypot(x, y, z) / 1000);
     }
-    if (!breathingSamples.length && !isNative && app.outputs.has("acc_breathing")) {
+    if (!breathingSamples.length && !isNative && breathingOutputIds.some((id) => app.outputs.has(id))) {
       if (!app.browserBreathing) app.browserBreathing = new BrowserBreathingClassifier(app.breathingConfig);
       breathingSamples = samples.map((sample) => app.browserBreathing.process(sample));
     }
@@ -761,9 +763,11 @@
   }
 
   function validateBreathingAxes() {
-    const classifierSelected = Boolean(elements["metric-options"].querySelector('input[value="acc_breathing"]:checked'));
+    const breathingSelected = breathingOutputIds.some((id) => (
+      elements["metric-options"].querySelector(`input[value="${id}"]`)?.checked
+    ));
     const axisCount = ["x", "y", "z"].filter((axis) => elements[`breathing-axis-${axis}`].checked).length;
-    const invalid = classifierSelected && axisCount < 2;
+    const invalid = breathingSelected && axisCount < 2;
     elements["breathing-axis-error"].closest("fieldset").classList.toggle("invalid", invalid);
     elements["output-dialog"].querySelector('button[value="confirm"]').disabled = invalid;
     return !invalid;
@@ -775,9 +779,11 @@
   }
 
   function updateBreathingConfigVisibility() {
-    const selected = Boolean(elements["metric-options"].querySelector('input[value="acc_breathing"]:checked'));
+    const selected = breathingOutputIds.some((id) => (
+      elements["metric-options"].querySelector(`input[value="${id}"]`)?.checked
+    ));
     const query = elements["metric-search"].value.trim().toLowerCase();
-    const classifierMatches = !query || "breathing phase classifier tunable acc projection waveform phase".includes(query);
+    const classifierMatches = !query || "breathing magnitude estimate continuous curve phase classifier inhale pause exhale tunable acc projection".includes(query);
     const visible = app.metricFamily === "acc" && selected && classifierMatches;
     elements["breathing-config"].hidden = !visible;
     elements["breathing-config"].closest(".metric-scroll").classList.toggle("with-config", visible);
@@ -1291,7 +1297,7 @@
   function broadcastVisualizerData(event) {
     if (["ecg", "accelerometer", "metrics", "connection"].includes(event.kind)) {
       let payload = event;
-      if (event.kind === "accelerometer" && app.outputs.has("acc_breathing")) {
+      if (event.kind === "accelerometer" && breathingOutputIds.some((id) => app.outputs.has(id))) {
         const sampleCount = event.samples?.length || 0;
         payload = {
           ...event,
