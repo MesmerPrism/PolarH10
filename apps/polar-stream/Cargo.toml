@@ -1,0 +1,27 @@
+[package]
+name = "polar-stream"
+description = "Low-latency Polar H10 bridge for LSL, OSC, and live visualization"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "polar_stream_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "polar-stream"
+path = "src/main.rs"
+
+[dependencies]
+polar-h10-core = { path = "../../crates/polar-h10-core" }
+polar-h10-input = { path = "../../crates/polar-h10-input" }
+polar-h10-output = { path = "../../crates/polar-h10-output" }
+serde.workspace = true
+tauri = { version = "2.11", features = [] }
+tokio.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2.5", features = [] }

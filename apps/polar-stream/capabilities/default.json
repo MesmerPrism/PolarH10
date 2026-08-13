@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-capability",
+  "description": "Local Polar Stream application window",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

@@ -7,6 +7,19 @@ Capture, inspect, and record Polar H10 telemetry without the Polar SDK. Use the
 native SwiftUI app on macOS, the fuller WPF operator surface on Windows, or the
 Windows CLI for scan, doctor, record, replay, and protocol inspection.
 
+## New: condensed cross-platform stream app
+
+The fork now includes **Polar Stream**, an HTML-driven Tauri/Rust application
+with only three surfaces: Input, Output, and Visualization. Raw ECG and raw ACC
+are the default outputs; LSL and OSC each have one switch; extra metrics are
+added from one compact output library. Its native implementation is split into
+independent protocol, BLE-input, and LSL/OSC-output crates so it can be extracted
+cleanly into a new repository. Stream names use one predictable convention
+(`participant_rawECG`, `participant_rawACC`, and so on), while the last accepted
+name and last successfully connected H10 are remembered between launches. See
+[Polar Stream](apps/polar-stream/README.md) and its
+[architecture](apps/polar-stream/ARCHITECTURE.md).
+
 Start with [Docs Home](docs/index.md) or the live
 [Pages site](https://mesmerprism.github.io/PolarH10/).
 If a public research preview release exists, install it from

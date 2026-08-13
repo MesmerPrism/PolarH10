@@ -1,0 +1,14 @@
+[package]
+name = "polar-h10-output"
+description = "Independent LSL and OSC output routing for Polar H10 signals"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+libloading.workspace = true
+polar-h10-core = { path = "../polar-h10-core" }
+serde.workspace = true
+tokio.workspace = true

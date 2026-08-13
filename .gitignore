@@ -59,6 +59,11 @@ node_modules/
 **/.build/
 **/.swiftpm/
 
+## Rust / Tauri
+target/
+**/target/
+apps/polar-stream/gen/
+
 ## Local preview and publish scratch
 /artifacts/
 /src/PolarH10.App.Package/AppPackages/
