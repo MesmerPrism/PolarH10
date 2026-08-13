@@ -13,7 +13,7 @@
     { id: "rr_interval", streamSuffix: "rrInterval", label: "RR interval", detail: "Beat-to-beat interval", unit: "ms", raw: false, family: "ecg" },
     { id: "rmssd", streamSuffix: "rmssd", label: "RMSSD", detail: "Rolling 60-beat window", unit: "ms", raw: false, family: "ecg" },
     { id: "raw_acc", streamSuffix: "rawACC", label: "Raw accelerometer", detail: "200 Hz · X, Y, Z", unit: "mg", raw: true, family: "acc" },
-    { id: "acc_magnitude", streamSuffix: "accMagnitude", label: "ACC magnitude", detail: "√(x² + y² + z²)", unit: "g", raw: false, family: "acc" },
+    { id: "acc_magnitude", streamSuffix: "accMagnitude", label: "3D acceleration magnitude", detail: "Device motion · √(x² + y² + z²)", unit: "g", raw: false, family: "acc" },
     { id: "acc_breathing_magnitude", streamSuffix: "accBreathingMagnitude", label: "Breathing magnitude estimate", detail: "Continuous tunable ACC projection", unit: "normalized / g", raw: false, family: "acc", experimental: true },
     { id: "acc_breathing_phase", streamSuffix: "accBreathingPhase", label: "Breathing phase classifier", detail: "Three states · inhale, pause, exhale", unit: "state", raw: false, family: "acc", experimental: true },
   ];
@@ -41,7 +41,7 @@
     },
     heart_rate: { label: "Heart rate", unit: "bpm", rate: 1, color: "#d85151" },
     rr_interval: { label: "RR interval", unit: "ms", rate: 2, color: "#6c62a8" },
-    acc_magnitude: { label: "ACC magnitude", unit: "g", rate: 200, color: "#3b78aa" },
+    acc_magnitude: { label: "3D acceleration magnitude", unit: "g", rate: 200, color: "#3b78aa" },
     acc_breathing_waveform: { parent: "acc_breathing_magnitude", label: "Breathing magnitude · curve", unit: "", rate: 200, color: "#3b78aa" },
     acc_breathing_circle: { parent: "acc_breathing_phase", label: "Breathing phase · circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
     rmssd: { label: "RMSSD", unit: "ms", rate: 1, color: "#168259" },

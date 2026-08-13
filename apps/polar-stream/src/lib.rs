@@ -139,8 +139,8 @@ fn get_bootstrap(state: State<'_, Arc<AppState>>) -> Bootstrap {
             ),
             MetricDescriptor::new(
                 "acc_magnitude",
-                "ACC magnitude",
-                "√(x² + y² + z²)",
+                "3D acceleration magnitude",
+                "Device motion · √(x² + y² + z²)",
                 "g",
                 false,
             ),
