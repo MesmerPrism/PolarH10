@@ -294,4 +294,22 @@ mod tests {
             Some("participant_07_heartRate")
         );
     }
+
+    #[test]
+    fn breathing_magnitude_and_phase_are_independent_scalar_streams() {
+        let magnitude = MetricSpec::for_id("acc_breathing_magnitude").unwrap();
+        let phase = MetricSpec::for_id("acc_breathing_phase").unwrap();
+        assert_eq!(magnitude.channels, 1);
+        assert_eq!(phase.channels, 1);
+        assert_eq!(magnitude.suffix(), "accBreathingMagnitude");
+        assert_eq!(phase.suffix(), "accBreathingPhase");
+        assert_eq!(
+            output_stream_name("participant_07", "acc_breathing_magnitude").as_deref(),
+            Some("participant_07_accBreathingMagnitude")
+        );
+        assert_eq!(
+            output_stream_name("participant_07", "acc_breathing_phase").as_deref(),
+            Some("participant_07_accBreathingPhase")
+        );
+    }
 }

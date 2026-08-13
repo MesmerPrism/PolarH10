@@ -287,13 +287,13 @@
               <label class="range-control" for="breathing-sensitivity">
                 <span><strong>Phase sensitivity</strong><output id="breathing-sensitivity-value">60%</output></span>
                 <input id="breathing-sensitivity" type="range" min="0" max="1" step="0.05" value="0.6" />
-                <small>Higher values classify smaller changes as inhale or exhale.</small>
+                <small>Phase output only · higher values classify smaller changes.</small>
               </label>
             </div>
 
             <div class="classifier-toggles">
               <label>
-                <span><strong>Normalize waveform</strong><small>Map the derived curve to 0–1.</small></span>
+                <span><strong>Normalize waveform</strong><small>Magnitude output only · map the curve to 0–1.</small></span>
                 <input id="breathing-normalize" class="switch-input" type="checkbox" checked />
                 <span class="switch blue" aria-hidden="true"></span>
               </label>
