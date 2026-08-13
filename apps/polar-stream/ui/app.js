@@ -1188,7 +1188,8 @@
   function installVisualizerDeckInteractions() {
     const deck = elements["visualizer-deck"];
     deck.addEventListener("dragover", (event) => {
-      const hasTransfer = [...event.dataTransfer.types].includes("application/x-polar-visualizer");
+      const transferTypes = [...event.dataTransfer.types];
+      const hasTransfer = transferTypes.includes("application/x-polar-visualizer") || transferTypes.includes("text/plain");
       if (!app.draggedVisualizerId && !hasTransfer) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
@@ -1216,7 +1217,8 @@
         return;
       }
       try {
-        const payload = JSON.parse(event.dataTransfer.getData("application/x-polar-visualizer"));
+        const raw = event.dataTransfer.getData("application/x-polar-visualizer") || event.dataTransfer.getData("text/plain");
+        const payload = JSON.parse(raw);
         if (!payload?.source) return;
         addVisualizer(payload.source);
         visualizerChannel?.postMessage({ type: "adopted", origin: payload.origin, viewId: payload.viewId });
@@ -1235,11 +1237,12 @@
     const payload = { source: view.source, origin: mainWindowId, viewId: view.id };
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("application/x-polar-visualizer", JSON.stringify(payload));
-    event.dataTransfer.setData("text/plain", visualDefinitions[view.source]?.label || view.source);
+    event.dataTransfer.setData("text/plain", JSON.stringify(payload));
   }
 
   function endVisualizerDrag(event, view) {
     view.card.classList.remove("dragging");
+    delete view.card.dataset.dragReady;
     app.draggedVisualizerId = null;
     const outside = event.clientX <= 0 || event.clientY <= 0 || event.clientX >= window.innerWidth || event.clientY >= window.innerHeight;
     if (!view.droppedInside && event.dataTransfer.dropEffect === "none" && outside) void detachVisualizer(view);

@@ -232,12 +232,14 @@
 
   function finishDrag(view) {
     view.card.classList.remove("dragging");
+    delete view.card.dataset.dragReady;
     draggedViewId = null;
   }
 
   function installDropMerging() {
     deck.addEventListener("dragover", (event) => {
-      const compatible = [...event.dataTransfer.types].includes("application/x-polar-visualizer");
+      const transferTypes = [...event.dataTransfer.types];
+      const compatible = transferTypes.includes("application/x-polar-visualizer") || transferTypes.includes("text/plain");
       if (!draggedViewId && !compatible) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";

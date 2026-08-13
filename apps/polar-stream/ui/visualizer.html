@@ -27,7 +27,7 @@
     </header>
 
     <main class="detached-main">
-      <div class="visualizer-deck detached-deck" id="detached-deck" aria-label="Detached visualization tiles">
+      <div class="visualizer-deck detached-deck" id="detached-deck" role="group" aria-label="Detached visualization tiles">
         <article class="visualizer-card" data-visualizer-id="primary">
           <div class="visual-toolbar">
             <button class="visualizer-drag-handle" type="button" title="Drag into another Polar Stream window to merge" aria-label="Drag visualization to rearrange or merge"><span aria-hidden="true">⠿</span></button>
@@ -38,7 +38,7 @@
             <button class="visualizer-action" data-visualizer-action="close" type="button" title="Close visualization" aria-label="Close visualization">×</button>
           </div>
           <div class="chart-shell">
-            <canvas aria-label="Live selected Polar H10 signal"></canvas>
+            <canvas role="img" aria-label="Live selected Polar H10 signal"></canvas>
             <div class="chart-y-labels" aria-hidden="true"><span>—</span><span>0</span><span>—</span></div>
             <div class="chart-empty">
               <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M7 35h10l5-14 8 28 7-23 5 9h15"/></svg>

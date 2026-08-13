@@ -3,5 +3,8 @@
   "identifier": "main-capability",
   "description": "Local Polar Stream application window",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": [
+    "core:default",
+    "core:webview:allow-create-webview-window"
+  ]
 }
