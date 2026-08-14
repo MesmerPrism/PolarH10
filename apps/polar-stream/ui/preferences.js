@@ -34,7 +34,10 @@
   }
 
   function saveLastDevice(device) {
-    return write({ ...load(), lastDevice: { id: device.id, name: device.name } });
+    return write({
+      ...load(),
+      lastDevice: device ? { id: device.id, name: device.name } : null,
+    });
   }
 
   window.PolarPreferences = Object.freeze({

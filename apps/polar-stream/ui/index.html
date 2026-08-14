@@ -26,6 +26,14 @@
         <span class="state-dot" id="app-state-dot"></span>
         <span id="app-state-text">Ready to connect</span>
       </div>
+      <div class="profile-actions" aria-label="Workspace profiles">
+        <label class="sr-only" for="profile-select">Load workspace profile</label>
+        <select id="profile-select" title="Load a saved workspace profile">
+          <option value="">Profiles…</option>
+        </select>
+        <button class="header-button" id="save-profile-button" type="button">Save profile</button>
+        <button class="header-button danger" id="delete-profile-button" type="button" disabled>Delete</button>
+      </div>
       <div class="latency-note">
         <span id="platform-label">LOCAL</span>
         <strong>Native data path</strong>
@@ -256,6 +264,27 @@
         </div>
         <div class="metric-scroll">
           <div class="metric-options" id="metric-options"></div>
+          <section class="formula-builder" id="formula-builder" aria-labelledby="formula-builder-title">
+            <header>
+              <div>
+                <p class="eyebrow">Math module</p>
+                <h3 id="formula-builder-title">Custom processed signals</h3>
+              </div>
+              <button class="secondary-button compact" id="add-custom-formula" type="button">＋ New formula</button>
+            </header>
+            <p class="formula-intro">Each expression produces one scalar LSL/OSC stream at its source rate. Formulas run in the native bounded DSP engine.</p>
+            <details class="formula-help">
+              <summary>Formula syntax &amp; DSP functions</summary>
+              <p><code>+ - * / % ^</code> · comparisons · <code>&amp;&amp; || !</code> · constants <code>pi</code>, <code>e</code> · lazy <code>if(condition, yes, no)</code></p>
+              <p><strong>Math:</strong> <code>abs sqrt cbrt exp ln log10 sin cos tan asin acos atan atan2 pow min max clamp floor ceil round sign</code></p>
+              <p><strong>DSP:</strong> <code>delay moving_mean moving_rms moving_std zscore ema lowpass highpass bandpass derivative integral</code>. Add <code>_n</code> to moving/z-score functions for sample-count windows; <code>rmssd(rr, count)</code> is available for RR.</p>
+            </details>
+            <div class="formula-boxes" id="formula-boxes"></div>
+            <div class="formula-empty" id="formula-empty">
+              <strong>No custom formulas yet</strong>
+              <span>Start blank, or copy an executable formula from a metric above.</span>
+            </div>
+          </section>
           <section class="breathing-config" id="breathing-config" aria-labelledby="breathing-config-title" hidden>
             <header>
               <div>

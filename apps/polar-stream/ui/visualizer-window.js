@@ -57,7 +57,7 @@
   const parameters = new URLSearchParams(location.search);
   const detachedId = `detached-${parameters.get("token") || Math.random().toString(36).slice(2, 10)}`;
   const initialViewId = parameters.get("view") || "detached-primary";
-  const initialSource = definitions[parameters.get("source")] ? parameters.get("source") : "raw_ecg";
+  const initialSource = parameters.get("source") || "raw_ecg";
   const channel = typeof BroadcastChannel === "function" ? new BroadcastChannel("polar-stream-visualizers") : null;
   const deck = document.getElementById("detached-deck");
   const emptyDeck = document.getElementById("detached-empty");
@@ -99,7 +99,7 @@
     if (!template) template = card.cloneNode(true);
     const dom = viewDom(card);
     const view = {
-      id, source, card, dom,
+      id, source, requestedSource: source, card, dom,
       circleLevel: 0.5,
       circleVelocity: 0,
       circleFrameAt: performance.now(),
@@ -111,6 +111,7 @@
     populateOptions(view);
     dom.source.addEventListener("change", () => {
       view.source = dom.source.value;
+      view.requestedSource = view.source;
       updateLabels(view);
       updateDocumentTitle();
     });
@@ -132,7 +133,8 @@
 
   function populateOptions(view) {
     view.dom.source.replaceChildren(...createOptions());
-    if (!choices.some((choice) => choice.id === view.source)) view.source = choices[0]?.id || "";
+    if (choices.some((choice) => choice.id === view.requestedSource)) view.source = view.requestedSource;
+    else if (!choices.some((choice) => choice.id === view.source)) view.source = choices[0]?.id || "";
     view.dom.source.value = view.source;
     view.dom.source.disabled = !choices.length;
     updateLabels(view);
@@ -306,6 +308,11 @@
       connected = Boolean(event.connected);
       renderConnectionState();
     }
+    for (const series of event.formulas?.series || []) {
+      const id = `custom:${series.formulaId ?? series.formula_id}`;
+      if (!buffers[id]) buffers[id] = new RingBuffer();
+      buffers[id].pushMany(series.values || []);
+    }
   }
 
   function renderConnectionState() {
@@ -323,6 +330,18 @@
       connected = Boolean(message.connected);
       renderConnectionState();
     } else if (message.type === "config") {
+      for (const choice of message.choices || []) {
+        if (!choice.formulaId) continue;
+        definitions[choice.id] = {
+          label: choice.label,
+          unit: choice.unit || "",
+          rate: Number(choice.rate) || 1,
+          color: choice.color || "#168259",
+          symmetric: Boolean(choice.symmetric),
+          formulaId: choice.formulaId,
+        };
+        if (!buffers[choice.id]) buffers[choice.id] = new RingBuffer();
+      }
       choices = (message.choices || []).filter((choice) => definitions[choice.id]);
       definitions.acc_breathing_waveform.unit = message.breathingNormalized === false ? "g projection" : "0–1";
       for (const view of views.values()) populateOptions(view);

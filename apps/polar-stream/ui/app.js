@@ -8,14 +8,14 @@
   const preferences = window.PolarPreferences;
 
   const fallbackCatalog = [
-    { id: "raw_ecg", streamSuffix: "rawECG", label: "Raw ECG", detail: "130 Hz · 1 channel", unit: "µV", raw: true, family: "ecg" },
-    { id: "heart_rate", streamSuffix: "heartRate", label: "Heart rate", detail: "Device-derived", unit: "bpm", raw: false, family: "ecg" },
-    { id: "rr_interval", streamSuffix: "rrInterval", label: "RR interval", detail: "Beat-to-beat interval", unit: "ms", raw: false, family: "ecg" },
-    { id: "rmssd", streamSuffix: "rmssd", label: "RMSSD", detail: "Rolling 60-beat window", unit: "ms", raw: false, family: "ecg" },
-    { id: "raw_acc", streamSuffix: "rawACC", label: "Raw accelerometer", detail: "200 Hz · X, Y, Z", unit: "mg", raw: true, family: "acc" },
-    { id: "acc_magnitude", streamSuffix: "accMagnitude", label: "3D acceleration magnitude", detail: "Device motion · √(x² + y² + z²)", unit: "g", raw: false, family: "acc" },
-    { id: "acc_breathing_magnitude", streamSuffix: "accBreathingMagnitude", label: "Breathing magnitude estimate", detail: "Continuous tunable ACC projection", unit: "normalized / g", raw: false, family: "acc", experimental: true },
-    { id: "acc_breathing_phase", streamSuffix: "accBreathingPhase", label: "Breathing phase classifier", detail: "Three states · inhale, pause, exhale", unit: "state", raw: false, family: "acc", experimental: true },
+    { id: "raw_ecg", streamSuffix: "rawECG", label: "Raw ECG", detail: "130 Hz · 1 channel", unit: "µV", raw: true, family: "ecg", formula: "ecg", customExpression: "ecg", formulaSource: "ecg" },
+    { id: "heart_rate", streamSuffix: "heartRate", label: "Heart rate", detail: "Device-derived", unit: "bpm", raw: false, family: "ecg", formula: "hr", customExpression: "hr", formulaSource: "heartRate" },
+    { id: "rr_interval", streamSuffix: "rrInterval", label: "RR interval", detail: "Beat-to-beat interval", unit: "ms", raw: false, family: "ecg", formula: "rr", customExpression: "rr", formulaSource: "rrInterval" },
+    { id: "rmssd", streamSuffix: "rmssd", label: "RMSSD", detail: "Rolling 60-beat window", unit: "ms", raw: false, family: "ecg", formula: "rmssd(rr, 60)", customExpression: "rmssd(rr, 60)", formulaSource: "rrInterval" },
+    { id: "raw_acc", streamSuffix: "rawACC", label: "Raw accelerometer", detail: "200 Hz · X, Y, Z", unit: "mg", raw: true, family: "acc", formula: "channels(x, y, z)", customExpression: "", formulaSource: "accelerometer" },
+    { id: "acc_magnitude", streamSuffix: "accMagnitude", label: "3D acceleration magnitude", detail: "Device motion · √(x² + y² + z²)", unit: "g", raw: false, family: "acc", formula: "sqrt(x*x + y*y + z*z) / 1000", customExpression: "sqrt(x*x + y*y + z*z) / 1000", formulaSource: "accelerometer" },
+    { id: "acc_breathing_magnitude", streamSuffix: "accBreathingMagnitude", label: "Breathing magnitude estimate", detail: "Continuous tunable ACC projection", unit: "normalized / g", raw: false, family: "acc", experimental: true, formula: "breathing_magnitude(x, y, z, true, false, true, 0.75, true, false)", customExpression: "breathing_magnitude(x, y, z, true, false, true, 0.75, true, false)", formulaSource: "accelerometer" },
+    { id: "acc_breathing_phase", streamSuffix: "accBreathingPhase", label: "Breathing phase classifier", detail: "Three states · inhale, pause, exhale", unit: "state", raw: false, family: "acc", experimental: true, formula: "breathing_phase(x, y, z, true, false, true, 0.75, 0.60, false)", customExpression: "breathing_phase(x, y, z, true, false, true, 0.75, 0.60, false)", formulaSource: "accelerometer" },
   ];
 
   const defaultBreathingConfig = {
@@ -26,6 +26,12 @@
     invert: false,
   };
   const breathingOutputIds = ["acc_breathing_magnitude", "acc_breathing_phase"];
+  const sourceDetails = {
+    ecg: { label: "ECG · 130 Hz", variables: "ecg", rate: 130, family: "ecg", color: "#d85151" },
+    accelerometer: { label: "Accelerometer · 200 Hz", variables: "x, y, z", rate: 200, family: "acc", color: "#3b78aa" },
+    heartRate: { label: "Heart rate · event rate", variables: "hr", rate: 1, family: "ecg", color: "#a65757" },
+    rrInterval: { label: "RR interval · beat rate", variables: "rr", rate: 2, family: "ecg", color: "#6c62a8" },
+  };
 
   const visualDefinitions = {
     raw_ecg: { label: "Raw ECG", unit: "µV", rate: 130, color: "#d85151", symmetric: true },
@@ -153,6 +159,8 @@
     "breathing-config", "breathing-axis-x", "breathing-axis-y", "breathing-axis-z",
     "breathing-axis-error", "breathing-smoothing", "breathing-smoothing-value",
     "breathing-sensitivity", "breathing-sensitivity-value", "breathing-normalize", "breathing-invert",
+    "profile-select", "save-profile-button", "delete-profile-button", "formula-builder", "formula-boxes",
+    "formula-empty", "add-custom-formula",
   ];
   for (const id of ids) elements[id] = document.getElementById(id);
 
@@ -172,6 +180,14 @@
     breathingConfig: { ...defaultBreathingConfig, axes: [...defaultBreathingConfig.axes] },
     browserBreathing: null,
     breathingPhase: 0,
+    customFormulas: [],
+    formulaDrafts: null,
+    formulaValidation: new Map(),
+    formulaValidationTimers: new Map(),
+    formulaFaultsShown: new Set(),
+    profileSummaries: [],
+    pendingWorkspace: null,
+    sessionSaveTimer: null,
     sampleCount: 0,
     demoTimer: null,
     demoPhase: 0,
@@ -231,6 +247,68 @@
     };
   }
 
+  function newFormulaId() {
+    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+    const bytes = new Uint8Array(16);
+    if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(bytes);
+    else for (let index = 0; index < bytes.length; index += 1) bytes[index] = Math.floor(Math.random() * 256);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    return [...bytes].map((value, index) => `${[4, 6, 8, 10].includes(index) ? "-" : ""}${value.toString(16).padStart(2, "0")}`).join("");
+  }
+
+  function normalizeFormulaDraft(value = {}) {
+    const source = sourceDetails[value.source] ? value.source : "ecg";
+    return {
+      id: String(value.id || newFormulaId()),
+      name: String(value.name || "Processed_signal"),
+      source,
+      expression: String(value.expression || ""),
+      unit: String(value.unit || (source === "ecg" ? "µV" : source === "accelerometer" ? "mg" : source === "heartRate" ? "bpm" : "ms")),
+      enabled: value.enabled !== false,
+    };
+  }
+
+  function customVisualId(id) {
+    return `custom:${id}`;
+  }
+
+  function customStreamName(formula, value = app.streamName) {
+    const base = normalizeStreamBase(value);
+    let suffix = "";
+    let separatorPending = false;
+    for (const character of formula.name.trim()) {
+      if (/[A-Za-z0-9_-]/.test(character)) {
+        if (separatorPending && suffix && !suffix.endsWith("_") && !suffix.endsWith("-")) suffix += "_";
+        suffix += character;
+        separatorPending = false;
+      } else {
+        separatorPending = true;
+      }
+    }
+    suffix = suffix.replace(/^[_-]+|[_-]+$/g, "") || "invalid";
+    return `${base || "—"}_${suffix}`;
+  }
+
+  function syncCustomVisualDefinitions() {
+    for (const id of Object.keys(visualDefinitions)) {
+      if (id.startsWith("custom:")) delete visualDefinitions[id];
+    }
+    for (const formula of app.customFormulas.filter((item) => item.enabled)) {
+      const id = customVisualId(formula.id);
+      const source = sourceDetails[formula.source] || sourceDetails.ecg;
+      visualDefinitions[id] = {
+        label: formula.name || "Custom formula",
+        unit: formula.unit,
+        rate: source.rate,
+        color: source.color,
+        symmetric: formula.source === "ecg",
+        formulaId: formula.id,
+      };
+      if (!buffers[id]) buffers[id] = new RingBuffer();
+    }
+  }
+
   function setTopStatus(message, state = "idle") {
     elements["app-state-text"].textContent = message;
     elements["app-state-dot"].className = `state-dot${state === "idle" ? "" : ` ${state}`}`;
@@ -264,10 +342,12 @@
     let bootstrap = {
       config: {
         streamName: "Polar-H10", lslEnabled: false, oscEnabled: false,
-        outputs: ["raw_ecg", "raw_acc"], breathingConfig: defaultBreathingConfig,
+        outputs: ["raw_ecg", "raw_acc"], breathingConfig: defaultBreathingConfig, customFormulas: [],
       },
       platform: "browser preview",
       metricCatalog: fallbackCatalog,
+      lastSession: null,
+      profiles: [],
     };
     if (isNative) {
       try {
@@ -280,7 +360,14 @@
     app.catalog = bootstrap.metricCatalog || fallbackCatalog;
     app.outputs = new Set(bootstrap.config?.outputs || ["raw_ecg", "raw_acc"]);
     app.breathingConfig = normalizeBreathingConfig(bootstrap.config?.breathingConfig);
-    app.streamName = normalizeStreamBase(app.preferences.streamName)
+    app.customFormulas = (bootstrap.config?.customFormulas || []).map(normalizeFormulaDraft);
+    app.profileSummaries = bootstrap.profiles || [];
+    app.pendingWorkspace = bootstrap.lastSession?.workspace || null;
+    if (bootstrap.lastSession?.preferredSensor) {
+      app.preferences = preferences.saveLastDevice(bootstrap.lastSession.preferredSensor);
+    }
+    app.streamName = normalizeStreamBase(bootstrap.lastSession?.outputConfig?.streamName)
+      || normalizeStreamBase(app.preferences.streamName)
       || normalizeStreamBase(bootstrap.config?.streamName)
       || "Polar-H10";
     elements["stream-name"].value = app.streamName;
@@ -290,7 +377,9 @@
     if (!isNative) elements["scan-caption"].textContent = "Interactive browser preview";
 
     renderMetricOptions();
+    renderFormulaBoxes();
     renderOutputs();
+    renderProfileOptions();
     installInteractions();
     await configureOutputs({ quiet: true });
     resizeCanvas();
@@ -303,6 +392,10 @@
     elements["disconnect-button"].addEventListener("click", disconnectDevice);
     elements["lsl-toggle"].addEventListener("change", configureOutputs);
     elements["osc-toggle"].addEventListener("change", configureOutputs);
+    elements["add-custom-formula"].addEventListener("click", () => addCustomFormula({ source: app.metricFamily === "acc" ? "accelerometer" : "ecg" }));
+    elements["save-profile-button"].addEventListener("click", saveNamedProfile);
+    elements["profile-select"].addEventListener("change", loadSelectedProfile);
+    elements["delete-profile-button"].addEventListener("click", deleteSelectedProfile);
 
     let nameTimer;
     elements["stream-name"].addEventListener("input", () => {
@@ -318,16 +411,25 @@
       window.setTimeout(() => elements["metric-search"].focus(), 0);
     });
     elements["output-dialog"].addEventListener("close", () => {
-      if (elements["output-dialog"].returnValue !== "confirm") return;
+      if (elements["output-dialog"].returnValue !== "confirm") {
+        app.formulaDrafts = null;
+        return;
+      }
       const selected = elements["metric-options"].querySelectorAll(".metric-checkbox:checked");
       app.outputs = new Set([...selected].map((input) => input.value));
       app.breathingConfig = readBreathingConfig();
+      app.customFormulas = readFormulaCards();
+      app.formulaDrafts = null;
       app.browserBreathing = null;
+      syncCustomVisualDefinitions();
       renderOutputs();
       configureOutputs();
     });
-    elements["output-dialog"].querySelector('button[value="confirm"]').addEventListener("click", (event) => {
-      if (!validateBreathingAxes()) event.preventDefault();
+    elements["output-dialog"].querySelector('button[value="confirm"]').addEventListener("click", async (event) => {
+      event.preventDefault();
+      if (!validateBreathingAxes()) return;
+      if (!await validateAllFormulaCards()) return;
+      elements["output-dialog"].close("confirm");
     });
     elements["show-ecg-metrics"].addEventListener("click", () => setMetricFamily("ecg"));
     elements["show-acc-metrics"].addEventListener("click", () => setMetricFamily("acc"));
@@ -341,12 +443,14 @@
     elements["breathing-smoothing"].addEventListener("input", updateBreathingControlLabels);
     elements["breathing-sensitivity"].addEventListener("input", updateBreathingControlLabels);
     registerVisualizer(elements["visualizer-primary"], "primary", app.selectedVisual);
-    restoreVisualizerLayout();
+    if (app.pendingWorkspace) applyWorkspaceLayout(app.pendingWorkspace);
+    else restoreVisualizerLayout();
     window.requestAnimationFrame(() => arrangeVisualizers(false));
     elements["add-visualizer"].addEventListener("click", () => addVisualizer());
     elements["visualizer-empty-deck"].addEventListener("click", () => addVisualizer());
     elements["reset-workspace-layout"].addEventListener("click", resetWorkspaceLayout);
     installWorkspaceSplitters();
+    if (app.pendingWorkspace) applyWorkspaceFractions(app.pendingWorkspace.paneFractions || defaultWorkspaceFractions());
     installVisualizerDeckInteractions();
     visualizerChannel?.addEventListener("message", handleVisualizerChannelMessage);
   }
@@ -544,7 +648,31 @@
       default:
         break;
     }
+    ingestFormulaBatch(event.formulas);
     broadcastVisualizerData(event);
+  }
+
+  function ingestFormulaBatch(batch) {
+    if (!batch) return;
+    for (const series of batch.series || []) {
+      const id = customVisualId(series.formulaId ?? series.formula_id);
+      if (!buffers[id]) buffers[id] = new RingBuffer();
+      buffers[id].pushMany(series.values || []);
+      const card = elements["formula-boxes"].querySelector(`[data-formula-id="${series.formulaId ?? series.formula_id}"]`);
+      if (card && card.dataset.valid === "true") {
+        const state = card.querySelector(".formula-status strong");
+        if (state) state.textContent = series.state === "warmingUp" ? "Warming up" : series.state === "faulted" ? "Faulted" : "Live";
+        card.classList.toggle("faulted", series.state === "faulted");
+      }
+    }
+    for (const fault of batch.faults || []) {
+      const id = fault.formulaId ?? fault.formula_id ?? "formula";
+      const key = `${id}:${fault.code || fault.message}`;
+      if (app.formulaFaultsShown.has(key)) continue;
+      app.formulaFaultsShown.add(key);
+      const formula = app.customFormulas.find((candidate) => candidate.id === id);
+      toast(`${formula?.name || "Custom formula"} stopped: ${fault.message || "non-finite output"}`, true);
+    }
   }
 
   function updateConnection(event, device = null) {
@@ -557,6 +685,7 @@
       app.currentDeviceId = connectedDevice?.id || null;
       if (connectedDevice) {
         app.preferences = preferences.saveLastDevice(connectedDevice);
+        scheduleLastSessionSave();
       }
     } else {
       app.currentDeviceId = null;
@@ -680,11 +809,254 @@
         updateDialogCount();
         updateBreathingConfigVisibility();
       });
-      label.append(mark, copy, checkbox);
+      const formulaRow = document.createElement("span");
+      formulaRow.className = "metric-formula";
+      const formulaCode = document.createElement("code");
+      formulaCode.textContent = metric.formula || metric.customExpression || "—";
+      formulaCode.title = metric.formula || "";
+      const useFormula = document.createElement("button");
+      useFormula.type = "button";
+      useFormula.textContent = metric.customExpression === "" ? "Start custom" : "Use as custom";
+      useFormula.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        addCustomFormula({
+          name: metric.id === "raw_acc" ? "Processed_ACC" : `${metric.label}_custom`,
+          source: metric.formulaSource || (family === "acc" ? "accelerometer" : "ecg"),
+          expression: metric.customExpression ?? metric.formula ?? "",
+          unit: metric.unit,
+        });
+      });
+      formulaRow.append(formulaCode, useFormula);
+      label.append(mark, copy, checkbox, formulaRow);
       return label;
     });
     elements["metric-options"].replaceChildren(...options);
     setMetricFamily(app.metricFamily);
+  }
+
+  function addCustomFormula(template = {}) {
+    const current = elements["formula-boxes"].children.length ? readFormulaCards() : (app.formulaDrafts || app.customFormulas);
+    if (current.length >= 32) {
+      toast("At most 32 custom formulas may be configured.", true);
+      return;
+    }
+    const source = template.source || (app.metricFamily === "acc" ? "accelerometer" : "ecg");
+    const baseName = template.name || (source === "accelerometer" ? "Processed_ACC" : "Processed_ECG");
+    const used = new Set(current.map((formula) => formula.name.toLowerCase()));
+    let name = baseName;
+    let copy = 2;
+    while (used.has(name.toLowerCase())) name = `${baseName}_${copy++}`;
+    app.formulaDrafts = [...current, normalizeFormulaDraft({ ...template, source, name })];
+    renderFormulaBoxes();
+    const card = elements["formula-boxes"].lastElementChild;
+    card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    card?.querySelector('[data-field="name"]')?.focus();
+    updateDialogCount();
+  }
+
+  function renderFormulaBoxes() {
+    const formulas = app.formulaDrafts || app.customFormulas;
+    const cards = formulas.map((formula) => createFormulaCard(normalizeFormulaDraft(formula)));
+    elements["formula-boxes"].replaceChildren(...cards);
+    elements["formula-empty"].hidden = cards.length > 0;
+    for (const card of cards) void validateFormulaCard(card);
+  }
+
+  function createFormulaCard(formula) {
+    const card = document.createElement("article");
+    card.className = "formula-card";
+    card.dataset.formulaId = formula.id;
+    card.dataset.valid = String(!formula.enabled);
+
+    const header = document.createElement("header");
+    const enabled = document.createElement("input");
+    enabled.type = "checkbox";
+    enabled.checked = formula.enabled;
+    enabled.className = "formula-enabled";
+    enabled.dataset.field = "enabled";
+    enabled.setAttribute("aria-label", `Enable ${formula.name}`);
+    const title = document.createElement("span");
+    title.className = "formula-card-title";
+    const titleName = document.createElement("strong");
+    titleName.textContent = formula.name;
+    const stream = document.createElement("small");
+    stream.textContent = customStreamName(formula, elements["stream-name"].value);
+    title.append(titleName, stream);
+    const actions = document.createElement("span");
+    actions.className = "formula-actions";
+    const duplicate = document.createElement("button");
+    duplicate.type = "button";
+    duplicate.title = "Duplicate formula";
+    duplicate.setAttribute("aria-label", `Duplicate ${formula.name}`);
+    duplicate.textContent = "⧉";
+    duplicate.addEventListener("click", () => {
+      const current = readFormulaCards();
+      const value = current.find((candidate) => candidate.id === formula.id);
+      if (value) addCustomFormula({ ...value, id: newFormulaId(), name: `${value.name}_copy` });
+    });
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.title = "Delete formula";
+    remove.setAttribute("aria-label", `Delete ${formula.name}`);
+    remove.textContent = "×";
+    remove.addEventListener("click", () => {
+      app.formulaDrafts = readFormulaCards().filter((candidate) => candidate.id !== formula.id);
+      app.formulaValidation.delete(formula.id);
+      renderFormulaBoxes();
+      updateDialogCount();
+    });
+    actions.append(duplicate, remove);
+    header.append(enabled, title, actions);
+
+    const fields = document.createElement("div");
+    fields.className = "formula-fields";
+    const nameField = createFormulaField("Stream suffix", "input", "name", formula.name);
+    nameField.control.maxLength = 48;
+    const sourceField = createFormulaField("Source", "select", "source", formula.source);
+    for (const [value, detail] of Object.entries(sourceDetails)) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = detail.label;
+      sourceField.control.append(option);
+    }
+    sourceField.control.value = formula.source;
+    const unitField = createFormulaField("Unit", "input", "unit", formula.unit);
+    unitField.control.maxLength = 24;
+    const expressionField = createFormulaField("Expression", "textarea", "expression", formula.expression);
+    expressionField.label.classList.add("expression");
+    expressionField.control.maxLength = 2048;
+    expressionField.control.spellcheck = false;
+    fields.append(nameField.label, sourceField.label, unitField.label, expressionField.label);
+
+    const status = document.createElement("div");
+    status.className = "formula-status";
+    const statusMessage = document.createElement("span");
+    statusMessage.textContent = `Variables: ${sourceDetails[formula.source].variables}`;
+    const statusState = document.createElement("strong");
+    statusState.textContent = formula.enabled ? "Checking…" : "Draft disabled";
+    status.append(statusMessage, statusState);
+    card.append(header, fields, status);
+
+    const schedule = () => {
+      const value = readFormulaCard(card);
+      titleName.textContent = value.name || "Unnamed formula";
+      stream.textContent = customStreamName(value, elements["stream-name"].value);
+      enabled.setAttribute("aria-label", `Enable ${value.name || "formula"}`);
+      window.clearTimeout(app.formulaValidationTimers.get(value.id));
+      app.formulaValidationTimers.set(value.id, window.setTimeout(() => void validateFormulaCard(card), 220));
+      updateDialogCount();
+    };
+    for (const input of card.querySelectorAll("input, select, textarea")) input.addEventListener("input", schedule);
+    enabled.addEventListener("change", schedule);
+    sourceField.control.addEventListener("change", () => {
+      statusMessage.textContent = `Variables: ${sourceDetails[sourceField.control.value].variables}`;
+    });
+    return card;
+  }
+
+  function createFormulaField(caption, kind, field, value) {
+    const label = document.createElement("label");
+    label.className = "formula-field";
+    label.append(document.createTextNode(caption));
+    const control = document.createElement(kind);
+    control.dataset.field = field;
+    if (kind !== "select") control.value = value;
+    label.append(control);
+    return { label, control };
+  }
+
+  function readFormulaCard(card) {
+    const field = (name) => card.querySelector(`[data-field="${name}"]`);
+    return {
+      id: card.dataset.formulaId,
+      name: field("name").value,
+      source: field("source").value,
+      expression: field("expression").value,
+      unit: field("unit").value,
+      enabled: field("enabled").checked,
+    };
+  }
+
+  function readFormulaCards() {
+    return [...elements["formula-boxes"].querySelectorAll(".formula-card")].map(readFormulaCard);
+  }
+
+  function formulaErrorMessage(error) {
+    if (error && typeof error === "object") return error.message || error.error || JSON.stringify(error);
+    const text = String(error || "Formula validation failed.");
+    try {
+      const parsed = JSON.parse(text);
+      return parsed.message || text;
+    } catch {
+      return text;
+    }
+  }
+
+  async function validateFormulaCard(card) {
+    if (!card?.isConnected) return false;
+    const validationSequence = String(Number(card.dataset.validationSequence || 0) + 1);
+    card.dataset.validationSequence = validationSequence;
+    const formula = readFormulaCard(card);
+    const message = card.querySelector(".formula-status span");
+    const state = card.querySelector(".formula-status strong");
+    if (!formula.enabled) {
+      card.dataset.valid = "true";
+      card.classList.remove("invalid");
+      message.textContent = `Variables: ${sourceDetails[formula.source].variables}`;
+      state.textContent = "Draft disabled";
+      return true;
+    }
+    state.textContent = "Checking…";
+    try {
+      let validation;
+      if (isNative) {
+        validation = await invoke("validate_custom_formula", { formula });
+      } else {
+        if (!formula.name.trim() || !formula.unit.trim() || !formula.expression.trim()) throw new Error("Name, unit, and expression are required.");
+        if (formula.expression.length > 2048) throw new Error("Expression must be at most 2048 bytes.");
+        validation = { normalized: formula, allowedVariables: sourceDetails[formula.source].variables.split(", "), stateSamples: 0 };
+      }
+      if (!card.isConnected || card.dataset.validationSequence !== validationSequence) return false;
+      card.dataset.valid = "true";
+      card.classList.remove("invalid");
+      app.formulaValidation.set(formula.id, validation);
+      const variables = validation.allowedVariables || sourceDetails[formula.source].variables.split(", ");
+      const stateCost = Number(validation.stateSamples || 0);
+      message.textContent = `Variables: ${variables.join(", ")}${stateCost ? ` · state: ${stateCost.toLocaleString()} samples` : ""}`;
+      state.textContent = "Valid";
+      return true;
+    } catch (error) {
+      if (!card.isConnected || card.dataset.validationSequence !== validationSequence) return false;
+      card.dataset.valid = "false";
+      card.classList.add("invalid");
+      app.formulaValidation.delete(formula.id);
+      message.textContent = formulaErrorMessage(error);
+      state.textContent = "Fix formula";
+      return false;
+    }
+  }
+
+  async function validateAllFormulaCards() {
+    const cards = [...elements["formula-boxes"].querySelectorAll(".formula-card")];
+    const results = await Promise.all(cards.map(validateFormulaCard));
+    const enabled = cards.map(readFormulaCard).filter((formula) => formula.enabled);
+    const names = new Set();
+    const builtInNames = new Set(app.catalog.map((metric) => String(metric.streamSuffix).toLowerCase()));
+    let unique = true;
+    let conflicts = false;
+    for (const formula of enabled) {
+      const normalized = app.formulaValidation.get(formula.id)?.normalized;
+      const key = String(normalized?.name || formula.name).trim().toLowerCase();
+      if (names.has(key)) unique = false;
+      if (builtInNames.has(key)) conflicts = true;
+      names.add(key);
+    }
+    if (!unique) toast("Enabled custom formula names must be unique.", true);
+    if (conflicts) toast("A custom formula name conflicts with a built-in stream suffix.", true);
+    const valid = results.every(Boolean) && unique && !conflicts;
+    if (!valid) cards.find((card) => card.dataset.valid !== "true")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return valid;
   }
 
   function syncDialogSelection() {
@@ -692,6 +1064,8 @@
       input.checked = app.outputs.has(input.value);
     });
     syncBreathingControls();
+    app.formulaDrafts = app.customFormulas.map((formula) => ({ ...formula }));
+    renderFormulaBoxes();
     elements["metric-search"].value = "";
     filterMetricOptions();
     updateBreathingConfigVisibility();
@@ -700,11 +1074,12 @@
 
   function updateDialogCount() {
     const selected = [...elements["metric-options"].querySelectorAll(".metric-checkbox:checked")];
-    const count = selected.length;
+    const custom = elements["formula-boxes"].querySelectorAll('.formula-card [data-field="enabled"]:checked').length;
+    const count = selected.length + custom;
     const ecgCount = selected.filter((input) => input.closest(".metric-option")?.dataset.family === "ecg").length;
     const accCount = count - ecgCount;
     elements["dialog-selection-count"].textContent = `${count} selected`;
-    elements["dialog-selection-detail"].textContent = `${ecgCount} ECG · ${accCount} ACC`;
+    elements["dialog-selection-detail"].textContent = `${ecgCount} ECG · ${accCount} ACC · ${custom} custom`;
   }
 
   function setMetricFamily(family) {
@@ -791,6 +1166,7 @@
   }
 
   function renderOutputs() {
+    syncCustomVisualDefinitions();
     const byId = new Map(app.catalog.map((metric) => [metric.id, metric]));
     const chips = [...app.outputs].map((id) => {
       const metric = byId.get(id);
@@ -814,8 +1190,27 @@
       chip.append(dot, label, remove);
       return chip;
     }).filter(Boolean);
+    for (const formula of app.customFormulas.filter((item) => item.enabled)) {
+      const chip = document.createElement("span");
+      chip.className = `output-chip ${sourceDetails[formula.source]?.family || "ecg"}`;
+      const dot = document.createElement("i");
+      const label = document.createElement("span");
+      label.textContent = customStreamName(formula, elements["stream-name"].value);
+      chip.title = `${formula.name} · ${formula.expression}`;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.setAttribute("aria-label", `Disable ${formula.name}`);
+      remove.textContent = "×";
+      remove.addEventListener("click", () => {
+        formula.enabled = false;
+        renderOutputs();
+        configureOutputs();
+      });
+      chip.append(dot, label, remove);
+      chips.push(chip);
+    }
     elements["output-chips"].replaceChildren(...chips);
-    const count = app.outputs.size;
+    const count = app.outputs.size + app.customFormulas.filter((formula) => formula.enabled).length;
     elements["included-count"].textContent = `${count} active`;
     elements["output-state"].textContent = `${count} signal${count === 1 ? "" : "s"}`;
     updateStreamNamePreview();
@@ -828,6 +1223,7 @@
       .map((id) => byId.get(id))
       .filter(Boolean)
       .map((metric) => streamOutputName(metric, elements["stream-name"].value));
+    names.push(...app.customFormulas.filter((formula) => formula.enabled).map((formula) => customStreamName(formula, elements["stream-name"].value)));
     if (!normalizeStreamBase(elements["stream-name"].value)) {
       elements["stream-name-preview"].textContent = "Use at least one letter or number; spaces become underscores.";
       return;
@@ -853,7 +1249,9 @@
 
   function availableVisualChoices() {
     return Object.entries(visualDefinitions)
-      .filter(([id, definition]) => app.outputs.has(definition.parent || id))
+      .filter(([id, definition]) => definition.formulaId
+        ? app.customFormulas.some((formula) => formula.id === definition.formulaId && formula.enabled)
+        : app.outputs.has(definition.parent || id))
       .map(([id, definition]) => ({ id, definition }));
   }
 
@@ -1046,6 +1444,43 @@
       userSized: Boolean(view.card.dataset.userSized),
       }));
     try { localStorage.setItem("polarStream.visualizerLayout.v1", JSON.stringify(layout)); } catch { /* storage is optional */ }
+    scheduleLastSessionSave();
+  }
+
+  function captureWorkspaceLayout() {
+    const available = workspaceAvailableWidth();
+    const input = document.querySelector(".input-panel")?.getBoundingClientRect().width || available * defaultWorkspaceFractions()[0];
+    const output = document.querySelector(".output-panel")?.getBoundingClientRect().width || available * defaultWorkspaceFractions()[1];
+    const fractions = window.matchMedia("(max-width: 900px)").matches
+      ? savedWorkspaceFractions()
+      : [input / available, output / available];
+    return {
+      paneFractions: fractions.map((value, index) => Math.min(0.9, Math.max(0.05, Number(value) || defaultWorkspaceFractions()[index]))),
+      visualizers: [...elements["visualizer-deck"].querySelectorAll(".visualizer-card")]
+        .map((card) => app.visualizers.get(card.dataset.visualizerId))
+        .filter(Boolean)
+        .map((view) => ({
+          source: view.source,
+          width: Math.max(0, Math.round(view.card.getBoundingClientRect().width)),
+          height: Math.max(0, Math.round(view.card.getBoundingClientRect().height)),
+          userSized: Boolean(view.card.dataset.userSized),
+        })),
+    };
+  }
+
+  function applyWorkspaceLayout(workspace) {
+    const visualizers = Array.isArray(workspace?.visualizers) ? workspace.visualizers : [];
+    for (const id of [...app.visualizers.keys()]) removeVisualizer(id, { save: false });
+    for (const item of visualizers) {
+      addVisualizer(item.source, {
+        arrange: false,
+        userSized: Boolean(item.userSized),
+        width: item.userSized ? Number(item.width) || null : null,
+        height: item.userSized ? Number(item.height) || null : null,
+      });
+    }
+    if (!visualizers.length) elements["visualizer-empty-deck"].hidden = false;
+    if (Array.isArray(workspace?.paneFractions)) applyWorkspaceFractions(workspace.paneFractions);
   }
 
   function restoreVisualizerLayout() {
@@ -1080,6 +1515,7 @@
     } catch { /* storage is optional */ }
     applyWorkspaceFractions(defaultWorkspaceFractions());
     arrangeVisualizers(true);
+    scheduleLastSessionSave();
     toast("Workspace layout reset.");
   }
 
@@ -1112,6 +1548,7 @@
       try {
         localStorage.setItem("polarStream.workspaceSplit.v1", JSON.stringify([safeInput / available, safeOutput / available]));
       } catch { /* storage is optional */ }
+      scheduleLastSessionSave();
     }
   }
 
@@ -1289,7 +1726,15 @@
   function broadcastVisualizerConfig() {
     visualizerChannel?.postMessage({
       type: "config",
-      choices: availableVisualChoices().map(({ id, definition }) => ({ id, label: definition.label, unit: definition.unit })),
+      choices: availableVisualChoices().map(({ id, definition }) => ({
+        id,
+        label: definition.label,
+        unit: definition.unit,
+        rate: definition.rate,
+        color: definition.color,
+        symmetric: Boolean(definition.symmetric),
+        formulaId: definition.formulaId || null,
+      })),
       breathingNormalized: app.breathingConfig.normalize,
     });
   }
@@ -1312,6 +1757,7 @@
   function handleVisualizerChannelMessage(messageEvent) {
     const message = messageEvent.data || {};
     if (message.type === "request-snapshot") {
+      broadcastVisualizerConfig();
       visualizerChannel?.postMessage({
         type: "snapshot",
         target: message.sender,
@@ -1319,7 +1765,6 @@
         breathingPhase: app.breathingPhase,
         connected: app.connected,
       });
-      broadcastVisualizerConfig();
     } else if (message.type === "dock-view" && message.source) {
       addVisualizer(message.source);
       visualizerChannel?.postMessage({ type: "adopted", origin: message.origin, viewId: message.viewId });
@@ -1328,7 +1773,134 @@
     }
   }
 
-  async function configureOutputs({ quiet = false } = {}) {
+  function currentOutputConfig() {
+    return {
+      streamName: normalizeStreamBase(elements["stream-name"].value) || app.streamName || "Polar-H10",
+      lslEnabled: elements["lsl-toggle"].checked,
+      oscEnabled: elements["osc-toggle"].checked,
+      outputs: [...app.outputs],
+      breathingConfig: app.breathingConfig,
+      customFormulas: app.customFormulas.map((formula) => ({ ...formula })),
+    };
+  }
+
+  function captureWorkspaceProfile() {
+    const sensor = app.preferences.lastDevice;
+    return {
+      schemaVersion: 1,
+      preferredSensor: sensor ? { id: sensor.id, name: sensor.name } : null,
+      outputConfig: currentOutputConfig(),
+      workspace: captureWorkspaceLayout(),
+    };
+  }
+
+  function scheduleLastSessionSave(delay = 550) {
+    if (!isNative || !app.visualizers) return;
+    window.clearTimeout(app.sessionSaveTimer);
+    app.sessionSaveTimer = window.setTimeout(() => void persistLastSession(), delay);
+  }
+
+  async function persistLastSession() {
+    if (!isNative) return;
+    try {
+      await invoke("save_last_session", { profile: captureWorkspaceProfile() });
+    } catch (error) {
+      console.warn("Could not save Last session", error);
+    }
+  }
+
+  function renderProfileOptions(selected = "") {
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Profiles…";
+    const options = app.profileSummaries.map((profile) => {
+      const option = document.createElement("option");
+      option.value = profile.name;
+      option.textContent = profile.name;
+      option.title = `Updated ${new Date(profile.updatedAtMs).toLocaleString()}`;
+      return option;
+    });
+    elements["profile-select"].replaceChildren(placeholder, ...options);
+    elements["profile-select"].value = app.profileSummaries.some((profile) => profile.name === selected) ? selected : "";
+    elements["delete-profile-button"].disabled = !elements["profile-select"].value;
+  }
+
+  async function refreshProfileOptions(selected = "") {
+    if (!isNative) return;
+    app.profileSummaries = await invoke("list_profiles");
+    renderProfileOptions(selected);
+  }
+
+  async function saveNamedProfile() {
+    if (!isNative) {
+      toast("Named profiles are stored by the native app. Open the desktop build to save one.");
+      return;
+    }
+    const currentName = elements["profile-select"].value;
+    const requested = window.prompt("Profile name", currentName || "My workspace");
+    if (requested == null) return;
+    try {
+      const summary = await invoke("save_profile", { name: requested, profile: captureWorkspaceProfile() });
+      await refreshProfileOptions(summary.name);
+      await persistLastSession();
+      toast(`Saved profile “${summary.name}”.`);
+    } catch (error) {
+      toast(String(error), true);
+    }
+  }
+
+  async function loadSelectedProfile() {
+    const name = elements["profile-select"].value;
+    elements["delete-profile-button"].disabled = !name;
+    if (!name || !isNative) return;
+    try {
+      const profile = await invoke("load_profile", { name });
+      await applyWorkspaceProfile(profile);
+      renderProfileOptions(name);
+      toast(`Loaded profile “${name}”.`);
+    } catch (error) {
+      renderProfileOptions();
+      toast(String(error), true);
+    }
+  }
+
+  async function deleteSelectedProfile() {
+    const name = elements["profile-select"].value;
+    if (!name || !isNative || !window.confirm(`Delete profile “${name}”?`)) return;
+    try {
+      await invoke("delete_profile", { name });
+      await refreshProfileOptions();
+      toast(`Deleted profile “${name}”.`);
+    } catch (error) {
+      toast(String(error), true);
+    }
+  }
+
+  async function applyWorkspaceProfile(profile) {
+    const config = profile.outputConfig || {};
+    app.outputs = new Set(config.outputs || []);
+    app.breathingConfig = normalizeBreathingConfig(config.breathingConfig);
+    app.customFormulas = (config.customFormulas || []).map(normalizeFormulaDraft);
+    app.streamName = normalizeStreamBase(config.streamName) || "Polar-H10";
+    elements["stream-name"].value = app.streamName;
+    elements["lsl-toggle"].checked = Boolean(config.lslEnabled);
+    elements["osc-toggle"].checked = Boolean(config.oscEnabled);
+    if (profile.preferredSensor) app.preferences = preferences.saveLastDevice(profile.preferredSensor);
+    else app.preferences = preferences.saveLastDevice(null);
+    app.browserBreathing = null;
+    app.formulaFaultsShown.clear();
+    renderOutputs();
+    renderFormulaBoxes();
+    await configureOutputs({ quiet: false, persist: false });
+    applyWorkspaceLayout(profile.workspace || {});
+    await persistLastSession();
+    if (profile.preferredSensor && window.confirm(`Outputs and workspace are applied. Reconnect to saved sensor “${profile.preferredSensor.name}” now?`)) {
+      if (app.connected) await disconnectDevice();
+      await scanDevices({ automatic: true });
+    }
+  }
+
+  async function configureOutputs({ quiet = false, persist = true } = {}) {
     const streamName = normalizeStreamBase(elements["stream-name"].value);
     if (!streamName) {
       elements["stream-name"].setAttribute("aria-invalid", "true");
@@ -1337,19 +1909,14 @@
     }
     elements["stream-name"].removeAttribute("aria-invalid");
     app.streamName = streamName;
-    const config = {
-      streamName,
-      lslEnabled: elements["lsl-toggle"].checked,
-      oscEnabled: elements["osc-toggle"].checked,
-      outputs: [...app.outputs],
-      breathingConfig: app.breathingConfig,
-    };
+    const config = { ...currentOutputConfig(), streamName };
     if (!isNative) {
       elements["stream-name"].value = streamName;
       app.preferences = preferences.saveStreamName(streamName);
       renderOutputs();
       elements["lsl-detail"].textContent = config.lslEnabled ? "Preview · liblsl is checked in the native app" : "Local network · time synchronized";
       elements["osc-detail"].textContent = config.oscEnabled ? "Preview · UDP localhost:9000" : "UDP · localhost:9000";
+      if (persist) scheduleLastSessionSave();
       return;
     }
 
@@ -1362,6 +1929,7 @@
       app.preferences = preferences.saveStreamName(app.streamName);
       renderOutputs();
       updateDestinationHealth(health);
+      if (persist) scheduleLastSessionSave();
     } catch (error) {
       if (!quiet) toast(String(error), true);
     }
@@ -1374,6 +1942,14 @@
     elements["osc-detail"].textContent = oscText;
     elements["lsl-detail"].classList.toggle("warning", elements["lsl-toggle"].checked && /not found|failed|could not|unavailable/i.test(lslText));
     elements["osc-detail"].classList.toggle("warning", elements["osc-toggle"].checked && /failed|could not|unavailable/i.test(oscText));
+    for (const formulaHealth of health.formulas || []) {
+      const id = formulaHealth.formulaId ?? formulaHealth.formula_id;
+      const card = elements["formula-boxes"].querySelector(`[data-formula-id="${id}"]`);
+      if (!card) continue;
+      card.classList.toggle("faulted", formulaHealth.state === "faulted");
+      const status = card.querySelector(".formula-status strong");
+      if (status && formulaHealth.state === "faulted") status.textContent = "Faulted";
+    }
   }
 
   function resizeCanvas(view = null) {

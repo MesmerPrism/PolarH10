@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+pub use polar_h10_math::{CustomFormulaConfig, FormulaSource};
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OutputConfig {
@@ -9,6 +11,8 @@ pub struct OutputConfig {
     pub outputs: Vec<String>,
     #[serde(default)]
     pub breathing_config: BreathingConfig,
+    #[serde(default)]
+    pub custom_formulas: Vec<CustomFormulaConfig>,
 }
 
 impl Default for OutputConfig {
@@ -19,6 +23,7 @@ impl Default for OutputConfig {
             osc_enabled: false,
             outputs: vec!["raw_ecg".into(), "raw_acc".into()],
             breathing_config: BreathingConfig::default(),
+            custom_formulas: Vec::new(),
         }
     }
 }
@@ -30,6 +35,43 @@ impl OutputConfig {
         self.outputs.dedup();
         self.outputs.retain(|id| MetricSpec::for_id(id).is_some());
         self.breathing_config = self.breathing_config.normalized();
+        if self.custom_formulas.len() > polar_h10_math::MAX_FORMULAS {
+            return Err(format!(
+                "At most {} custom formulas may be configured.",
+                polar_h10_math::MAX_FORMULAS
+            ));
+        }
+        let mut ids = std::collections::HashSet::new();
+        let mut names = std::collections::HashSet::new();
+        for formula in &mut self.custom_formulas {
+            if !ids.insert(formula.id.clone()) {
+                return Err("Custom formula IDs must be unique.".into());
+            }
+            if formula.enabled {
+                *formula = formula
+                    .clone()
+                    .normalized()
+                    .map_err(|error| error.to_string())?;
+                let name = formula.name.to_ascii_lowercase();
+                if !names.insert(name) {
+                    return Err("Enabled custom formula names must be unique.".into());
+                }
+                if MetricSpec::all()
+                    .iter()
+                    .any(|spec| spec.suffix.eq_ignore_ascii_case(&formula.name))
+                {
+                    return Err(format!(
+                        "Custom formula name '{}' conflicts with a built-in output.",
+                        formula.name
+                    ));
+                }
+            } else if formula.expression.len() > polar_h10_math::MAX_EXPRESSION_BYTES
+                || formula.name.len() > 256
+                || formula.unit.len() > 128
+            {
+                return Err("Disabled formula draft exceeds storage limits.".into());
+            }
+        }
         Ok(self)
     }
 
@@ -90,6 +132,15 @@ pub struct OutputHealth {
     pub stream_name: String,
     pub lsl: String,
     pub osc: String,
+    pub formulas: Vec<FormulaHealth>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FormulaHealth {
+    pub formula_id: String,
+    pub state: polar_h10_math::FormulaRuntimeState,
+    pub message: Option<String>,
 }
 
 #[derive(Clone, Copy)]
@@ -104,6 +155,19 @@ pub struct MetricSpec {
 }
 
 impl MetricSpec {
+    pub fn all() -> [Self; 8] {
+        [
+            Self::for_id("raw_ecg").expect("known metric"),
+            Self::for_id("raw_acc").expect("known metric"),
+            Self::for_id("heart_rate").expect("known metric"),
+            Self::for_id("rr_interval").expect("known metric"),
+            Self::for_id("acc_magnitude").expect("known metric"),
+            Self::for_id("acc_breathing_magnitude").expect("known metric"),
+            Self::for_id("acc_breathing_phase").expect("known metric"),
+            Self::for_id("rmssd").expect("known metric"),
+        ]
+    }
+
     pub fn for_id(id: &str) -> Option<Self> {
         Some(match id {
             "raw_ecg" => Self {
@@ -222,6 +286,11 @@ pub fn output_stream_name(base_name: &str, metric_id: &str) -> Option<String> {
     MetricSpec::for_id(metric_id).map(|spec| format!("{base_name}_{}", spec.suffix()))
 }
 
+/// Returns the canonical discoverable name for a validated custom formula.
+pub fn custom_output_stream_name(base_name: &str, formula: &CustomFormulaConfig) -> String {
+    format!("{base_name}_{}", formula.name)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -311,5 +380,57 @@ mod tests {
             output_stream_name("participant_07", "acc_breathing_phase").as_deref(),
             Some("participant_07_accBreathingPhase")
         );
+    }
+
+    #[test]
+    fn validates_and_names_custom_formula_streams() {
+        let formula = CustomFormulaConfig {
+            id: "123e4567-e89b-42d3-a456-426614174000".into(),
+            name: " Filtered ECG ".into(),
+            source: FormulaSource::Ecg,
+            expression: " moving_mean(ecg, 0.2) ".into(),
+            unit: " µV ".into(),
+            enabled: true,
+        };
+        let config = OutputConfig {
+            custom_formulas: vec![formula],
+            ..OutputConfig::default()
+        }
+        .normalized()
+        .unwrap();
+        let formula = &config.custom_formulas[0];
+        assert_eq!(formula.name, "Filtered_ECG");
+        assert_eq!(formula.expression, "moving_mean(ecg, 0.2)");
+        assert_eq!(formula.unit, "µV");
+        assert_eq!(
+            custom_output_stream_name("participant_07", formula),
+            "participant_07_Filtered_ECG"
+        );
+    }
+
+    #[test]
+    fn rejects_duplicate_or_builtin_custom_formula_names() {
+        let formula = |id: &str, name: &str| CustomFormulaConfig {
+            id: id.into(),
+            name: name.into(),
+            source: FormulaSource::Ecg,
+            expression: "ecg".into(),
+            unit: "µV".into(),
+            enabled: true,
+        };
+        let duplicate = OutputConfig {
+            custom_formulas: vec![
+                formula("123e4567-e89b-42d3-a456-426614174000", "Alpha"),
+                formula("123e4567-e89b-42d3-a456-426614174001", "alpha"),
+            ],
+            ..OutputConfig::default()
+        };
+        assert!(duplicate.normalized().is_err());
+
+        let builtin = OutputConfig {
+            custom_formulas: vec![formula("123e4567-e89b-42d3-a456-426614174000", "rawECG")],
+            ..OutputConfig::default()
+        };
+        assert!(builtin.normalized().is_err());
     }
 }

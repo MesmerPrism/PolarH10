@@ -6,10 +6,12 @@ use std::{
 use libloading::Library;
 use polar_h10_core::AccSample;
 
+use crate::{CustomFormulaConfig, custom_output_stream_name};
 use crate::{MetricSpec, output_stream_name};
 
 type StreamInfo = *mut c_void;
 type Outlet = *mut c_void;
+type XmlElement = *mut c_void;
 type CreateStreamInfo = unsafe extern "C" fn(
     *const c_char,
     *const c_char,
@@ -23,6 +25,10 @@ type CreateOutlet = unsafe extern "C" fn(StreamInfo, c_int, c_int) -> Outlet;
 type DestroyOutlet = unsafe extern "C" fn(Outlet);
 type PushSample = unsafe extern "C" fn(Outlet, *const c_float, c_double, c_int) -> c_int;
 type LocalClock = unsafe extern "C" fn() -> c_double;
+type GetDesc = unsafe extern "C" fn(StreamInfo) -> XmlElement;
+type AppendChild = unsafe extern "C" fn(XmlElement, *const c_char) -> XmlElement;
+type AppendChildValue =
+    unsafe extern "C" fn(XmlElement, *const c_char, *const c_char) -> XmlElement;
 
 struct LslApi {
     _library: Library,
@@ -32,6 +38,9 @@ struct LslApi {
     destroy_outlet: DestroyOutlet,
     push_sample: PushSample,
     local_clock: LocalClock,
+    get_desc: GetDesc,
+    append_child: AppendChild,
+    append_child_value: AppendChildValue,
 }
 
 // liblsl documents outlets as usable across threads. Function pointers remain
@@ -65,6 +74,15 @@ impl LslApi {
                         let local_clock = *library
                             .get::<LocalClock>(b"lsl_local_clock\0")
                             .map_err(|error| error.to_string())?;
+                        let get_desc = *library
+                            .get::<GetDesc>(b"lsl_get_desc\0")
+                            .map_err(|error| error.to_string())?;
+                        let append_child = *library
+                            .get::<AppendChild>(b"lsl_append_child\0")
+                            .map_err(|error| error.to_string())?;
+                        let append_child_value = *library
+                            .get::<AppendChildValue>(b"lsl_append_child_value\0")
+                            .map_err(|error| error.to_string())?;
                         return Ok(Self {
                             _library: library,
                             create_streaminfo,
@@ -73,6 +91,9 @@ impl LslApi {
                             destroy_outlet,
                             push_sample,
                             local_clock,
+                            get_desc,
+                            append_child,
+                            append_child_value,
                         });
                     }
                 }
@@ -128,20 +149,59 @@ impl LslPublisher {
     }
 
     pub(crate) fn add_outlet(&mut self, base_name: &str, spec: MetricSpec) {
-        let Some(api) = &self.api else { return };
         let Some(output_name) = output_stream_name(base_name, spec.id) else {
             return;
         };
-        let Ok(name) = CString::new(output_name.as_str()) else {
+        self.add_named_outlet(
+            spec.id,
+            &output_name,
+            spec.stream_type,
+            spec.label,
+            spec.unit,
+            spec.channels,
+            spec.rate_hz,
+            None,
+        );
+    }
+
+    pub(crate) fn add_custom_outlet(&mut self, base_name: &str, formula: &CustomFormulaConfig) {
+        let output_name = custom_output_stream_name(base_name, formula);
+        let source = format!("{:?}", formula.source);
+        self.add_named_outlet(
+            &formula.id,
+            &output_name,
+            formula.source.stream_type(),
+            &formula.name,
+            &formula.unit,
+            1,
+            formula.source.rate_hz(),
+            Some((&formula.expression, &source, &formula.id)),
+        );
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn add_named_outlet(
+        &mut self,
+        key: &str,
+        output_name: &str,
+        stream_type_value: &str,
+        label_value: &str,
+        unit_value: &str,
+        channels: i32,
+        rate_hz: f64,
+        formula_metadata: Option<(&str, &str, &str)>,
+    ) {
+        let Some(api) = &self.api else { return };
+        let Ok(name) = CString::new(output_name) else {
             return;
         };
-        let Ok(stream_type) = CString::new(spec.stream_type) else {
+        let Ok(stream_type) = CString::new(stream_type_value) else {
             return;
         };
-        let Ok(source) = CString::new(format!("polar-h10-{output_name}")) else {
-            return;
-        };
-        let Ok(_unit) = CString::new(spec.unit) else {
+        let source_id = formula_metadata
+            .map(|(_, _, formula_id)| format!("polar-h10-formula-{formula_id}"))
+            .unwrap_or_else(|| format!("polar-h10-{output_name}"));
+        let Ok(source) = CString::new(source_id) else {
             return;
         };
 
@@ -151,31 +211,126 @@ impl LslPublisher {
             (api.create_streaminfo)(
                 name.as_ptr(),
                 stream_type.as_ptr(),
-                spec.channels,
-                spec.rate_hz,
+                channels,
+                rate_hz,
                 1,
                 source.as_ptr(),
             )
         };
         if info.is_null() {
-            self.status = format!("Could not create {} stream", spec.label);
+            self.status = format!("Could not create {label_value} stream");
             return;
         }
+        self.append_metadata(
+            info,
+            label_value,
+            unit_value,
+            stream_type_value,
+            channels,
+            formula_metadata,
+        );
         // SAFETY: info is live; create_outlet copies its metadata.
         let outlet = unsafe { (api.create_outlet)(info, 0, 360) };
         unsafe { (api.destroy_streaminfo)(info) };
         if outlet.is_null() {
-            self.status = format!("Could not open {} outlet", spec.label);
+            self.status = format!("Could not open {label_value} outlet");
             return;
         }
         self.outlets.insert(
-            spec.id.into(),
+            key.into(),
             LslOutlet {
                 handle: outlet,
-                rate_hz: spec.rate_hz,
+                rate_hz,
             },
         );
         self.status = format!("Publishing {} stream(s)", self.outlets.len());
+    }
+
+    fn append_metadata(
+        &self,
+        info: StreamInfo,
+        label: &str,
+        unit: &str,
+        stream_type: &str,
+        channels: i32,
+        formula_metadata: Option<(&str, &str, &str)>,
+    ) {
+        let Some(api) = &self.api else { return };
+        let Ok(channels_name) = CString::new("channels") else {
+            return;
+        };
+        let Ok(channel_name) = CString::new("channel") else {
+            return;
+        };
+        let Ok(label_name) = CString::new("label") else {
+            return;
+        };
+        let Ok(unit_name) = CString::new("unit") else {
+            return;
+        };
+        let Ok(type_name) = CString::new("type") else {
+            return;
+        };
+        let (Ok(label), Ok(unit), Ok(stream_type)) = (
+            CString::new(label),
+            CString::new(unit),
+            CString::new(stream_type),
+        ) else {
+            return;
+        };
+        // SAFETY: `info` is live until outlet creation; all C strings live for
+        // these calls, and liblsl owns the appended metadata nodes.
+        unsafe {
+            let desc = (api.get_desc)(info);
+            if desc.is_null() {
+                return;
+            }
+            let channels_element = (api.append_child)(desc, channels_name.as_ptr());
+            for index in 0..channels {
+                let channel = (api.append_child)(channels_element, channel_name.as_ptr());
+                let channel_label = if channels == 3 {
+                    match index {
+                        0 => CString::new("X"),
+                        1 => CString::new("Y"),
+                        _ => CString::new("Z"),
+                    }
+                } else {
+                    CString::new(label.as_bytes())
+                };
+                let Ok(channel_label) = channel_label else {
+                    return;
+                };
+                (api.append_child_value)(channel, label_name.as_ptr(), channel_label.as_ptr());
+                (api.append_child_value)(channel, unit_name.as_ptr(), unit.as_ptr());
+                (api.append_child_value)(channel, type_name.as_ptr(), stream_type.as_ptr());
+            }
+
+            if let Some((expression, source, formula_id)) = formula_metadata {
+                let Ok(processing_name) = CString::new("processing") else {
+                    return;
+                };
+                let Ok(formula_name) = CString::new("formula") else {
+                    return;
+                };
+                let Ok(source_name) = CString::new("source") else {
+                    return;
+                };
+                let Ok(id_name) = CString::new("formula_id") else {
+                    return;
+                };
+                let (Ok(expression), Ok(source), Ok(formula_id)) = (
+                    CString::new(expression),
+                    CString::new(source),
+                    CString::new(formula_id),
+                ) else {
+                    return;
+                };
+                let processing = (api.append_child)(desc, processing_name.as_ptr());
+                (api.append_child_value)(processing, formula_name.as_ptr(), expression.as_ptr());
+                (api.append_child_value)(processing, source_name.as_ptr(), source.as_ptr());
+                (api.append_child_value)(processing, id_name.as_ptr(), formula_id.as_ptr());
+            }
+        }
     }
 
     pub(crate) fn push_scalar(&mut self, id: &str, value: f32) {

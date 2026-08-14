@@ -2483,11 +2483,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "polar-h10-math"
+version = "0.1.0"
+dependencies = [
+ "polar-h10-core",
+ "serde",
+ "thiserror 2.0.20",
+ "uuid",
+]
+
+[[package]]
 name = "polar-h10-output"
 version = "0.1.0"
 dependencies = [
  "libloading 0.8.9",
  "polar-h10-core",
+ "polar-h10-math",
  "serde",
  "tokio",
 ]
@@ -2500,6 +2511,7 @@ dependencies = [
  "polar-h10-input",
  "polar-h10-output",
  "serde",
+ "serde_json",
  "tauri",
  "tauri-build",
  "tokio",

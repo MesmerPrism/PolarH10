@@ -12,9 +12,12 @@ Windows CLI for scan, doctor, record, replay, and protocol inspection.
 The fork now includes **Polar Stream**, an HTML-driven Tauri/Rust application
 with only three surfaces: Input, Output, and Visualization. Raw ECG and raw ACC
 are the default outputs; LSL and OSC each have one switch; extra metrics are
-added from one compact output library. Its native implementation is split into
-independent protocol, BLE-input, and LSL/OSC-output crates so it can be extracted
-cleanly into a new repository. Stream names use one predictable convention
+added from one compact output library. A bounded native math module lets each
+user-defined formula turn ECG, ACC, HR, or RR input into its own scalar LSL/OSC
+stream and live chart. Last session and named profiles retain the complete
+output/formula/layout workspace. Its native implementation is split into
+independent protocol, BLE-input, math/DSP, and LSL/OSC-output crates so it can be
+extracted cleanly into a new repository. Stream names use one predictable convention
 (`participant_rawECG`, `participant_rawACC`, and so on), while the last accepted
 name and last successfully connected H10 are remembered between launches. See
 [Polar Stream](apps/polar-stream/README.md) and its

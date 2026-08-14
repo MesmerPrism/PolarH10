@@ -4,10 +4,10 @@ Polar Stream is the condensed successor UI for this fork. It has exactly three
 working areas:
 
 1. **Input** — scan, connect, connection state, and battery.
-2. **Output** — raw ECG/ACC readings, stream base name, LSL/OSC switches, and an
-   extensible output list split into red ECG and blue ACC families. The ACC
-   family intentionally stays small and labels its breathing classifier as
-   experimental.
+2. **Output** — raw ECG/ACC readings, stream base name, LSL/OSC switches, an
+   extensible output list, and a custom math module. Each formula is bound to
+   one source clock and emits one processed scalar stream. The ACC family
+   intentionally labels its breathing classifier as experimental.
 3. **Visualization** — a resizable tile workspace whose views independently
    select from the active outputs. Raw acceleration uses one selection with X,
    Y, and Z shown as three vertically stacked traces. The experimental breathing
@@ -29,7 +29,7 @@ crates; see [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Validate the reusable crates
 
 ```bash
-cargo test -p polar-h10-core -p polar-h10-input -p polar-h10-output
+cargo test -p polar-h10-core -p polar-h10-input -p polar-h10-math -p polar-h10-output
 ```
 
 ## Preview the interface
@@ -90,14 +90,66 @@ The fixed OSC destination is deliberate: changing it is an integration concern,
 not a lever needed in the primary UI. It can later be injected through app
 configuration without touching acquisition or visualization code.
 
-## Remembered preferences
+## Custom math outputs
 
-The WebView's app-local storage retains the last accepted stream base name and
-the last successfully connected sensor ID and name. On the next launch, Polar
-Stream applies the name immediately and scans automatically for that sensor. It
-prefers an exact device-ID match, falls back to a single unambiguous name match,
-and otherwise leaves all scan results available for manual selection. A failed
-connection never replaces the remembered sensor.
+Open **Add output**, then use **New formula** or **Use as custom** beside an
+existing metric. A formula has a stable UUID, stream suffix, source, expression,
+unit, and enabled flag. Its discoverable name is
+`<base>_<formula suffix>` in both LSL and OSC. Enabled formulas are also
+available as live visualization sources, including detached visualization
+windows.
+
+The four source clocks deliberately expose only their own variables:
+
+| Source | Variables | Nominal output rate |
+| --- | --- | --- |
+| ECG | `ecg` in µV | 130 Hz |
+| Accelerometer | `x`, `y`, `z` in mg | 200 Hz |
+| Heart rate | `hr` in bpm | device event rate |
+| RR interval | `rr` in ms | one value per accepted beat interval |
+
+Expressions support arithmetic, comparisons, Boolean operators, `pi`, `e`, and
+bounded functions including `abs`, `sqrt`, trigonometry, `min`, `max`, `clamp`,
+and lazy `if`. Stateful DSP includes time- or sample-count moving mean/RMS/
+standard-deviation/z-score, delay, EMA, low/high/band-pass filters, derivative,
+integral, RMSSD, and the existing experimental ACC breathing magnitude/phase
+classifier. The editor displays the executable expression used by every
+built-in metric; raw ACC is documented as `channels(x, y, z)` because the
+built-in is three-channel, while a custom scalar ACC formula starts blank.
+
+Formulas are parsed by `polar-h10-math`; they are not JavaScript, Rust, or shell
+code. There are no statements, assignments, loops, strings, filesystem calls,
+or network calls. Validation caps expression/AST depth, stateful call count,
+window sizes, total retained state, and work per sample. A formula is isolated
+from every other formula. Repeated non-finite results fault only that formula
+after ten consecutive failures, stop its stream values, and surface the fault
+in the UI.
+
+Example formulas:
+
+```text
+moving_mean(ecg, 0.20)
+lowpass(sqrt(x*x + y*y + z*z) / 1000, 4)
+zscore_n(rr, 20)
+if(abs(ecg) > 500, ecg, 0)
+```
+
+## Workspace profiles and Last session
+
+The native app stores a versioned **Last session** plus up to 50 named profiles
+in its fixed app-configuration directory. A profile includes the preferred
+sensor, complete output configuration, custom formula drafts, destination
+switches, pane proportions, and up to 16 visualization tiles. Last session is
+updated after accepted output or layout changes and restored on launch. Loading
+a named profile applies outputs and layout first, then offers to reconnect its
+saved sensor. The scanner prefers an exact device-ID match, falls back to one
+unambiguous name match, and otherwise leaves the results for manual selection.
+
+Writes use a temporary file plus a previous-file fallback. Oversized, corrupt,
+or unknown-version settings are preserved beside the settings file as a recovery
+copy rather than being silently overwritten. The WebView's old local
+preferences remain only as migration/fallback data for the stream name and last
+sensor.
 
 ## Android
 

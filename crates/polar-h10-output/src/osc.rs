@@ -35,6 +35,13 @@ impl OscPublisher {
         let Some(output_name) = output_stream_name(stream_name, metric_id) else {
             return;
         };
+        self.send_named_series(&output_name, timestamp_ns, values);
+    }
+
+    pub(crate) fn send_named_series<I>(&self, output_name: &str, timestamp_ns: u64, values: I)
+    where
+        I: IntoIterator<Item = f32>,
+    {
         let path = format!("/{output_name}");
         let packet = encode_floats(&path, timestamp_ns, values);
         let _ = self.socket.try_send_to(&packet, self.target);
