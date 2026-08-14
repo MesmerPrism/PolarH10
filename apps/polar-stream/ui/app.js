@@ -6,6 +6,7 @@
   const invoke = nativeCore?.invoke?.bind(nativeCore);
   const NativeChannel = nativeCore?.Channel;
   const preferences = window.PolarPreferences;
+  const previewFixtureApi = window.PolarPreviewFixture;
 
   const fallbackCatalog = [
     { id: "raw_ecg", streamSuffix: "rawECG", label: "Raw ECG", detail: "130 Hz · 1 channel", unit: "µV", raw: true, family: "ecg", formula: "ecg", customExpression: "ecg", formulaSource: "ecg" },
@@ -189,8 +190,9 @@
     pendingWorkspace: null,
     sessionSaveTimer: null,
     sampleCount: 0,
-    demoTimer: null,
-    demoPhase: 0,
+    previewRecording: null,
+    previewRecordingError: null,
+    previewPlayer: null,
     outputSequence: 0,
     connectionGeneration: 0,
     currentDeviceId: null,
@@ -374,7 +376,19 @@
     elements["lsl-toggle"].checked = Boolean(bootstrap.config?.lslEnabled);
     elements["osc-toggle"].checked = Boolean(bootstrap.config?.oscEnabled);
     elements["platform-label"].textContent = String(bootstrap.platform || "local").toUpperCase();
-    if (!isNative) elements["scan-caption"].textContent = "Interactive browser preview";
+    if (!isNative) {
+      prepareMockDataControl();
+      try {
+        await loadPreviewRecording();
+        const seconds = app.previewRecording.durationMs / 1000;
+        elements["platform-label"].textContent = "RECORDED PREVIEW";
+        addActivity(`Real Polar H10 preview fixture ready · ${seconds} second loop`);
+      } catch (error) {
+        app.previewRecordingError = String(error);
+        addActivity(app.previewRecordingError);
+      }
+      updateMockDataControl();
+    }
 
     renderMetricOptions();
     renderFormulaBoxes();
@@ -384,11 +398,14 @@
     await configureOutputs({ quiet: true });
     resizeCanvas();
     window.requestAnimationFrame(drawFrame);
-    if (app.preferences.lastDevice) void scanDevices({ automatic: true });
+    if (isNative && app.preferences.lastDevice) void scanDevices({ automatic: true });
   }
 
   function installInteractions() {
-    elements["scan-button"].addEventListener("click", () => scanDevices());
+    elements["scan-button"].addEventListener("click", () => {
+      if (isNative) void scanDevices();
+      else void activateMockData();
+    });
     elements["disconnect-button"].addEventListener("click", disconnectDevice);
     elements["lsl-toggle"].addEventListener("change", configureOutputs);
     elements["osc-toggle"].addEventListener("change", configureOutputs);
@@ -468,10 +485,7 @@
     try {
       const devices = isNative
         ? await invoke("scan_devices")
-        : await new Promise((resolve) => window.setTimeout(() => resolve([
-            { id: "preview-h10-a", name: "Polar H10 8F3A2C1B", rssi: -48 },
-            { id: "preview-h10-b", name: "Polar H10 4D9E7A20", rssi: -63 },
-          ]), 850));
+        : await previewDevices();
       app.devices = devices;
       renderDevices(devices);
       const count = devices.length;
@@ -505,6 +519,41 @@
       elements["scan-button"].disabled = false;
       elements["scan-button"].classList.remove("scanning");
       elements["scan-button"].querySelector("span").textContent = "Scan again";
+    }
+  }
+
+  function prepareMockDataControl() {
+    elements["scan-button"].classList.add("mock-data-button");
+    elements["scan-button"].querySelector("svg").hidden = true;
+    elements["scan-button"].closest(".scan-row").classList.add("mock-data-row");
+    elements["scan-caption"].hidden = true;
+    elements["device-list"].hidden = true;
+  }
+
+  function updateMockDataControl() {
+    if (isNative) return;
+    elements["scan-button"].querySelector("span").textContent = app.connecting
+      ? "Loading Mock Data…"
+      : app.connected
+        ? "Mock Data active"
+        : "Mock Data";
+    elements["scan-button"].disabled = app.connecting || app.connected;
+  }
+
+  async function activateMockData() {
+    if (app.connecting || app.connected) return;
+    try {
+      const devices = await previewDevices();
+      app.devices = devices;
+      await connectDevice(devices[0]);
+    } catch (error) {
+      const message = String(error);
+      app.previewRecordingError = message;
+      setTopStatus("Mock Data unavailable", "error");
+      elements["input-state"].textContent = "Error";
+      addActivity(message);
+      toast(message, true);
+      updateMockDataControl();
     }
   }
 
@@ -572,10 +621,18 @@
     app.connecting = true;
     app.pendingDevice = device;
     renderDevices(app.devices);
-    setTopStatus(automatic ? "Reconnecting to last used Polar H10" : "Connecting to Polar H10", "working");
-    elements["input-state"].textContent = "Connecting";
+    updateMockDataControl();
+    setTopStatus(
+      isNative
+        ? automatic ? "Reconnecting to last used Polar H10" : "Connecting to Polar H10"
+        : "Loading Mock Data",
+      "working",
+    );
+    elements["input-state"].textContent = isNative ? "Connecting" : "Loading";
     elements["device-name"].textContent = device.name;
-    elements["connection-detail"].textContent = "Opening the low-energy connection…";
+    elements["connection-detail"].textContent = isNative
+      ? "Opening the low-energy connection…"
+      : "Preparing the recorded preview loop…";
     addActivity(`${automatic ? "Reconnecting" : "Connecting"} to ${device.name}`);
 
     try {
@@ -587,11 +644,13 @@
         await invoke("connect_device", { deviceId: device.id, events: channel });
       } else {
         await new Promise((resolve) => window.setTimeout(resolve, 450));
+        if (!app.previewRecording) throw new Error(app.previewRecordingError || "The real preview recording is unavailable.");
         handleNativeEvent({
           kind: "connection", connected: true, streaming: true, deviceName: device.name,
-          batteryPercent: 86, attMtu: 64, message: "Raw ECG and accelerometer are streaming",
+          batteryPercent: null, attMtu: null,
+          message: `Looping a real ${app.previewRecording.durationMs / 1000}-second ECG and accelerometer recording`,
         }, device);
-        startDemoSignal();
+        startPreviewRecording();
       }
     } catch (error) {
       if (generation !== app.connectionGeneration) return;
@@ -603,6 +662,7 @@
       addActivity(String(error));
       toast(String(error), true);
       renderDevices(app.devices);
+      updateMockDataControl();
     }
   }
 
@@ -611,7 +671,7 @@
     app.connectionGeneration += 1;
     try {
       if (isNative) await invoke("disconnect_device");
-      stopDemoSignal();
+      stopPreviewRecording();
       handleNativeEvent({
         kind: "connection", connected: false, streaming: false,
         deviceName: elements["device-name"].textContent, batteryPercent: null, message: "Disconnected",
@@ -691,15 +751,21 @@
       app.currentDeviceId = null;
     }
     renderDevices(app.devices);
+    updateMockDataControl();
     elements["connection-card"].classList.toggle("connected", app.connected);
     elements["disconnect-button"].hidden = !app.connected;
     elements["connection-meta"].hidden = !app.connected;
     elements["device-name"].textContent = app.connected ? event.deviceName : "No sensor connected";
-    elements["connection-detail"].textContent = app.connected ? event.message : "Scan for a nearby chest strap.";
+    elements["connection-detail"].textContent = app.connected
+      ? event.message
+      : isNative ? "Scan for a nearby chest strap." : "Choose Mock Data to preview the interface.";
     elements["battery-value"].textContent = event.batteryPercent == null ? "—" : `${event.batteryPercent}%`;
     resetLatencyMetric();
     elements["input-state"].textContent = app.connected ? "Streaming" : "Idle";
-    setTopStatus(app.connected ? "Sensor connected · streams live" : "Ready to connect", app.connected ? "connected" : "idle");
+    setTopStatus(
+      app.connected ? isNative ? "Sensor connected · streams live" : "Mock Data active" : "Ready to connect",
+      app.connected ? "connected" : "idle",
+    );
     addActivity(app.connected ? `${event.deviceName} connected` : "Sensor disconnected");
   }
 
@@ -2229,41 +2295,48 @@
     elements["ecg-spark"].setAttribute("d", path.join(" "));
   }
 
-  function startDemoSignal() {
-    stopDemoSignal();
-    let lastMetric = 0;
-    app.demoTimer = window.setInterval(() => {
-      const ecg = [];
-      const acc = [];
-      for (let index = 0; index < 17; index += 1) {
-        const phase = app.demoPhase + index / 130;
-        const beatPhase = (phase * 1.18) % 1;
-        const qrs = 880 * Math.exp(-Math.pow((beatPhase - 0.12) / 0.028, 2));
-        const q = -180 * Math.exp(-Math.pow((beatPhase - 0.09) / 0.018, 2));
-        const t = 150 * Math.exp(-Math.pow((beatPhase - 0.42) / 0.09, 2));
-        ecg.push(Math.round(qrs + q + t + Math.sin(phase * 7) * 12));
-      }
-      for (let index = 0; index < 26; index += 1) {
-        const phase = app.demoPhase + index / 200;
-        acc.push({
-          xMg: Math.round(Math.sin(phase * 4.5) * 85),
-          yMg: Math.round(Math.cos(phase * 3.1) * 52),
-          zMg: Math.round(995 + Math.sin(phase * 6.3) * 25),
-        });
-      }
-      app.demoPhase += 0.13;
-      handleNativeEvent({ kind: "ecg", sensorTimestampNs: 0, microvolts: ecg, estimatedLatencyMs: 131, samplesPerPacket: 17 });
-      handleNativeEvent({ kind: "accelerometer", sensorTimestampNs: 0, samples: acc });
-      if (app.demoPhase - lastMetric >= 1) {
-        lastMetric = app.demoPhase;
-        handleNativeEvent({ kind: "metrics", heartRateBpm: 71, rrIntervalsMs: [845 + Math.sin(app.demoPhase) * 18], rmssdMs: 28.4 });
-      }
-    }, 130);
+  async function loadPreviewRecording() {
+    if (!previewFixtureApi) throw new Error("Preview fixture support did not load.");
+    const response = await fetch("data/preview-recording.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Real preview recording is missing. Run `cargo run -p capture-preview-fixture` with an awake Polar H10.");
+    }
+    const fixture = previewFixtureApi.validateFixture(await response.json());
+    app.previewRecording = fixture;
+    app.previewRecordingError = null;
+    return fixture;
   }
 
-  function stopDemoSignal() {
-    if (app.demoTimer) window.clearInterval(app.demoTimer);
-    app.demoTimer = null;
+  async function previewDevices() {
+    await new Promise((resolve) => window.setTimeout(resolve, 300));
+    if (!app.previewRecording) {
+      try {
+        await loadPreviewRecording();
+      } catch (error) {
+        app.previewRecordingError = String(error);
+        throw error;
+      }
+    }
+    return [{
+      id: "recorded-preview-loop",
+      name: "Mock Data",
+      rssi: null,
+    }];
+  }
+
+  function startPreviewRecording() {
+    stopPreviewRecording();
+    app.previewPlayer = new previewFixtureApi.LoopPlayer(
+      app.previewRecording,
+      (event) => handleNativeEvent(event),
+      { onLoop: () => { app.browserBreathing = null; } },
+    );
+    app.previewPlayer.start();
+  }
+
+  function stopPreviewRecording() {
+    app.previewPlayer?.stop();
+    app.previewPlayer = null;
   }
 
   function formatValue(value, digits = 1) {

@@ -5,6 +5,7 @@ members = [
     "crates/polar-h10-input",
     "crates/polar-h10-math",
     "crates/polar-h10-output",
+    "tools/capture-fixture",
 ]
 resolver = "2"
 

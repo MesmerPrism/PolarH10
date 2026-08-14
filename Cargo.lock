@@ -310,6 +310,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "capture-preview-fixture"
+version = "0.1.0"
+dependencies = [
+ "polar-h10-core",
+ "polar-h10-input",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "cargo-platform"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -23,6 +23,8 @@ name and last successfully connected H10 are remembered between launches. See
 [Polar Stream](apps/polar-stream/README.md) and its
 [architecture](apps/polar-stream/ARCHITECTURE.md).
 
+![Real Polar H10 ECG and accelerometer preview loop](docs/assets/polar-stream-recorded-preview.svg)
+
 Start with [Docs Home](docs/index.md) or the live
 [Pages site](https://mesmerprism.github.io/PolarH10/).
 If a public research preview release exists, install it from

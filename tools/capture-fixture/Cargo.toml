@@ -1,0 +1,15 @@
+[package]
+name = "capture-preview-fixture"
+description = "Capture an anonymized real Polar H10 recording for browser and SVG previews"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+polar-h10-core = { path = "../../crates/polar-h10-core" }
+polar-h10-input = { path = "../../crates/polar-h10-input" }
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true

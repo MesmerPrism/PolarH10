@@ -57,7 +57,8 @@ Rules enforced by the crate graph:
   resampling or cross-clock variable access occurs.
 - The opt-in ACC breathing classifier runs in `polar-h10-core`; the HTML layer
   receives the same derived waveform and phase values that native LSL/OSC
-  publishers receive. Browser preview uses a synthetic-only mirror.
+  publishers receive. Browser preview runs its UI-only mirror over the shared
+  real Polar H10 recording fixture; it never generates replacement sensor data.
 - Adding a built-in metric means registering its descriptor and feeding a
   `MetricValue`; user-defined scalar metrics use `polar-h10-math` and do not
   change BLE acquisition.

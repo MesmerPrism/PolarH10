@@ -34,15 +34,28 @@ cargo test -p polar-h10-core -p polar-h10-input -p polar-h10-math -p polar-h10-o
 
 ## Preview the interface
 
-The frontend includes a browser-only synthetic signal so its complete workflow
-can be reviewed without BLE hardware. Synthetic mode is never entered by the
-native application.
+The browser preview loops one anonymized 60-second recording captured from a
+real Polar H10. The same fixture feeds the raw readings, visualization buffers,
+derived ACC views, and inline ECG SVG sparkline. There is no generated ECG or
+ACC fallback, and recorded-preview mode is never entered by the native app.
+
+Capture or replace the canonical recording while wearing the strap:
+
+```bash
+cargo run -p capture-preview-fixture
+```
+
+That command also renders the static waveform SVG from the same fixture. The
+browser rejects a missing, truncated, malformed, or non-recorded fixture with an
+actionable message.
+
+![Real Polar H10 ECG and accelerometer preview loop](../../docs/assets/polar-stream-recorded-preview.svg)
 
 ```bash
 npx browser-sync start --server apps/polar-stream/ui --no-open --no-ui
 ```
 
-Open `http://127.0.0.1:3000`, scan, and select the preview H10.
+Open `http://127.0.0.1:3000` and click **Mock Data**.
 
 ## Run the native desktop app
 

@@ -60,6 +60,14 @@ dotnet run --project src/PolarH10.Cli -- scan
 
 ## Choose Your Path
 
+### Preview Polar Stream without hardware
+
+- [Polar Stream Recorded Preview](polar-stream-preview.md)
+- Open the browser interface and choose **Mock Data** to loop a real 60-second
+  Polar H10 ECG and accelerometer recording.
+- Build the native Tauri app when you want live Polar H10 input with LSL or OSC
+  output; recorded-preview mode remains browser-only.
+
 ### Use the macOS app
 
 - [Download & Install](download.md)
@@ -95,6 +103,7 @@ dotnet run --project src/PolarH10.Cli -- scan
 
 ## Read These First
 
+- [Polar Stream Recorded Preview](polar-stream-preview.md)
 - [Getting Started on macOS](platform-guides/macos.md)
 - [Getting Started on Windows](getting-started.md)
 - [First Recording](first-recording.md)
