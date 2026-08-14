@@ -32,6 +32,9 @@ Key fields include:
 - `AccFrameCount`
 - `TranscriptEntryCount`
 
+On macOS, `DeviceAddress` contains the app-scoped CoreBluetooth peripheral UUID.
+On Windows, it contains the Bluetooth address used by the WinRT transport.
+
 ### `hr_rr.csv`
 
 Heart-rate and RR-interval output derived from the standard Heart Rate Service.

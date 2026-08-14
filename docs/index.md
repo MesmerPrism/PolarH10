@@ -1,7 +1,7 @@
 ---
 title: Docs Home
-description: Start here if you want to use a Polar H10 on Windows without the Polar SDK, then drop into protocol and transport internals only when you need them.
-summary: Use the WPF app or CLI to get from nearby strap to saved session first; protocol docs and Mermaid maps come after the operator path is clear.
+description: Start here if you want to use a Polar H10 on Windows or macOS without the Polar SDK, then drop into protocol and transport internals only when needed.
+summary: Use the native Mac app, Windows WPF app, or CLI to get from nearby strap to saved session before moving into protocol docs and diagrams.
 nav_label: Docs Home
 nav_group: Start Here
 nav_order: 10
@@ -9,19 +9,19 @@ nav_order: 10
 
 # PolarH10 Developer Reference
 
-Use a Polar H10 on Windows without the Polar SDK. Scan nearby straps, inspect
-live HR, ECG, and ACC data, review RR-derived coherence, short-term HRV, and
-breathing-dynamics entropy, compare multiple active straps, and record reusable
-sessions from a WPF app or CLI.
+Use a Polar H10 on Windows or macOS without the Polar SDK. Scan nearby straps,
+inspect live HR, ECG, and ACC data, review RR-derived coherence and short-term
+HRV, and record reusable sessions from native desktop apps. The Windows surface
+also provides multi-device comparison and the full breathing-dynamics workflow.
 
 ## Quick Start
 
-- Windows 10 version 1903 or later
-- .NET 8.0 SDK
+- macOS 13+ for the native SwiftUI app, or Windows 10 version 1903+
+- Xcode 15+ for Mac source builds; .NET 8.0 SDK for Windows source builds
 - Bluetooth LE adapter
 - Polar H10 chest strap
 
-If you want the packaged desktop app instead of building from source, start with [Download & Install](download.md). The current installer channel is a self-signed Research Preview.
+If you want a packaged desktop app instead of building from source, start with [Download & Install](download.md). The Research Preview includes a Universal Mac ZIP and a guided Windows installer.
 
 ```powershell
 git clone https://github.com/MesmerPrism/PolarH10.git
@@ -46,7 +46,8 @@ dotnet run --project src/PolarH10.Cli -- scan
 
 ## What This Project Is
 
-- A direct BLE/GATT workflow for the Polar H10 on Windows.
+- A direct BLE/GATT workflow for the Polar H10 on Windows and macOS.
+- A native SwiftUI/CoreBluetooth Mac app for single-sensor live telemetry, RR analysis, and session capture.
 - A practical WPF app for scanning, connecting, inspecting live telemetry, reviewing coherence, HRV, and breathing-dynamics tabs, and recording sessions.
 - A CLI for scripted scan, doctor, monitor, record, replay, and session review work.
 - A protocol and transport reference once you need PMD, GATT, or decoder internals.
@@ -58,6 +59,20 @@ dotnet run --project src/PolarH10.Cli -- scan
 - It is not a medical device or a substitute for clinical interpretation.
 
 ## Choose Your Path
+
+### Preview Polar Stream without hardware
+
+- [Polar Stream Recorded Preview](polar-stream-preview.md)
+- Open the browser interface and choose **Mock Data** to loop a real 60-second
+  Polar H10 ECG and accelerometer recording.
+- Build the native Tauri app when you want live Polar H10 input with LSL or OSC
+  output; recorded-preview mode remains browser-only.
+
+### Use the macOS app
+
+- [Download & Install](download.md)
+- [Getting Started on macOS](platform-guides/macos.md)
+- [Output Formats](output-formats.md)
 
 ### Use the WPF app
 
@@ -88,6 +103,8 @@ dotnet run --project src/PolarH10.Cli -- scan
 
 ## Read These First
 
+- [Polar Stream Recorded Preview](polar-stream-preview.md)
+- [Getting Started on macOS](platform-guides/macos.md)
 - [Getting Started on Windows](getting-started.md)
 - [First Recording](first-recording.md)
 - [Troubleshooting](troubleshooting.md)

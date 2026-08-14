@@ -1,11 +1,11 @@
 %% Runtime lifecycle from discovery through streaming and capture.
 
 flowchart LR
-    S1["01 SCAN<br/>watch Polar advertisements"] --> S2["02 SELECT DEVICE<br/>choose alias + target link"]
+    S1["01 SCAN<br/>watch Polar advertisements"] --> S2["02 SELECT DEVICE<br/>choose identifier + target link"]
     S2 --> S3["03 OPEN GATT<br/>services · characteristics · notifications"]
     S3 --> S4["04 NEGOTIATE PMD<br/>settings query + stream start"]
     S4 --> S5["05 LIVE TELEMETRY<br/>HR · RR · ECG · ACC"]
-    S5 --> S6["06 OPTIONAL RECORD<br/>CSV + JSONL + run manifest"]
+    S5 --> S6["06 OPTIONAL RECORD<br/>CSV + JSONL + optional run manifest"]
     S5 --> S7["07 DIAGNOSTICS<br/>doctor / monitor / runtime log"]
     S6 --> S8["08 STOP / CUT LINK<br/>flush files + release session"]
     S7 --> S8

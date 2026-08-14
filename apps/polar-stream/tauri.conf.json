@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Polar Stream",
+  "version": "0.1.0",
+  "identifier": "dev.georgefejer.polarstream",
+  "build": {
+    "frontendDist": "ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "security": {
+      "csp": "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost"
+    },
+    "windows": [
+      {
+        "label": "main",
+        "title": "Polar Stream",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 980,
+        "minHeight": 680,
+        "resizable": true,
+        "center": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": false,
+    "icon": ["../../docs/assets/polarh10-stripe-mark.png"],
+    "category": "DeveloperTool",
+    "shortDescription": "Low-latency Polar H10 stream bridge",
+    "longDescription": "Connect a Polar H10 and publish raw ECG, accelerometer, and selected metrics over LSL or OSC.",
+    "macOS": {
+      "minimumSystemVersion": "10.15",
+      "infoPlist": "Info.plist"
+    },
+    "android": {
+      "minSdkVersion": 24
+    }
+  }
+}

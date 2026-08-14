@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#17221d" />
+    <title>Polar Stream</title>
+    <link rel="icon" href="favicon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="preferences.js" defer></script>
+    <script src="preview-fixture.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#input-section">Skip to workspace</a>
+
+    <header class="app-bar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+          <rect x="1" y="1" width="38" height="38" rx="10" />
+          <path d="M8 21h5l2.5-7 4.1 15 3.4-11 2.4 5H32" />
+        </svg>
+        <span class="brand-copy"><strong>Polar Stream</strong><small>H10 signal bridge</small></span>
+      </div>
+      <div class="app-state" aria-live="polite">
+        <span class="state-dot" id="app-state-dot"></span>
+        <span id="app-state-text">Ready to connect</span>
+      </div>
+      <div class="profile-actions" aria-label="Workspace profiles">
+        <label class="sr-only" for="profile-select">Load workspace profile</label>
+        <select id="profile-select" title="Load a saved workspace profile">
+          <option value="">Profiles…</option>
+        </select>
+        <button class="header-button" id="save-profile-button" type="button">Save profile</button>
+        <button class="header-button danger" id="delete-profile-button" type="button" disabled>Delete</button>
+      </div>
+      <div class="latency-note">
+        <span id="platform-label">LOCAL</span>
+        <strong>Native data path</strong>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="workspace-panel input-panel" id="input-section" aria-labelledby="input-heading">
+        <header class="section-heading">
+          <span class="section-number">01</span>
+          <div>
+            <p class="eyebrow">Input</p>
+            <h1 id="input-heading">Polar H10</h1>
+          </div>
+          <span class="section-state" id="input-state">Idle</span>
+        </header>
+
+        <div class="connection-card" id="connection-card">
+          <div class="sensor-glyph" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path d="M8 24c4-8 9-12 16-12s12 4 16 12c-4 8-9 12-16 12S12 32 8 24Z"/><path d="M15 24h5l2-6 4 12 2-6h5"/></svg>
+          </div>
+          <div class="connection-copy">
+            <strong id="device-name">No sensor connected</strong>
+            <span id="connection-detail">Scan for a nearby chest strap.</span>
+          </div>
+          <button class="text-button danger" id="disconnect-button" hidden>Disconnect</button>
+        </div>
+
+        <div class="connection-meta" id="connection-meta" hidden>
+          <span><small>BATTERY</small><strong id="battery-value">—</strong></span>
+          <span><small>ECG</small><strong>130 Hz</strong></span>
+          <span><small>ACC</small><strong>200 Hz</strong></span>
+          <span class="latency-metric" id="latency-metric" title="Measured after ECG packets begin arriving.">
+            <small>LATENCY <em>EST.</em></small><strong id="latency-value" aria-live="polite">Measuring…</strong>
+          </span>
+        </div>
+
+        <div class="scan-row">
+          <button class="primary-button" id="scan-button">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v14M6.5 6.5 10 3l3.5 3.5M6.5 13.5 10 17l3.5-3.5"/></svg>
+            <span>Scan for sensors</span>
+          </button>
+          <span class="scan-caption" id="scan-caption">Bluetooth Low Energy</span>
+        </div>
+
+        <div class="device-list" id="device-list" aria-live="polite">
+          <div class="empty-state" id="device-empty">
+            <span class="empty-orbit" aria-hidden="true"></span>
+            <p>Your H10 will appear here.</p>
+            <small>Wear the strap and wet the electrodes before scanning.</small>
+          </div>
+        </div>
+
+        <div class="activity-block">
+          <div class="mini-heading"><strong>Connection activity</strong><span>Latest</span></div>
+          <ol class="activity-list" id="activity-list">
+            <li><time>NOW</time><span>Bluetooth interface ready</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <div class="workspace-splitter" data-workspace-splitter="input-output" role="separator" aria-label="Resize input and output panes" aria-orientation="vertical" aria-valuemin="16" aria-valuemax="70" aria-valuenow="31" tabindex="0">
+        <span aria-hidden="true"></span>
+      </div>
+
+      <section class="workspace-panel output-panel" id="output-section" aria-labelledby="output-heading">
+        <header class="section-heading">
+          <span class="section-number">02</span>
+          <div>
+            <p class="eyebrow">Output</p>
+            <h2 id="output-heading">Signals &amp; streams</h2>
+          </div>
+          <span class="section-state live-state" id="output-state">2 signals</span>
+        </header>
+
+        <div class="raw-grid" aria-label="Latest raw sensor values">
+          <article class="raw-card ecg-card">
+            <header><span class="signal-swatch"></span><strong>Raw ECG</strong><small>µV</small></header>
+            <div class="raw-reading"><span id="raw-ecg-value">—</span><small id="ecg-rate">130 samples/s</small></div>
+            <svg class="spark-placeholder" viewBox="0 0 280 44" preserveAspectRatio="none" aria-hidden="true"><path id="ecg-spark" d="M0 24h280" /></svg>
+          </article>
+          <article class="raw-card acc-card">
+            <header><span class="signal-swatch"></span><strong>Raw accelerometer</strong><small>mg</small></header>
+            <div class="acc-reading">
+              <span><small>X</small><strong id="raw-acc-x">—</strong></span>
+              <span><small>Y</small><strong id="raw-acc-y">—</strong></span>
+              <span><small>Z</small><strong id="raw-acc-z">—</strong></span>
+            </div>
+            <small class="sample-rate">200 samples/s · 3 axes</small>
+          </article>
+        </div>
+
+        <div class="config-block">
+          <label class="field-label" for="stream-name">Stream base name</label>
+          <div class="name-field">
+            <input id="stream-name" maxlength="64" value="Polar-H10" spellcheck="false" />
+            <span class="valid-mark" aria-hidden="true">✓</span>
+          </div>
+          <p class="field-help" id="stream-name-preview">Publishes Polar-H10_rawECG · Polar-H10_rawACC</p>
+        </div>
+
+        <div class="destination-block">
+          <div class="mini-heading"><strong>Make available through</strong><span>Optional</span></div>
+          <label class="destination-row">
+            <span class="protocol-mark lsl-mark">LSL</span>
+            <span><strong>Lab Streaming Layer</strong><small id="lsl-detail">Local network · time synchronized</small></span>
+            <input id="lsl-toggle" class="switch-input" type="checkbox" />
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+          <label class="destination-row">
+            <span class="protocol-mark osc-mark">OSC</span>
+            <span><strong>Open Sound Control</strong><small id="osc-detail">UDP · localhost:9000</small></span>
+            <input id="osc-toggle" class="switch-input" type="checkbox" />
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="outputs-block">
+          <div class="mini-heading"><strong>Included outputs</strong><span id="included-count">2 active</span></div>
+          <div class="output-chips" id="output-chips"></div>
+          <button class="add-output-button" id="open-output-dialog">
+            <span aria-hidden="true">＋</span>
+            Add output
+          </button>
+        </div>
+      </section>
+
+      <div class="workspace-splitter" data-workspace-splitter="output-visual" role="separator" aria-label="Resize output and visualization panes" aria-orientation="vertical" aria-valuemin="16" aria-valuemax="70" aria-valuenow="35" tabindex="0">
+        <span aria-hidden="true"></span>
+      </div>
+
+      <section class="workspace-panel visual-panel" id="visual-section" aria-labelledby="visual-heading">
+        <header class="section-heading">
+          <span class="section-number">03</span>
+          <div>
+            <p class="eyebrow">Visualization</p>
+            <h2 id="visual-heading">Live workspace</h2>
+          </div>
+          <div class="visual-heading-actions">
+            <span class="section-state" id="render-rate">60 fps</span>
+            <button class="panel-action" id="add-visualizer" type="button" title="Add another visualization" aria-label="Add another visualization">＋</button>
+            <button class="panel-action" id="reset-workspace-layout" type="button" title="Reset pane and visualization sizes" aria-label="Reset pane and visualization sizes">↺</button>
+          </div>
+        </header>
+
+        <div class="visualizer-deck" id="visualizer-deck" role="group" aria-label="Visualization tiles">
+          <article class="visualizer-card" id="visualizer-primary" data-visualizer-id="primary">
+            <div class="visual-toolbar">
+              <button class="visualizer-drag-handle" type="button" title="Drag to rearrange or drag outside to detach" aria-label="Drag visualization to rearrange or detach"><span aria-hidden="true">⠿</span></button>
+              <label for="visual-source">Display</label>
+              <select id="visual-source"></select>
+              <div class="visual-value">
+                <strong id="visual-current">—</strong>
+                <span id="visual-unit">µV</span>
+              </div>
+              <button class="visualizer-action" data-visualizer-action="popout" type="button" title="Open as a separate window" aria-label="Open visualization as a separate window">↗</button>
+              <button class="visualizer-action" data-visualizer-action="close" type="button" title="Close visualization" aria-label="Close visualization">×</button>
+            </div>
+
+            <div class="chart-shell" id="chart-shell">
+              <canvas id="signal-canvas" role="img" aria-label="Live selected Polar H10 signal"></canvas>
+              <div class="chart-y-labels" aria-hidden="true"><span id="y-max">—</span><span>0</span><span id="y-min">—</span></div>
+              <div class="chart-empty" id="chart-empty">
+                <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M7 35h10l5-14 8 28 7-23 5 9h15"/></svg>
+                <strong>Waiting for signal</strong>
+                <span>Connect a Polar H10 to begin.</span>
+              </div>
+            </div>
+
+            <div class="chart-footer">
+              <span class="visual-legend" id="visual-legend"><span class="legend-item"><i class="legend-line"></i><strong>Raw ECG</strong></span></span>
+              <span class="chart-window-label">5 second window</span>
+              <span class="chart-scale-label">Auto scale</span>
+            </div>
+          </article>
+
+          <button class="visualizer-empty-deck" id="visualizer-empty-deck" type="button" hidden>
+            <span aria-hidden="true">＋</span>
+            <strong>Add a visualization</strong>
+            <small>Open one or more live signals in this pane.</small>
+          </button>
+        </div>
+
+        <p class="workspace-hint">Pull pane dividers or a visualization’s lower-right corner. Drag its dotted handle to rearrange it; drag beyond the window edge to detach it.</p>
+      </section>
+    </main>
+
+    <footer class="status-bar">
+      <span><i class="footer-dot"></i><span id="footer-status">Engine ready</span></span>
+      <span id="sample-counter">0 samples</span>
+      <span>Polar H10 · unofficial research tool</span>
+    </footer>
+
+    <dialog class="output-dialog" id="output-dialog" aria-labelledby="output-dialog-title">
+      <form method="dialog">
+        <header>
+          <div><p class="eyebrow">Output library</p><h2 id="output-dialog-title">Add signals</h2></div>
+          <button class="icon-button" value="cancel" aria-label="Close">×</button>
+        </header>
+        <div class="library-controls">
+          <p class="dialog-intro">Choose the measurement family first, then add only the signals your downstream tools need.</p>
+          <div class="metric-family-toggle" role="group" aria-label="Metric family">
+            <button class="family-choice ecg active" id="show-ecg-metrics" type="button" aria-pressed="true">
+              <span class="family-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><path d="M5 25h9l4-12 7 24 6-18 4 6h8"/></svg>
+              </span>
+              <span><strong>ECG metrics</strong><small>Validated sensor focus</small></span>
+            </button>
+            <button class="family-choice acc" id="show-acc-metrics" type="button" aria-pressed="false">
+              <span class="family-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="4"/><path d="M24 20V7m0 0-4 5m4-5 4 5M20.5 26 9 33m0 0 6-.2M9 33l2.7-5.3M27.5 26 39 33m0 0-2.7-5.3M39 33l-6-.2"/></svg>
+              </span>
+              <span><strong>ACC metrics</strong><small>Experimental breathing</small></span>
+            </button>
+          </div>
+          <div class="family-context ecg" id="metric-family-context">
+            <strong id="metric-family-title">ECG is the primary measurement family</strong>
+            <span id="metric-family-description">Start here for the H10's established electrical and beat-to-beat signals.</span>
+          </div>
+          <div class="metric-search-row">
+            <label for="metric-search">Search this family</label>
+            <div class="metric-search-field">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+              <input id="metric-search" type="search" placeholder="e.g. raw, RR, breathing…" autocomplete="off" />
+            </div>
+            <span id="metric-result-count">4 ECG metrics</span>
+          </div>
+        </div>
+        <div class="metric-scroll">
+          <div class="metric-options" id="metric-options"></div>
+          <section class="formula-builder" id="formula-builder" aria-labelledby="formula-builder-title">
+            <header>
+              <div>
+                <p class="eyebrow">Math module</p>
+                <h3 id="formula-builder-title">Custom processed signals</h3>
+              </div>
+              <button class="secondary-button compact" id="add-custom-formula" type="button">＋ New formula</button>
+            </header>
+            <p class="formula-intro">Each expression produces one scalar LSL/OSC stream at its source rate. Formulas run in the native bounded DSP engine.</p>
+            <details class="formula-help">
+              <summary>Formula syntax &amp; DSP functions</summary>
+              <p><code>+ - * / % ^</code> · comparisons · <code>&amp;&amp; || !</code> · constants <code>pi</code>, <code>e</code> · lazy <code>if(condition, yes, no)</code></p>
+              <p><strong>Math:</strong> <code>abs sqrt cbrt exp ln log10 sin cos tan asin acos atan atan2 pow min max clamp floor ceil round sign</code></p>
+              <p><strong>DSP:</strong> <code>delay moving_mean moving_rms moving_std zscore ema lowpass highpass bandpass derivative integral</code>. Add <code>_n</code> to moving/z-score functions for sample-count windows; <code>rmssd(rr, count)</code> is available for RR.</p>
+            </details>
+            <div class="formula-boxes" id="formula-boxes"></div>
+            <div class="formula-empty" id="formula-empty">
+              <strong>No custom formulas yet</strong>
+              <span>Start blank, or copy an executable formula from a metric above.</span>
+            </div>
+          </section>
+          <section class="breathing-config" id="breathing-config" aria-labelledby="breathing-config-title" hidden>
+            <header>
+              <div>
+                <p class="eyebrow">Breathing setup</p>
+                <h3 id="breathing-config-title">Tune the selected ACC breathing outputs</h3>
+              </div>
+              <span class="experimental-badge">Experimental</span>
+            </header>
+            <p class="breathing-warning"><strong>Not validated as respiratory measurements.</strong> Treat these outputs as exploratory and verify them against a reference sensor before interpreting them.</p>
+
+            <fieldset class="axis-picker">
+              <legend>Axes included</legend>
+              <p>Two-axis X + Z is the repository default and avoids the rotational Y axis. Three-axis fusion is available for comparison.</p>
+              <div>
+                <label><input id="breathing-axis-x" type="checkbox" value="x" checked /><span>X</span></label>
+                <label><input id="breathing-axis-y" type="checkbox" value="y" /><span>Y</span></label>
+                <label><input id="breathing-axis-z" type="checkbox" value="z" checked /><span>Z</span></label>
+                <em>Recommended: X + Z</em>
+              </div>
+              <small id="breathing-axis-error" role="status">Select at least two axes.</small>
+            </fieldset>
+
+            <div class="classifier-controls">
+              <label class="range-control" for="breathing-smoothing">
+                <span><strong>Smoothing window</strong><output id="breathing-smoothing-value">0.75 s</output></span>
+                <input id="breathing-smoothing" type="range" min="0.2" max="3" step="0.05" value="0.75" />
+                <small>Longer windows reduce jitter but add response delay.</small>
+              </label>
+              <label class="range-control" for="breathing-sensitivity">
+                <span><strong>Phase sensitivity</strong><output id="breathing-sensitivity-value">60%</output></span>
+                <input id="breathing-sensitivity" type="range" min="0" max="1" step="0.05" value="0.6" />
+                <small>Phase output only · higher values classify smaller changes.</small>
+              </label>
+            </div>
+
+            <div class="classifier-toggles">
+              <label>
+                <span><strong>Normalize waveform</strong><small>Magnitude output only · map the curve to 0–1.</small></span>
+                <input id="breathing-normalize" class="switch-input" type="checkbox" checked />
+                <span class="switch blue" aria-hidden="true"></span>
+              </label>
+              <label>
+                <span><strong>Invert direction</strong><small>Swap inhale and exhale if strap orientation reverses the curve.</small></span>
+                <input id="breathing-invert" class="switch-input" type="checkbox" />
+                <span class="switch blue" aria-hidden="true"></span>
+              </label>
+            </div>
+
+            <div class="visualization-note">
+              <strong>Two independent outputs · shared settings</strong>
+              <span><i class="wave-icon" aria-hidden="true"></i> Magnitude time series</span>
+              <span><i class="circle-icon" aria-hidden="true"></i> Three-state phase</span>
+            </div>
+          </section>
+          <div class="metric-empty-search" id="metric-empty-search" hidden>
+            <strong>No matching metrics</strong>
+            <span>Try a broader search within this family.</span>
+          </div>
+        </div>
+        <footer>
+          <div class="selection-summary">
+            <strong id="dialog-selection-count">2 selected</strong>
+            <span id="dialog-selection-detail">1 ECG · 1 ACC</span>
+          </div>
+          <button class="primary-button compact" value="confirm">Apply outputs</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  </body>
+</html>
