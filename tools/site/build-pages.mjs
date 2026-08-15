@@ -23,15 +23,15 @@ const siteConfig = {
   repoUrl: 'https://github.com/MesmerPrism/PolarH10',
   baseUrl: 'https://mesmerprism.github.io/PolarH10/',
   siteName: 'PolarH10',
-  brandTagline: 'Windows-first telemetry toolkit',
-  homeTitle: 'Windows-first Polar H10 telemetry toolkit',
+  brandTagline: 'Windows + macOS telemetry toolkit',
+  homeTitle: 'Polar H10 telemetry toolkit for Windows and macOS',
   referenceTitle: 'PolarH10 Developer Reference',
-  sharedPromise: 'Academic-friendly Windows-first Polar H10 telemetry toolkit for HR, RR, ECG, ACC, multi-device comparison, and ACC-based breathing views without the Polar SDK.',
-  defaultDescription: 'Windows-first Polar H10 docs, onboarding guides, protocol reference, and Mermaid system diagrams. Unofficial project; not endorsed by or affiliated with Polar Electro Oy.',
+  sharedPromise: 'Academic-friendly Polar H10 telemetry toolkit for HR, RR, ECG, ACC, and session capture on Windows and macOS without the Polar SDK.',
+  defaultDescription: 'Polar H10 desktop apps, onboarding guides, protocol reference, and Mermaid system diagrams for Windows and macOS. Unofficial project; not endorsed by Polar Electro Oy.',
   socialImage: 'assets/brutal-tdr-preview.png',
   favicon: 'assets/polarh10-stripe-mark.png',
   themeColor: '#f3eee6',
-  navGroups: ['Start Here', 'Task Guides', 'Troubleshooting', 'Internals'],
+  navGroups: ['Start Here', 'Task Guides', 'Platform Guides', 'Troubleshooting', 'Internals'],
   diagramViewerLabel: 'Diagram Viewer',
   diagramViewerDescription: 'Browse onboarding, runtime, and architecture Mermaid diagrams.',
   searchTitle: 'Search the PolarH10 docs',
@@ -262,9 +262,9 @@ ${renderHead({
     <main data-pagefind-body>
     <section class="hero hero-home">
       <div class="panel hero-copy tone-dark">
-        <div class="page-marker">Unofficial Windows-first Polar H10 toolkit for academic workflows</div>
-        <h1>Record and compare Polar H10 telemetry on Windows.</h1>
-        <p class="hero-lede">PolarH10 is designed first for academics who need a practical Windows workflow without the Polar SDK. Use the WPF app or CLI to inspect HR, RR, ECG, and ACC live, track multiple H10 devices in parallel, record reusable sessions, and review derived views such as coherence, short-term HRV, ACC-based breathing-volume approximation, and breathing-dynamics features.</p>
+        <div class="page-marker">Unofficial Polar H10 toolkit for academic workflows</div>
+        <h1>Record Polar H10 telemetry on Windows or Mac.</h1>
+        <p class="hero-lede">PolarH10 gives researchers direct desktop workflows without the Polar SDK. Use Polar Stream for low-latency ECG and ACC output over LSL or OSC, preview its interface from a real recorded H10 loop, or use the native Mac and Windows tools for collection, analysis, and reusable sessions.</p>
         <div class="stats">
           <div class="stat">
             <strong>Parallel live monitoring</strong>
@@ -275,12 +275,13 @@ ${renderHead({
             <span>Review HR, RR, ECG, ACC, and ACC-based breathing output within the same session instead of splitting those signals across separate tools.</span>
           </div>
           <div class="stat">
-            <strong>Methods and implementation notes</strong>
-            <span>Read the workflow guides, formula sheets, output formats, protocol reference, and diagrams when validation or extension matters.</span>
+            <strong>Real-data hardware-free preview</strong>
+            <span>Use one anonymized 60-second Polar H10 ECG and accelerometer recording to review Polar Stream without generated sensor data.</span>
           </div>
         </div>
         <div class="action-row">
           <a class="button primary" href="reference/download.html">Download research preview</a>
+          <a class="button primary" href="reference/polar-stream-preview.html">Try Mock Data</a>
           <a class="button primary" href="reference/getting-started.html">Get started</a>
           <a class="button" href="reference/first-recording.html">Record a first session</a>
           <a class="button" href="reference/formula-sheets.html">Read the formulas</a>
@@ -288,10 +289,10 @@ ${renderHead({
         </div>
       </div>
       <aside class="panel hero-preview">
-        <h2 class="section-heading">For studies, methods, and implementation</h2>
-        <p>This site is organized around three common academic tasks: running a Windows collection session, checking how derived values are computed, and tracing the implementation when reproducibility or extension matters.</p>
-        <img src="assets/brutal-tdr-preview.png" alt="PolarH10 WPF application preview with multiple tracked devices" />
-        <p class="hero-preview-note">The preview shows parallel device tracking in the live workspace. If you already know the term you need, search for <code>doctor</code>, <code>RR</code>, <code>breathing</code>, or <code>protocol.jsonl</code> and jump straight to the matching guide.</p>
+        <h2 class="section-heading">One real recording, every Polar Stream preview</h2>
+        <p>The browser interface and its static waveform preview share the same anonymized 60-second ECG and accelerometer recording captured from a Polar H10.</p>
+        <img src="assets/polar-stream-recorded-preview.svg" alt="Recorded Polar H10 ECG and accelerometer waveform preview" />
+        <p class="hero-preview-note">Choose <strong>Mock Data</strong> in the browser preview to loop the recording. Native Polar Stream continues to scan only for live Polar H10 hardware.</p>
       </aside>
     </section>
 
@@ -301,15 +302,17 @@ ${renderHead({
       <div class="audience-grid logo-sequence">
         <article class="audience-card">
           <h3>Running sessions and comparing devices</h3>
-          <p>Start here if you need to connect straps, monitor live telemetry, compare multiple active H10 units, or collect reusable Windows sessions for later analysis.</p>
+          <p>Start here if you need to connect a strap on Mac or Windows, monitor live telemetry, compare multiple units on Windows, or collect reusable sessions for later analysis.</p>
           <ul class="audience-link-list">
-            <li><a class="audience-link" href="reference/download.html"><strong>Download research preview</strong><span>Install the self-signed preview release and follow the first-time trust step.</span></a></li>
+            <li><a class="audience-link" href="reference/polar-stream-preview.html"><strong>Polar Stream Mock Data</strong><span>Review the interface using a real 60-second H10 recording, without BLE hardware or generated ECG and ACC.</span></a></li>
+            <li><a class="audience-link" href="reference/download.html"><strong>Download research preview</strong><span>Choose the Universal Mac app or guided Windows installer and follow its first-launch trust step.</span></a></li>
+            <li><a class="audience-link" href="reference/platform-guides/macos.html"><strong>macOS guide</strong><span>Install or build the native SwiftUI/CoreBluetooth app and record a first Mac session.</span></a></li>
             <li><a class="audience-link" href="reference/synthetic-bio-companion.html"><strong>SyntheticBio companion</strong><span>Run deterministic synthetic telemetry for repeatable PolarH10 demos, fixture export, and same-machine transport tests.</span></a></li>
             <li><a class="audience-link" href="reference/getting-started.html"><strong>Getting started</strong><span>Clone, build, and reach a safe first run.</span></a></li>
             <li><a class="audience-link" href="reference/first-recording.html"><strong>First recording</strong><span>Run the first end-to-end session and save reusable output.</span></a></li>
             <li><a class="audience-link" href="reference/app-overview.html"><strong>App overview</strong><span>See the tracked-device workflow, live views, and operator-facing surfaces.</span></a></li>
             <li><a class="audience-link" href="reference/cli.html"><strong>CLI guide</strong><span>Use the terminal workflow for scan, doctor, record, and replay.</span></a></li>
-            <li><a class="audience-link" href="reference/troubleshooting.html"><strong>Troubleshooting</strong><span>Fix the common Windows BLE and device-discovery failures first.</span></a></li>
+            <li><a class="audience-link" href="reference/troubleshooting.html"><strong>Troubleshooting</strong><span>Fix common BLE and device-discovery failures first.</span></a></li>
           </ul>
         </article>
         <article class="audience-card">
@@ -326,7 +329,7 @@ ${renderHead({
         </article>
         <article class="audience-card">
           <h3>Validating or extending the implementation</h3>
-          <p>Start here if you need repo structure, saved record formats, protocol details, or the diagrams that explain how the Windows BLE and analysis pipeline fits together.</p>
+          <p>Start here if you need repo structure, saved record formats, protocol details, or diagrams explaining the Windows and macOS BLE paths.</p>
           <ul class="audience-link-list">
             <li><a class="audience-link" href="reference/protocol/overview.html"><strong>Protocol overview</strong><span>Map PMD, GATT, decoding, and the lower-level data path.</span></a></li>
             <li><a class="audience-link" href="reference/output-formats.html"><strong>Output formats</strong><span>Inspect the session files, manifests, and recorded artifacts.</span></a></li>
@@ -339,12 +342,12 @@ ${renderHead({
 
     <section class="section panel section-panel">
       <h2 class="section-heading">Typical session flow</h2>
-      <p class="section-subtitle">If you are collecting lab data on Windows, this is the order of operations that keeps the session trustworthy.</p>
+      <p class="section-subtitle">On Windows or macOS, this is the order of operations that keeps a collection session trustworthy.</p>
       <div class="step-grid logo-sequence">
         <div class="step-card">
           <div class="step-no">01</div>
           <h3>Choose the devices and tool</h3>
-          <p>Find the intended H10 units, confirm the Bluetooth addresses, and decide whether the session belongs in the WPF app or the CLI.</p>
+          <p>Find the intended H10, confirm its platform identifier, and choose the native Mac app, Windows WPF app, or CLI.</p>
         </div>
         <div class="step-card">
           <div class="step-no">02</div>
@@ -367,6 +370,10 @@ ${renderHead({
     <section class="section panel section-panel">
       <h2 class="section-heading">Docs That Matter First</h2>
       <div class="card-grid logo-sequence">
+        <a class="path-card" href="reference/polar-stream-preview.html">
+          <h3>Polar Stream Recorded Preview</h3>
+          <p>Use the Mock Data button to drive the interface and waveform previews from one real 60-second Polar H10 fixture.</p>
+        </a>
         <a class="path-card" href="reference/getting-started.html">
           <h3>Getting Started</h3>
           <p>Real clone URL, prerequisites, first build, and the safest path to a successful local run.</p>
@@ -664,7 +671,7 @@ function renderHeader(topNav, homeHref, searchHref) {
 }
 
 function renderFooter() {
-  return `<footer class="footer" data-pagefind-ignore>PolarH10 WPF app, CLI capture tooling, protocol docs, and Mermaid diagrams. Unofficial project; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
+  return `<footer class="footer" data-pagefind-ignore>PolarH10 native Mac app, Windows WPF app, CLI capture tooling, protocol docs, and diagrams. Unofficial project; not endorsed by or affiliated with Polar Electro Oy.</footer>`;
 }
 
 function renderArt() {

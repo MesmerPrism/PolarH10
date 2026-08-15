@@ -1,31 +1,62 @@
 # PolarH10
 
-> **Unofficial** Windows-first Polar H10 telemetry toolkit for .NET.
+> **Unofficial** Windows and macOS Polar H10 telemetry toolkit.
 > Not affiliated with or endorsed by Polar Electro.
 
-Capture, inspect, and record Polar H10 telemetry on Windows without the Polar
-SDK. Use the WPF app for live monitoring and derived metrics, or the CLI for
-scan, doctor, record, replay, and protocol inspection.
+Capture, inspect, and record Polar H10 telemetry without the Polar SDK. Use the
+native SwiftUI app on macOS, the fuller WPF operator surface on Windows, or the
+Windows CLI for scan, doctor, record, replay, and protocol inspection.
+
+## New: condensed cross-platform stream app
+
+The fork now includes **Polar Stream**, an HTML-driven Tauri/Rust application
+with only three surfaces: Input, Output, and Visualization. Raw ECG and raw ACC
+are the default outputs; LSL and OSC each have one switch; extra metrics are
+added one at a time from a responsive output library. Every built-in metric has
+a recorded Polar H10 outcome preview, concise scientific context, and primary
+citations; time-window and breathing settings recompute the preview live. A
+bounded native math module lets each user-defined formula turn ECG, ACC, HR, or
+RR input into its own scalar LSL/OSC stream and live chart. A signal-variable
+map, built-in templates, insert keyboard with contextual help, and recorded
+before/after chart make the formula module usable without memorizing its
+grammar. Last session and named profiles retain the complete
+output/formula/layout workspace. Its native implementation is split into
+independent protocol, BLE-input, math/DSP, and LSL/OSC-output crates so it can
+be extracted cleanly into a new repository. Stream names use one predictable
+convention (`participant_rawECG`, `participant_rawACC`, and so on), while the
+last accepted name and last successfully connected H10 are remembered between
+launches. See
+[Polar Stream](apps/polar-stream/README.md) and its
+[architecture](apps/polar-stream/ARCHITECTURE.md).
+
+![Real Polar H10 ECG and accelerometer preview loop](docs/assets/polar-stream-recorded-preview.svg)
+
+![Polar Stream output library with recorded RMSSD outcome preview](docs/assets/polar-stream-output-library.png)
+
+![Polar Stream guided formula editor and recorded before/after preview](docs/assets/polar-stream-formula-lab.png)
 
 Start with [Docs Home](docs/index.md) or the live
 [Pages site](https://mesmerprism.github.io/PolarH10/).
 If a public research preview release exists, install it from
 [Download & Install](https://mesmerprism.github.io/PolarH10/reference/download.html).
-The current installer channel is a self-signed Research Preview. The recommended path is the guided `PolarH10-Preview-Setup.exe` helper, which prompts for admin rights, trusts the published `PolarH10.cer` certificate, and opens App Installer for you.
+The current release channel includes a Universal Mac app plus the self-signed
+Windows Research Preview installer.
 
 ## What It Gives You
 
 - **WPF operator surface** for scan, connect, live telemetry, RR-derived coherence review, short-term HRV review, breathing calibration, breathing-dynamics entropy review, diagnostics, and recording
+- **Native Mac operator surface** for CoreBluetooth scan/connect, live HR/RR/ECG/ACC, rolling HRV and coherence, and compatible session capture
 - **CLI capture path** for `scan`, `monitor`, `doctor`, `record`, `replay`, `sessions`, and protocol output
 - **Protocol layer** with C# decoders for ECG, accelerometer, and heart rate / RR intervals
 - **Windows BLE transport** with WinRT scanner, connection, and GATT support
+- **macOS BLE transport** through Apple's CoreBluetooth framework
 - **Session recorder** that writes CSV sensor data plus JSON metadata and JSONL protocol transcripts
 - **GitHub Pages docs** with onboarding guides, troubleshooting, output-file notes, and Mermaid diagrams
 - **Synthetic showcase publication bundle** with committed figures, manifest metadata, and scenario exports for reproducible examples
 
 ## What This Project Is
 
-- A Windows-first direct BLE/GATT workflow for the [Polar H10](https://www.polar.com/en/sensors/h10-heart-rate-sensor).
+- A direct BLE/GATT workflow for the [Polar H10](https://www.polar.com/en/sensors/h10-heart-rate-sensor) on Windows and macOS.
 - A practical operator tool as well as a protocol reference.
 - A source-available way to inspect and record telemetry without taking a dependency on the Polar SDK at runtime.
 
@@ -37,18 +68,17 @@ The current installer channel is a self-signed Research Preview. The recommended
 
 ## Quick Start
 
-### Prerequisites
+### Platform prerequisites
 
-- Windows 10 version 1903 or later
-- .NET 8.0 SDK
 - Bluetooth LE adapter
 - Polar H10 chest strap (firmware 3.x+)
+- macOS 13 or later for the native Mac app
+- Windows 10 version 1903 or later and the .NET 8.0 SDK for Windows source builds
 
 ### Install the packaged app
 
-If you want the Windows installer instead of a source build, use the
-published [Download & Install](https://mesmerprism.github.io/PolarH10/reference/download.html)
-page.
+Use the published [Download & Install](https://mesmerprism.github.io/PolarH10/reference/download.html)
+page for the Universal Mac ZIP or guided Windows installer.
 
 ### Clone, build, and test
 
@@ -60,6 +90,24 @@ dotnet test PolarH10.sln
 ```
 
 ## Choose Your Path
+
+### Use the macOS app
+
+Download `PolarH10-macOS-universal.zip` from the
+[latest release](https://github.com/GeorgeFejer91/PolarH10/releases/latest), or
+run the Swift package from source on a Mac:
+
+```bash
+swift test --package-path macos
+bash tools/macos/build-app.sh 0.1.0
+open artifacts/macos/PolarH10.app
+```
+
+The native Mac preview scans and connects through CoreBluetooth, streams HR,
+RR, ECG, and ACC, computes rolling HRV/coherence metrics, and saves the same
+session file family used elsewhere in the repo. See [Getting Started on
+macOS](docs/platform-guides/macos.md) for installation, permissions, current
+feature scope, and Universal app packaging.
 
 ### Use the WPF app
 
@@ -269,6 +317,24 @@ For a local unsigned packaging check, run:
 powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 -Unsigned
 ```
 
+## macOS app pipeline
+
+The native Mac source lives under `macos/`. The release workflow in
+`.github/workflows/release-macos.yml` tests the portable decoder/analysis core,
+builds the SwiftUI/CoreBluetooth app for both `arm64` and `x86_64`, combines the
+binaries into `PolarH10.app`, and publishes
+`PolarH10-macOS-universal.zip` plus its SHA-256 checksum.
+
+Build the same Universal artifact locally on a Mac with Xcode 15 or later:
+
+```bash
+bash tools/macos/build-app.sh 0.1.0
+open artifacts/macos/PolarH10.app
+```
+
+The public no-budget Mac channel is ad-hoc signed rather than notarized, so the
+first launch requires Control-click > Open or approval in Privacy & Security.
+
 ## Diagram Toolchain
 
 The Mermaid-based diagram pipeline keeps larger operational diagrams in
@@ -288,7 +354,7 @@ npm run diagram:dev
 
 ```mermaid
 flowchart LR
-    R["POLARH10<br/>WINDOWS H10 WORKSPACE"]
+    R["POLARH10<br/>WINDOWS + MACOS WORKSPACE"]
 
     subgraph Source["src/ // runtime code"]
         P1["Protocol<br/>decoders · coherence · HRV · breathing"]
@@ -297,6 +363,12 @@ flowchart LR
         P4["Transport.Windows<br/>scanner · GATT adapters"]
         P5["Cli<br/>windows + synthetic workflows"]
         P6["App<br/>shell · coherence · HRV · dynamics"]
+    end
+
+    subgraph Mac["macos/ // native Mac client"]
+        M1["PolarH10MacCore<br/>PMD decoders · HRV · coherence"]
+        M2["PolarH10Mac<br/>SwiftUI · CoreBluetooth · recording"]
+        M3["MacCoreTests<br/>protocol + analysis parity"]
     end
 
     subgraph Tests["tests/ // verification"]
@@ -324,6 +396,7 @@ flowchart LR
     end
 
     R --> Source
+    R --> Mac
     R --> Tests
     R --> Docs
     R --> Tooling
@@ -334,6 +407,7 @@ flowchart LR
     TL3 --> D3
 
     style Source fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
+    style Mac fill:#EDE8FF,stroke:#7657C8,stroke-width:1.5px;
     style Tests fill:#EFF6E8,stroke:#7DBA44,stroke-width:1.5px;
     style Docs fill:#E8F4FB,stroke:#258ACB,stroke-width:1.5px;
     style Tooling fill:#FFE8D4,stroke:#F28F28,stroke-width:1.5px;
@@ -345,8 +419,10 @@ flowchart LR
     classDef docs fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
     classDef tooling fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef sample fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
+    classDef mac fill:#EDE8FF,stroke:#7657C8,color:#1F2226,stroke-width:1.5px;
     class R hub;
     class P1,P2,P3,P4,P5,P6 source;
+    class M1,M2,M3 mac;
     class T1,T2,T3 tests;
     class D1,D2,D3,D4 docs;
     class TL1,TL2,TL3 tooling;
@@ -405,6 +481,13 @@ flowchart LR
         G3["WaveformChart<br/>live telemetry rendering"]
     end
 
+    subgraph MacClient["NATIVE MACOS CLIENT"]
+        MB["CoreBluetooth<br/>scan · connect · GATT"]
+        MC["PolarH10MacCore<br/>HR · PMD decode · RR analysis"]
+        MG["SwiftUI shell<br/>live charts · capture controls"]
+        MR["Mac session recorder<br/>compatible CSV + JSONL family"]
+    end
+
     PMD --> SE
     CP --> SE
     EC --> SE
@@ -441,6 +524,12 @@ flowchart LR
     BD --> G1
     BD --> G2
     G1 --> G3
+    MB --> MC
+    MC --> MG
+    MC --> MR
+    GID -.-> MC
+    PMD -.-> MC
+    MR -.-> RE
 
     style Protocol fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
     style Transport fill:#EFF6E8,stroke:#7DBA44,stroke-width:1.5px;
@@ -448,6 +537,7 @@ flowchart LR
     style Implementations fill:#E9F1FF,stroke:#258ACB,stroke-width:1.5px;
     style Recording fill:#FFE8D4,stroke:#F28F28,stroke-width:1.5px;
     style Surfaces fill:#FFF4CC,stroke:#F3C333,stroke-width:1.5px;
+    style MacClient fill:#EDE8FF,stroke:#7657C8,stroke-width:1.5px;
 
     classDef core fill:#FFE1D9,stroke:#EC4736,color:#1F2226,stroke-width:1.5px;
     classDef contracts fill:#EEF6E8,stroke:#7DBA44,color:#1F2226,stroke-width:1.5px;
@@ -455,12 +545,14 @@ flowchart LR
     classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
     classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef surface fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
+    classDef mac fill:#EDE8FF,stroke:#7657C8,color:#1F2226,stroke-width:1.5px;
     class EC,AC,HR,CH,HV,BR,BD,PMD,CP,GID core;
     class IS,IC,IG contracts;
     class WB,SB impl;
     class SE,MD active;
     class RE,SD,MA,DR record;
     class C1,G1,G2,G3 surface;
+    class MB,MC,MG,MR mac;
     linkStyle default stroke:#626A72,stroke-width:1.8px;
 ```
 
@@ -488,16 +580,16 @@ flowchart LR
         DACC["AccDecoder<br/>x / y / z mG"]
     end
 
-    subgraph Session["SESSION EVENTS"]
-        SHR["HeartRateReceived"]
-        SECG["EcgFrameReceived"]
-        SACC["AccFrameReceived"]
+    subgraph Session["DECODED SESSION EVENTS"]
+        SHR["heart rate + RR sample"]
+        SECG["ECG frame"]
+        SACC["ACC frame"]
     end
 
     subgraph Output["CONSUMERS"]
-        REC["PolarSessionRecorder<br/>hr.csv · ecg.csv · acc.csv · protocol.jsonl"]
-        CHART["WaveformChart<br/>live telemetry surfaces"]
-        LOG["Runtime logs<br/>WPF + CLI diagnostics"]
+        REC["Session recorder<br/>hr_rr.csv · ecg.csv · acc.csv · protocol.jsonl"]
+        CHART["WPF / SwiftUI charts<br/>live telemetry surfaces"]
+        LOG["Runtime logs<br/>Mac app · WPF · CLI"]
     end
 
     H10 --> ADV

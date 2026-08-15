@@ -45,6 +45,13 @@ flowchart LR
         G3["WaveformChart<br/>live telemetry rendering"]
     end
 
+    subgraph MacClient["NATIVE MACOS CLIENT"]
+        MB["CoreBluetooth<br/>scan · connect · GATT"]
+        MC["PolarH10MacCore<br/>HR · PMD decode · RR analysis"]
+        MG["SwiftUI shell<br/>live charts · capture controls"]
+        MR["Mac session recorder<br/>compatible CSV + JSONL family"]
+    end
+
     PMD --> SE
     CP --> SE
     EC --> SE
@@ -81,6 +88,12 @@ flowchart LR
     BD --> G1
     BD --> G2
     G1 --> G3
+    MB --> MC
+    MC --> MG
+    MC --> MR
+    GID -.-> MC
+    PMD -.-> MC
+    MR -.-> RE
 
     style Protocol fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
     style Transport fill:#EFF6E8,stroke:#7DBA44,stroke-width:1.5px;
@@ -88,6 +101,7 @@ flowchart LR
     style Implementations fill:#E9F1FF,stroke:#258ACB,stroke-width:1.5px;
     style Recording fill:#FFE8D4,stroke:#F28F28,stroke-width:1.5px;
     style Surfaces fill:#FFF4CC,stroke:#F3C333,stroke-width:1.5px;
+    style MacClient fill:#EDE8FF,stroke:#7657C8,stroke-width:1.5px;
 
     classDef core fill:#FFE1D9,stroke:#EC4736,color:#1F2226,stroke-width:1.5px;
     classDef contracts fill:#EEF6E8,stroke:#7DBA44,color:#1F2226,stroke-width:1.5px;
@@ -95,10 +109,12 @@ flowchart LR
     classDef active fill:#1F2226,stroke:#258ACB,color:#FFFDF9,stroke-width:2px;
     classDef record fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef surface fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
+    classDef mac fill:#EDE8FF,stroke:#7657C8,color:#1F2226,stroke-width:1.5px;
     class EC,AC,HR,CH,HV,BR,BD,PMD,CP,GID core;
     class IS,IC,IG contracts;
     class WB,SB impl;
     class SE,MD active;
     class RE,SD,MA,DR record;
     class C1,G1,G2,G3 surface;
+    class MB,MC,MG,MR mac;
     linkStyle default stroke:#626A72,stroke-width:1.8px;

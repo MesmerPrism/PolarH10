@@ -1,9 +1,15 @@
 flowchart TD
-    U["You have a Polar H10 and want data on Windows"]
+    U["You have a Polar H10 and want desktop data"]
 
-    U --> A["Use the WPF app"]
+    U --> M["Use the native Mac app"]
+    U --> A["Use the Windows WPF app"]
     U --> B["Use the CLI"]
     U --> C["Study protocol or integrate code"]
+
+    M --> M1["Scan and connect through CoreBluetooth"]
+    M --> M2["Inspect HR / RR / ECG / ACC"]
+    M --> M3["Review HRV + coherence"]
+    M --> M4["Record the compatible session file family"]
 
     A --> A1["Scan nearby straps"]
     A --> A2["Inspect live HR / ECG / ACC"]
@@ -12,7 +18,7 @@ flowchart TD
     A --> A5["Calibrate breathing when ACC is stable"]
     A --> A6["Track multiple active straps"]
 
-    B --> B1["Run scan and doctor"]
+    B --> B1["Run Windows scan and doctor"]
     B --> B2["Record to CSV + JSONL"]
     B --> B3["Replay saved sessions without hardware"]
 

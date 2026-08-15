@@ -2,7 +2,7 @@
 %% Keep the README version lightweight; push deeper diagrams into docs/diagrams.
 
 flowchart LR
-    R["POLARH10<br/>WINDOWS H10 WORKSPACE"]
+    R["POLARH10<br/>WINDOWS + MACOS WORKSPACE"]
 
     subgraph Source["src/ // runtime code"]
         P1["Protocol<br/>decoders · coherence · HRV · breathing"]
@@ -11,6 +11,12 @@ flowchart LR
         P4["Transport.Windows<br/>scanner · GATT adapters"]
         P5["Cli<br/>windows + synthetic workflows"]
         P6["App<br/>shell · coherence · HRV · dynamics"]
+    end
+
+    subgraph Mac["macos/ // native Mac client"]
+        M1["PolarH10MacCore<br/>PMD decoders · HRV · coherence"]
+        M2["PolarH10Mac<br/>SwiftUI · CoreBluetooth · recording"]
+        M3["MacCoreTests<br/>protocol + analysis parity"]
     end
 
     subgraph Tests["tests/ // verification"]
@@ -38,6 +44,7 @@ flowchart LR
     end
 
     R --> Source
+    R --> Mac
     R --> Tests
     R --> Docs
     R --> Tooling
@@ -48,6 +55,7 @@ flowchart LR
     TL3 --> D3
 
     style Source fill:#FFE7E1,stroke:#EC4736,stroke-width:1.5px;
+    style Mac fill:#EDE8FF,stroke:#7657C8,stroke-width:1.5px;
     style Tests fill:#EFF6E8,stroke:#7DBA44,stroke-width:1.5px;
     style Docs fill:#E8F4FB,stroke:#258ACB,stroke-width:1.5px;
     style Tooling fill:#FFE8D4,stroke:#F28F28,stroke-width:1.5px;
@@ -59,8 +67,10 @@ flowchart LR
     classDef docs fill:#E7F3FA,stroke:#258ACB,color:#1F2226,stroke-width:1.5px;
     classDef tooling fill:#FFE8D4,stroke:#F28F28,color:#1F2226,stroke-width:1.5px;
     classDef sample fill:#FFF4CC,stroke:#F3C333,color:#1F2226,stroke-width:1.5px;
+    classDef mac fill:#EDE8FF,stroke:#7657C8,color:#1F2226,stroke-width:1.5px;
     class R hub;
     class P1,P2,P3,P4,P5,P6 source;
+    class M1,M2,M3 mac;
     class T1,T2,T3 tests;
     class D1,D2,D3,D4 docs;
     class TL1,TL2,TL3 tooling;

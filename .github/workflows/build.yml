@@ -58,3 +58,20 @@ jobs:
 
       - name: Build Pages site
         run: npm run pages:build
+
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test macOS core
+        run: swift test --package-path macos
+
+      - name: Build Universal macOS app
+        run: bash tools/macos/build-app.sh 0.0.0
+
+      - name: Upload macOS app
+        uses: actions/upload-artifact@v4
+        with:
+          name: PolarH10-macOS-universal
+          path: artifacts/macos/PolarH10-macOS-universal.zip

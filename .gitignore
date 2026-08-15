@@ -55,6 +55,15 @@ node_modules/
 /out/
 /.codex-build/
 
+## Swift Package Manager
+**/.build/
+**/.swiftpm/
+
+## Rust / Tauri
+target/
+**/target/
+apps/polar-stream/gen/
+
 ## Local preview and publish scratch
 /artifacts/
 /src/PolarH10.App.Package/AppPackages/

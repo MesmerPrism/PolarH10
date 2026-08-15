@@ -5,9 +5,10 @@
       "title": "Choose Your Path",
       "source": "choose-your-path.mmd",
       "category": "onboarding",
-      "description": "Decision map for the WPF app, CLI, and protocol-first reader paths",
+      "description": "Decision map for the native Mac app, Windows WPF app, CLI, and protocol-first paths",
       "relatedDocs": [
         "../index.md",
+        "../platform-guides/macos.md",
         "../app-overview.md",
         "../coherence-workflow.md",
         "../hrv-workflow.md",
@@ -24,6 +25,7 @@
       "description": "From scan and connection check to a saved session and replay",
       "relatedDocs": [
         "../first-recording.md",
+        "../platform-guides/macos.md",
         "../getting-started.md",
         "../coherence-workflow.md",
         "../hrv-workflow.md",
@@ -40,6 +42,7 @@
       "description": "Top-level organisation of the PolarH10 workspace",
       "relatedDocs": [
         "../index.md",
+        "../platform-guides/macos.md",
         "../app-overview.md",
         "../coherence-workflow.md",
         "../hrv-workflow.md",
@@ -54,6 +57,7 @@
       "description": "Layered subsystem design: protocol, transport, session, consumers",
       "relatedDocs": [
         "../app-overview.md",
+        "../platform-guides/macos.md",
         "../protocol/overview.md",
         "../coherence-workflow.md",
         "../hrv-workflow.md",
@@ -69,6 +73,7 @@
       "description": "Signal path from Polar H10 hardware through decoders to disk and UI",
       "relatedDocs": [
         "../output-formats.md",
+        "../platform-guides/macos.md",
         "../protocol/overview.md"
       ]
     },

@@ -68,6 +68,7 @@ jobs:
           "package_version=$packageVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Validate signing configuration
+        id: signing
         shell: pwsh
         env:
           WINDOWS_PACKAGE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_PACKAGE_CERTIFICATE_BASE64 }}
@@ -82,19 +83,27 @@ jobs:
           }
 
           if ($missing.Count -gt 0) {
-            throw "Missing required release secret(s): $($missing -join ', ')"
+            Write-Warning "Skipping the Windows release because this fork has no signing secrets: $($missing -join ', ')"
+            "ready=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+          else {
+            "ready=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           }
 
       - name: Restore
+        if: steps.signing.outputs.ready == 'true'
         run: dotnet restore PolarH10.sln
 
       - name: Build
+        if: steps.signing.outputs.ready == 'true'
         run: dotnet build PolarH10.sln --no-restore --configuration Release
 
       - name: Test
+        if: steps.signing.outputs.ready == 'true'
         run: dotnet test PolarH10.sln --no-build --configuration Release --verbosity normal
 
       - name: Decode signing certificate
+        if: steps.signing.outputs.ready == 'true'
         id: certificate
         shell: pwsh
         env:
@@ -106,6 +115,7 @@ jobs:
           "path=$certificatePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Build signed Windows preview package
+        if: steps.signing.outputs.ready == 'true'
         shell: pwsh
         env:
           WINDOWS_PACKAGE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_PACKAGE_CERTIFICATE_PASSWORD }}
@@ -135,6 +145,7 @@ jobs:
           & powershell -ExecutionPolicy Bypass -File .\tools\app\Build-App-Package.ps1 @args
 
       - name: Publish preview setup bootstrapper
+        if: steps.signing.outputs.ready == 'true'
         shell: pwsh
         run: |
           & powershell -ExecutionPolicy Bypass -File .\tools\app\Publish-PreviewSetup.ps1 `
@@ -142,6 +153,7 @@ jobs:
             -FileName $env:PREVIEW_SETUP_FILE_NAME
 
       - name: Write SHA256 sums
+        if: steps.signing.outputs.ready == 'true'
         shell: pwsh
         run: |
           $files = @(
@@ -156,12 +168,14 @@ jobs:
             Set-Content -Path (Join-Path $PWD 'artifacts\windows-installer\SHA256SUMS.txt') -Encoding utf8
 
       - name: Upload workflow artifacts
+        if: steps.signing.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: PolarH10-windows-release
           path: artifacts/windows-installer
 
       - name: Publish GitHub release
+        if: steps.signing.outputs.ready == 'true'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -182,10 +196,15 @@ jobs:
           }
           else {
             gh release create $tagName $assets --title $releaseTitle --generate-notes --latest --target $env:GITHUB_SHA
+            if ($LASTEXITCODE -ne 0) {
+              # The macOS release job may have created the shared tag release
+              # between the view and create calls.
+              gh release upload $tagName $assets --clobber
+            }
           }
 
       - name: Remove signing certificate
-        if: always()
+        if: always() && steps.signing.outputs.ready == 'true'
         shell: pwsh
         run: |
           if (Test-Path '${{ steps.certificate.outputs.path }}') {
