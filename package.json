@@ -15,6 +15,7 @@
     "app:signing:preview": "node ./tools/diagrams/invoke-powershell.mjs ../app/New-Preview-SigningCertificate.ps1",
     "ui:preview:capture": "node ./tools/diagrams/invoke-powershell.mjs ../site/capture-wpf-preview.ps1",
     "preview:fixture:test": "node --test ./tools/capture-fixture/test-preview-fixture.cjs",
+    "polar-stream:ui:test": "node --test ./tools/capture-fixture/test-preview-fixture.cjs ./tools/capture-fixture/test-metric-library.cjs",
     "pages:build:site": "node ./tools/site/build-pages.mjs",
     "pages:validate": "node ./tools/site/validate-pages.mjs",
     "pages:index": "pagefind --site site && node ./tools/site/index-pages.mjs",

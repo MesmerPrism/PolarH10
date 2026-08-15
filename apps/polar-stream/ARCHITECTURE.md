@@ -62,6 +62,10 @@ Rules enforced by the crate graph:
 - Adding a built-in metric means registering its descriptor and feeding a
   `MetricValue`; user-defined scalar metrics use `polar-h10-math` and do not
   change BLE acquisition.
+- Hardware-free metric previews are computed in the WebView from the canonical
+  anonymized real-recording fixture. The library metadata owns the short
+  evidence summaries and external citations, while native descriptors remain
+  the authority for IDs, units, suffixes, and runtime values.
 - UI preferences are isolated in `ui/preferences.js`; Bluetooth and output
   crates remain free of WebView storage concerns. Versioned full profiles are
   validated and persisted by the native coordinator to a fixed app-config file.
@@ -101,6 +105,16 @@ dropped; ten consecutive non-finite results fault only that formula. Editing its
 source/expression or reconnecting resets fault/runtime state. Aggregate retained
 DSP state is bounded across all formulas.
 
+The formula editor mirrors this grammar with a restricted browser parser solely
+for hardware-free before/after previews over the recorded fixture. It has no
+access to JavaScript globals, the filesystem, or the network; native validation
+and native execution remain the publishing authority. Duration-based RR
+templates (`rr_mean`, `rr_mean_hr`, `rr_rmssd`, `rr_ln_rmssd`, `rr_sdnn`,
+`rr_pnn50`, `rr_sd1`, and `excitement`) retain 5–300 seconds and are covered by
+cross-checks against the same core `RrTracker` metrics. Fixed-beat-count
+`rmssd` and `pnn50` remain available when count rather than duration is the
+intended definition.
+
 ## Latency policy
 
 1. Decode each BLE notification once in Rust.
@@ -130,7 +144,15 @@ not to the lifetime of the recording.
    `crates/polar-h10-output/src/config.rs`.
 2. Produce the value in the coordinator or a future independent metrics crate.
 3. Add its label to the bootstrap catalog in `apps/polar-stream/src/lib.rs`.
-4. Add a visualization definition only if the value should be chartable.
+4. Add its recorded-data preview, evidence summary, citations, and focused UI
+   test in `ui/metric-library.js`.
+5. Add a visualization definition only if the value should be chartable.
+
+The rolling RR tracker retains at most five minutes. Mean NN, mean HR, RMSSD,
+lnRMSSD, SDNN, pNN50, and Poincaré SD1 use independently persisted 10–300 second
+windows. The Excite-O-Meter output uses a causal rolling baseline so it can be
+published in real time; the UI explicitly distinguishes that adaptation from
+the cited post-session method and labels it experimental.
 
 The two ACC-breathing outputs are derived once per ACC batch after applying the
 selected axes, rolling dominant-axis projection, smoothing, adaptive

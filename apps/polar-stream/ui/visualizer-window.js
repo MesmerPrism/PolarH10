@@ -13,6 +13,13 @@
     },
     heart_rate: { label: "Heart rate", unit: "bpm", rate: 1, color: "#d85151" },
     rr_interval: { label: "RR interval", unit: "ms", rate: 2, color: "#6c62a8" },
+    mean_nn: { label: "Mean NN", unit: "ms", rate: 1, color: "#2b8061" },
+    mean_hr: { label: "Mean heart rate", unit: "bpm", rate: 1, color: "#b05b5b" },
+    ln_rmssd: { label: "lnRMSSD", unit: "ln(ms)", rate: 1, color: "#168259" },
+    sdnn: { label: "SDNN", unit: "ms", rate: 1, color: "#477f66" },
+    pnn50: { label: "pNN50", unit: "%", rate: 1, color: "#367b82" },
+    sd1: { label: "SD1", unit: "ms", rate: 1, color: "#5c7d3a" },
+    excitement_index: { label: "Excite-O-Meter excitement level", unit: "0-1", rate: 1, color: "#b36a22" },
     acc_magnitude: { label: "3D acceleration magnitude", unit: "g", rate: 200, color: "#3b78aa" },
     acc_breathing_waveform: { label: "Breathing magnitude · curve", unit: "0–1", rate: 200, color: "#3b78aa" },
     acc_breathing_circle: { label: "Breathing phase · circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
@@ -303,7 +310,12 @@
     } else if (event.kind === "metrics") {
       buffers.heart_rate.push(event.heartRateBpm ?? event.heart_rate_bpm);
       buffers.rr_interval.pushMany(event.rrIntervalsMs ?? event.rr_intervals_ms);
-      buffers.rmssd.push(event.rmssdMs ?? event.rmssd_ms);
+      const metrics = event.metrics || [];
+      for (const metric of metrics) {
+        const id = String(metric.id || "");
+        if (buffers[id]) buffers[id].push(Number(metric.value));
+      }
+      if (!metrics.length) buffers.rmssd.push(event.rmssdMs ?? event.rmssd_ms);
     } else if (event.kind === "connection") {
       connected = Boolean(event.connected);
       renderConnectionState();

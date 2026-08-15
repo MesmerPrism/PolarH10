@@ -7,12 +7,21 @@
   const NativeChannel = nativeCore?.Channel;
   const preferences = window.PolarPreferences;
   const previewFixtureApi = window.PolarPreviewFixture;
+  const metricLibrary = window.PolarMetricLibrary;
+  const formulaPreview = window.PolarFormulaPreview;
 
   const fallbackCatalog = [
     { id: "raw_ecg", streamSuffix: "rawECG", label: "Raw ECG", detail: "130 Hz · 1 channel", unit: "µV", raw: true, family: "ecg", formula: "ecg", customExpression: "ecg", formulaSource: "ecg" },
     { id: "heart_rate", streamSuffix: "heartRate", label: "Heart rate", detail: "Device-derived", unit: "bpm", raw: false, family: "ecg", formula: "hr", customExpression: "hr", formulaSource: "heartRate" },
     { id: "rr_interval", streamSuffix: "rrInterval", label: "RR interval", detail: "Beat-to-beat interval", unit: "ms", raw: false, family: "ecg", formula: "rr", customExpression: "rr", formulaSource: "rrInterval" },
-    { id: "rmssd", streamSuffix: "rmssd", label: "RMSSD", detail: "Rolling 60-beat window", unit: "ms", raw: false, family: "ecg", formula: "rmssd(rr, 60)", customExpression: "rmssd(rr, 60)", formulaSource: "rrInterval" },
+    { id: "mean_nn", streamSuffix: "meanNN", label: "Mean NN", detail: "Rolling RR window", unit: "ms", raw: false, family: "ecg", formula: "rr_mean(rr, 60)", customExpression: "rr_mean(rr, 60)", formulaSource: "rrInterval" },
+    { id: "mean_hr", streamSuffix: "meanHR", label: "Mean heart rate", detail: "Rolling RR window", unit: "bpm", raw: false, family: "ecg", formula: "rr_mean_hr(rr, 60)", customExpression: "rr_mean_hr(rr, 60)", formulaSource: "rrInterval" },
+    { id: "rmssd", streamSuffix: "rmssd", label: "RMSSD", detail: "Rolling RR window", unit: "ms", raw: false, family: "ecg", formula: "rr_rmssd(rr, 60)", customExpression: "rr_rmssd(rr, 60)", formulaSource: "rrInterval" },
+    { id: "ln_rmssd", streamSuffix: "lnRMSSD", label: "lnRMSSD", detail: "Natural log of rolling RMSSD", unit: "ln(ms)", raw: false, family: "ecg", formula: "rr_ln_rmssd(rr, 60)", customExpression: "rr_ln_rmssd(rr, 60)", formulaSource: "rrInterval" },
+    { id: "sdnn", streamSuffix: "sdnn", label: "SDNN", detail: "Rolling RR window", unit: "ms", raw: false, family: "ecg", formula: "rr_sdnn(rr, 60)", customExpression: "rr_sdnn(rr, 60)", formulaSource: "rrInterval" },
+    { id: "pnn50", streamSuffix: "pnn50", label: "pNN50", detail: "Adjacent RR differences > 50 ms", unit: "%", raw: false, family: "ecg", formula: "rr_pnn50(rr, 60)", customExpression: "rr_pnn50(rr, 60)", formulaSource: "rrInterval" },
+    { id: "sd1", streamSuffix: "sd1", label: "SD1", detail: "Poincaré short axis · RMSSD / √2", unit: "ms", raw: false, family: "ecg", formula: "rr_sd1(rr, 60)", customExpression: "rr_sd1(rr, 60)", formulaSource: "rrInterval" },
+    { id: "excitement_index", streamSuffix: "excitementIndex", label: "Excite-O-Meter excitement level", detail: "Causal rolling-baseline adaptation", unit: "0-1", raw: false, family: "ecg", experimental: true, formula: "excitement(rr, 60)", customExpression: "excitement(rr, 60)", formulaSource: "rrInterval" },
     { id: "raw_acc", streamSuffix: "rawACC", label: "Raw accelerometer", detail: "200 Hz · X, Y, Z", unit: "mg", raw: true, family: "acc", formula: "channels(x, y, z)", customExpression: "", formulaSource: "accelerometer" },
     { id: "acc_magnitude", streamSuffix: "accMagnitude", label: "3D acceleration magnitude", detail: "Device motion · √(x² + y² + z²)", unit: "g", raw: false, family: "acc", formula: "sqrt(x*x + y*y + z*z) / 1000", customExpression: "sqrt(x*x + y*y + z*z) / 1000", formulaSource: "accelerometer" },
     { id: "acc_breathing_magnitude", streamSuffix: "accBreathingMagnitude", label: "Breathing magnitude estimate", detail: "Continuous tunable ACC projection", unit: "normalized / g", raw: false, family: "acc", experimental: true, formula: "breathing_magnitude(x, y, z, true, false, true, 0.75, true, false)", customExpression: "breathing_magnitude(x, y, z, true, false, true, 0.75, true, false)", formulaSource: "accelerometer" },
@@ -48,6 +57,13 @@
     },
     heart_rate: { label: "Heart rate", unit: "bpm", rate: 1, color: "#d85151" },
     rr_interval: { label: "RR interval", unit: "ms", rate: 2, color: "#6c62a8" },
+    mean_nn: { label: "Mean NN", unit: "ms", rate: 1, color: "#2b8061" },
+    mean_hr: { label: "Mean heart rate", unit: "bpm", rate: 1, color: "#b05b5b" },
+    ln_rmssd: { label: "lnRMSSD", unit: "ln(ms)", rate: 1, color: "#168259" },
+    sdnn: { label: "SDNN", unit: "ms", rate: 1, color: "#477f66" },
+    pnn50: { label: "pNN50", unit: "%", rate: 1, color: "#367b82" },
+    sd1: { label: "SD1", unit: "ms", rate: 1, color: "#5c7d3a" },
+    excitement_index: { label: "Excite-O-Meter excitement level", unit: "0-1", rate: 1, color: "#b36a22" },
     acc_magnitude: { label: "3D acceleration magnitude", unit: "g", rate: 200, color: "#3b78aa" },
     acc_breathing_waveform: { parent: "acc_breathing_magnitude", label: "Breathing magnitude · curve", unit: "", rate: 200, color: "#3b78aa" },
     acc_breathing_circle: { parent: "acc_breathing_phase", label: "Breathing phase · circle", unit: "", rate: 60, color: "#3b78aa", kind: "breathing-circle" },
@@ -162,6 +178,12 @@
     "breathing-sensitivity", "breathing-sensitivity-value", "breathing-normalize", "breathing-invert",
     "profile-select", "save-profile-button", "delete-profile-button", "formula-builder", "formula-boxes",
     "formula-empty", "add-custom-formula",
+    "metric-preview", "metric-preview-mark", "metric-preview-title", "metric-preview-detail",
+    "metric-preview-value", "metric-preview-unit", "metric-preview-canvas", "metric-preview-empty",
+    "metric-preview-legend", "metric-preview-note", "metric-window-config", "metric-window-seconds",
+    "metric-window-value", "metric-preview-settings", "metric-preview-summary", "metric-preview-links",
+    "metric-preview-stream", "metric-preview-formula", "preview-use-formula", "metric-add-button",
+    "formula-template-buttons",
   ];
   for (const id of ids) elements[id] = document.getElementById(id);
 
@@ -178,6 +200,10 @@
     visualizerSequence: 0,
     draggedVisualizerId: null,
     metricFamily: "ecg",
+    focusedMetricId: "raw_ecg",
+    dialogOutputs: new Set(),
+    metricSettings: metricLibrary?.normalizeMetricSettings?.() || {},
+    metricSettingsDraft: null,
     breathingConfig: { ...defaultBreathingConfig, axes: [...defaultBreathingConfig.axes] },
     browserBreathing: null,
     breathingPhase: 0,
@@ -231,6 +257,18 @@
       || fallbackCatalog.find((candidate) => candidate.id === metric.id)?.streamSuffix
       || metric.id;
     return base ? `${base}_${suffix}` : `—_${suffix}`;
+  }
+
+  function metricExpression(metric) {
+    let expression = metric.customExpression ?? metric.formula ?? "";
+    if (metricLibrary.knowledge[metric.id]?.windowed && expression) {
+      const seconds = metricLibrary.normalizeMetricSettings(app.metricSettingsDraft || app.metricSettings)[metric.id]?.windowSeconds || 60;
+      expression = expression.replace(
+        /(\b(?:rr_mean|rr_mean_hr|rr_rmssd|rr_ln_rmssd|rr_sdnn|rr_pnn50|rr_sd1|excitement)\(rr,\s*)[\d.]+(\s*\))/,
+        `$1${seconds}$2`,
+      );
+    }
+    return expression;
   }
 
   function normalizeBreathingConfig(value = {}) {
@@ -361,6 +399,7 @@
 
     app.catalog = bootstrap.metricCatalog || fallbackCatalog;
     app.outputs = new Set(bootstrap.config?.outputs || ["raw_ecg", "raw_acc"]);
+    app.metricSettings = metricLibrary?.normalizeMetricSettings?.(bootstrap.config?.metricSettings) || {};
     app.breathingConfig = normalizeBreathingConfig(bootstrap.config?.breathingConfig);
     app.customFormulas = (bootstrap.config?.customFormulas || []).map(normalizeFormulaDraft);
     app.profileSummaries = bootstrap.profiles || [];
@@ -376,21 +415,24 @@
     elements["lsl-toggle"].checked = Boolean(bootstrap.config?.lslEnabled);
     elements["osc-toggle"].checked = Boolean(bootstrap.config?.oscEnabled);
     elements["platform-label"].textContent = String(bootstrap.platform || "local").toUpperCase();
+    try {
+      await loadPreviewRecording();
+      const seconds = app.previewRecording.durationMs / 1000;
+      addActivity(`Real Polar H10 preview fixture ready · ${seconds} second loop`);
+    } catch (error) {
+      app.previewRecordingError = String(error);
+      addActivity(app.previewRecordingError);
+    }
     if (!isNative) {
       prepareMockDataControl();
-      try {
-        await loadPreviewRecording();
-        const seconds = app.previewRecording.durationMs / 1000;
+      if (app.previewRecording) {
         elements["platform-label"].textContent = "RECORDED PREVIEW";
-        addActivity(`Real Polar H10 preview fixture ready · ${seconds} second loop`);
-      } catch (error) {
-        app.previewRecordingError = String(error);
-        addActivity(app.previewRecordingError);
       }
       updateMockDataControl();
     }
 
     renderMetricOptions();
+    renderFormulaTemplates();
     renderFormulaBoxes();
     renderOutputs();
     renderProfileOptions();
@@ -425,6 +467,10 @@
     elements["open-output-dialog"].addEventListener("click", () => {
       syncDialogSelection();
       elements["output-dialog"].showModal();
+      window.requestAnimationFrame(() => {
+        renderMetricPreview();
+        renderAllFormulaPreviews();
+      });
       window.setTimeout(() => elements["metric-search"].focus(), 0);
     });
     elements["output-dialog"].addEventListener("close", () => {
@@ -432,8 +478,8 @@
         app.formulaDrafts = null;
         return;
       }
-      const selected = elements["metric-options"].querySelectorAll(".metric-checkbox:checked");
-      app.outputs = new Set([...selected].map((input) => input.value));
+      app.outputs = new Set(app.dialogOutputs);
+      app.metricSettings = metricLibrary.normalizeMetricSettings(app.metricSettingsDraft);
       app.breathingConfig = readBreathingConfig();
       app.customFormulas = readFormulaCards();
       app.formulaDrafts = null;
@@ -451,14 +497,33 @@
     elements["show-ecg-metrics"].addEventListener("click", () => setMetricFamily("ecg"));
     elements["show-acc-metrics"].addEventListener("click", () => setMetricFamily("acc"));
     elements["metric-search"].addEventListener("input", filterMetricOptions);
+    elements["metric-add-button"].addEventListener("click", toggleFocusedMetric);
+    elements["metric-window-seconds"].addEventListener("input", () => {
+      const settings = metricLibrary.normalizeMetricSettings(app.metricSettingsDraft);
+      settings[app.focusedMetricId] = { windowSeconds: Number(elements["metric-window-seconds"].value) };
+      app.metricSettingsDraft = settings;
+      renderFormulaTemplates();
+      renderMetricPreview();
+    });
+    elements["preview-use-formula"].addEventListener("click", () => {
+      const metric = app.catalog.find((candidate) => candidate.id === app.focusedMetricId);
+      if (!metric || metric.customExpression == null) return;
+      addCustomFormulaFromMetric(metric);
+    });
+    elements["metric-preview-settings"].append(elements["breathing-config"]);
     for (const axis of ["x", "y", "z"]) {
       elements[`breathing-axis-${axis}`].addEventListener("change", () => {
         validateBreathingAxes();
         updateDialogCount();
+        renderMetricPreview();
       });
     }
-    elements["breathing-smoothing"].addEventListener("input", updateBreathingControlLabels);
-    elements["breathing-sensitivity"].addEventListener("input", updateBreathingControlLabels);
+    for (const control of ["breathing-smoothing", "breathing-sensitivity", "breathing-normalize", "breathing-invert"]) {
+      elements[control].addEventListener("input", () => {
+        updateBreathingControlLabels();
+        renderMetricPreview();
+      });
+    }
     registerVisualizer(elements["visualizer-primary"], "primary", app.selectedVisual);
     if (app.pendingWorkspace) applyWorkspaceLayout(app.pendingWorkspace);
     else restoreVisualizerLayout();
@@ -470,6 +535,12 @@
     if (app.pendingWorkspace) applyWorkspaceFractions(app.pendingWorkspace.paneFractions || defaultWorkspaceFractions());
     installVisualizerDeckInteractions();
     visualizerChannel?.addEventListener("message", handleVisualizerChannelMessage);
+    let previewResizeTimer;
+    window.addEventListener("resize", () => {
+      if (!elements["output-dialog"].open) return;
+      window.clearTimeout(previewResizeTimer);
+      previewResizeTimer = window.setTimeout(renderMetricPreview, 100);
+    });
   }
 
   async function scanDevices({ automatic = false } = {}) {
@@ -833,19 +904,56 @@
   function ingestMetrics(event) {
     buffers.heart_rate.push(event.heartRateBpm ?? event.heart_rate_bpm);
     buffers.rr_interval.pushMany(event.rrIntervalsMs ?? event.rr_intervals_ms ?? []);
-    const rmssd = event.rmssdMs ?? event.rmssd_ms;
-    if (rmssd != null) buffers.rmssd.push(rmssd);
+    const samples = event.metrics || [];
+    for (const sample of samples) {
+      const id = String(sample.id || "");
+      if (buffers[id]) buffers[id].push(Number(sample.value));
+    }
+    if (!samples.length) {
+      const rmssd = event.rmssdMs ?? event.rmssd_ms;
+      if (rmssd != null) buffers.rmssd.push(rmssd);
+    }
   }
 
   function updateSampleCounter() {
     elements["sample-counter"].textContent = `${app.sampleCount.toLocaleString()} samples`;
   }
 
+  function renderFormulaTemplates() {
+    const templates = app.catalog.filter((metric) => metric.customExpression != null && metric.id !== "raw_acc");
+    const buttons = templates.map((metric) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `formula-template-button ${metric.family || "ecg"}`;
+      const label = document.createElement("strong");
+      label.textContent = metric.label;
+      const expression = document.createElement("code");
+      expression.textContent = metricExpression(metric);
+      button.title = `Load ${metric.label}: ${expression.textContent}`;
+      button.append(label, expression);
+      button.addEventListener("click", () => addCustomFormulaFromMetric(metric));
+      return button;
+    });
+    elements["formula-template-buttons"].replaceChildren(...buttons);
+  }
+
+  function addCustomFormulaFromMetric(metric) {
+    const family = metric.family || (metric.id.includes("acc") ? "acc" : "ecg");
+    addCustomFormula({
+      name: `${metric.label}_custom`,
+      source: metric.formulaSource || (family === "acc" ? "accelerometer" : "ecg"),
+      expression: metricExpression(metric),
+      unit: metric.unit,
+    });
+  }
+
   function renderMetricOptions() {
     const options = app.catalog.map((metric) => {
-      const label = document.createElement("label");
+      const label = document.createElement("button");
+      label.type = "button";
       const family = metric.family || (metric.id.includes("acc") ? "acc" : "ecg");
       label.className = `metric-option ${family}`;
+      label.dataset.metricId = metric.id;
       label.dataset.family = family;
       label.dataset.search = `${metric.label} ${metric.detail} ${metric.unit} ${metric.streamSuffix}`.toLowerCase();
       const mark = document.createElement("span");
@@ -867,34 +975,10 @@
       const detail = document.createElement("small");
       detail.textContent = `${metric.detail} · ${metric.unit} · _${metric.streamSuffix}`;
       copy.append(nameLine, detail);
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.className = "metric-checkbox";
-      checkbox.value = metric.id;
-      checkbox.addEventListener("change", () => {
-        updateDialogCount();
-        updateBreathingConfigVisibility();
-      });
-      const formulaRow = document.createElement("span");
-      formulaRow.className = "metric-formula";
-      const formulaCode = document.createElement("code");
-      formulaCode.textContent = metric.formula || metric.customExpression || "—";
-      formulaCode.title = metric.formula || "";
-      const useFormula = document.createElement("button");
-      useFormula.type = "button";
-      useFormula.textContent = metric.customExpression === "" ? "Start custom" : "Use as custom";
-      useFormula.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        addCustomFormula({
-          name: metric.id === "raw_acc" ? "Processed_ACC" : `${metric.label}_custom`,
-          source: metric.formulaSource || (family === "acc" ? "accelerometer" : "ecg"),
-          expression: metric.customExpression ?? metric.formula ?? "",
-          unit: metric.unit,
-        });
-      });
-      formulaRow.append(formulaCode, useFormula);
-      label.append(mark, copy, checkbox, formulaRow);
+      const state = document.createElement("span");
+      state.className = "metric-option-state";
+      label.append(mark, copy, state);
+      label.addEventListener("click", () => focusMetric(metric.id));
       return label;
     });
     elements["metric-options"].replaceChildren(...options);
@@ -927,6 +1011,165 @@
     elements["formula-boxes"].replaceChildren(...cards);
     elements["formula-empty"].hidden = cards.length > 0;
     for (const card of cards) void validateFormulaCard(card);
+  }
+
+  function renderAllFormulaPreviews() {
+    for (const card of elements["formula-boxes"].querySelectorAll(".formula-card")) renderFormulaCardPreview(card);
+  }
+
+  function createFormulaAssistant(card, expressionControl, sourceControl) {
+    const assistant = document.createElement("section");
+    assistant.className = "formula-assistant";
+
+    const keyboard = document.createElement("div");
+    keyboard.className = "formula-keyboard";
+    const keyboardHeader = document.createElement("header");
+    const keyboardTitle = document.createElement("strong");
+    keyboardTitle.textContent = "Insert keyboard";
+    const keyboardHint = document.createElement("span");
+    keyboardHint.textContent = "Hover or focus a key to learn what it does";
+    keyboardHeader.append(keyboardTitle, keyboardHint);
+    const keyboardGroups = document.createElement("div");
+    keyboardGroups.className = "formula-keyboard-groups";
+    keyboard.append(keyboardHeader, keyboardGroups);
+
+    const preview = document.createElement("div");
+    preview.className = "formula-card-preview";
+    const previewHeader = document.createElement("header");
+    const previewTitle = document.createElement("strong");
+    previewTitle.textContent = "Recorded before / after";
+    const previewValue = document.createElement("span");
+    previewValue.dataset.previewValue = "";
+    previewValue.textContent = "—";
+    previewHeader.append(previewTitle, previewValue);
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "Recorded formula input and output preview");
+    const previewFooter = document.createElement("footer");
+    const legend = document.createElement("span");
+    legend.className = "formula-preview-legend";
+    legend.innerHTML = '<span><i class="input"></i>Input</span><span><i class="output"></i>Formula output</span>';
+    const note = document.createElement("span");
+    note.dataset.previewNote = "";
+    note.textContent = "Waiting for a valid expression";
+    previewFooter.append(legend, note);
+    preview.append(previewHeader, canvas, previewFooter);
+    assistant.append(keyboard, preview);
+
+    card._formulaControls = { expressionControl, sourceControl, keyboardGroups, canvas, previewValue, note };
+    renderFormulaKeyboard(card);
+    return assistant;
+  }
+
+  function renderFormulaKeyboard(card) {
+    const controls = card._formulaControls;
+    if (!controls) return;
+    const groups = formulaPreview.keypad(controls.sourceControl.value);
+    const groupNames = { variables: "Variables", common: "Operators", functions: "Functions" };
+    controls.keyboardGroups.replaceChildren(...Object.entries(groups).map(([key, entries]) => {
+      const group = document.createElement("section");
+      const title = document.createElement("span");
+      title.textContent = groupNames[key];
+      const keys = document.createElement("div");
+      for (const entry of entries) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = entry.label;
+        button.title = entry.title;
+        button.setAttribute("aria-label", `${entry.label}: ${entry.title}`);
+        button.addEventListener("click", () => insertFormulaText(controls.expressionControl, entry));
+        keys.append(button);
+      }
+      group.append(title, keys);
+      return group;
+    }));
+  }
+
+  function insertFormulaText(control, entry) {
+    const start = control.selectionStart ?? control.value.length;
+    const end = control.selectionEnd ?? start;
+    const selected = control.value.slice(start, end);
+    let insertion = entry.insert;
+    if (selected && /\([A-Za-z]+,/.test(insertion)) {
+      insertion = insertion.replace(/\(([A-Za-z]+),/, `(${selected},`);
+    } else if (selected && insertion.endsWith("()")) {
+      insertion = `${insertion.slice(0, -1)}${selected})`;
+    }
+    control.setRangeText(insertion, start, end, "end");
+    if (!selected && entry.cursorBack) {
+      const position = Math.max(0, control.selectionStart - entry.cursorBack);
+      control.setSelectionRange(position, position);
+    }
+    control.focus();
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function scheduleFormulaCardPreview(card) {
+    window.clearTimeout(card._formulaPreviewTimer);
+    card._formulaPreviewTimer = window.setTimeout(() => renderFormulaCardPreview(card), 100);
+  }
+
+  function renderFormulaCardPreview(card) {
+    const controls = card._formulaControls;
+    if (!controls) return;
+    try {
+      const formula = readFormulaCard(card);
+      const result = formulaPreview.preview(app.previewRecording, formula);
+      controls.previewValue.textContent = Number(result.current).toLocaleString(undefined, { maximumFractionDigits: 3 });
+      controls.note.textContent = result.note;
+      controls.note.title = `${result.inputLabel} (${result.inputUnit})`;
+      card.querySelector(".formula-card-preview").classList.remove("invalid");
+      drawFormulaPreview(controls.canvas, result);
+    } catch (error) {
+      controls.previewValue.textContent = "—";
+      controls.note.textContent = formulaErrorMessage(error);
+      controls.note.title = "";
+      card.querySelector(".formula-card-preview").classList.add("invalid");
+      drawFormulaPreview(controls.canvas, null);
+    }
+  }
+
+  function drawFormulaPreview(canvas, result) {
+    const width = Math.max(1, canvas.clientWidth);
+    const height = Math.max(1, canvas.clientHeight);
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+    context.strokeStyle = "#dfe6e1";
+    context.lineWidth = 1;
+    for (let row = 1; row < 3; row += 1) {
+      context.beginPath();
+      context.moveTo(0, row * height / 3);
+      context.lineTo(width, row * height / 3);
+      context.stroke();
+    }
+    if (!result) return;
+    drawFormulaSeries(context, result.input, width, height, "#9aa8a0");
+    drawFormulaSeries(context, result.output, width, height, "#168259");
+  }
+
+  function drawFormulaSeries(context, samples, width, height, color) {
+    const clean = samples.filter((sample) => Number.isFinite(sample.value));
+    if (!clean.length) return;
+    let low = Math.min(...clean.map((sample) => sample.value));
+    let high = Math.max(...clean.map((sample) => sample.value));
+    if (Math.abs(high - low) < Number.EPSILON) { low -= 1; high += 1; }
+    const first = clean[0].time;
+    const duration = Math.max(Number.EPSILON, clean.at(-1).time - first);
+    const stride = Math.max(1, Math.floor(clean.length / Math.max(1, width * 1.5)));
+    context.beginPath();
+    context.strokeStyle = color;
+    context.lineWidth = color === "#168259" ? 1.6 : 1;
+    for (let index = 0; index < clean.length; index += stride) {
+      const sample = clean[index];
+      const x = (sample.time - first) / duration * width;
+      const y = height - 5 - (sample.value - low) / (high - low) * (height - 10);
+      if (index === 0) context.moveTo(x, y); else context.lineTo(x, y);
+    }
+    context.stroke();
   }
 
   function createFormulaCard(formula) {
@@ -1002,7 +1245,8 @@
     const statusState = document.createElement("strong");
     statusState.textContent = formula.enabled ? "Checking…" : "Draft disabled";
     status.append(statusMessage, statusState);
-    card.append(header, fields, status);
+    const assistant = createFormulaAssistant(card, expressionField.control, sourceField.control);
+    card.append(header, fields, assistant, status);
 
     const schedule = () => {
       const value = readFormulaCard(card);
@@ -1011,13 +1255,17 @@
       enabled.setAttribute("aria-label", `Enable ${value.name || "formula"}`);
       window.clearTimeout(app.formulaValidationTimers.get(value.id));
       app.formulaValidationTimers.set(value.id, window.setTimeout(() => void validateFormulaCard(card), 220));
+      scheduleFormulaCardPreview(card);
       updateDialogCount();
     };
     for (const input of card.querySelectorAll("input, select, textarea")) input.addEventListener("input", schedule);
     enabled.addEventListener("change", schedule);
     sourceField.control.addEventListener("change", () => {
       statusMessage.textContent = `Variables: ${sourceDetails[sourceField.control.value].variables}`;
+      renderFormulaKeyboard(card);
+      scheduleFormulaCardPreview(card);
     });
+    scheduleFormulaCardPreview(card);
     return card;
   }
 
@@ -1126,26 +1374,55 @@
   }
 
   function syncDialogSelection() {
-    elements["metric-options"].querySelectorAll(".metric-checkbox").forEach((input) => {
-      input.checked = app.outputs.has(input.value);
-    });
+    app.dialogOutputs = new Set(app.outputs);
+    app.metricSettingsDraft = metricLibrary.normalizeMetricSettings(app.metricSettings);
     syncBreathingControls();
     app.formulaDrafts = app.customFormulas.map((formula) => ({ ...formula }));
+    renderFormulaTemplates();
     renderFormulaBoxes();
     elements["metric-search"].value = "";
     filterMetricOptions();
-    updateBreathingConfigVisibility();
+    updateMetricOptionStates();
+    renderMetricPreview();
     updateDialogCount();
   }
 
   function updateDialogCount() {
-    const selected = [...elements["metric-options"].querySelectorAll(".metric-checkbox:checked")];
     const custom = elements["formula-boxes"].querySelectorAll('.formula-card [data-field="enabled"]:checked').length;
+    const selected = [...app.dialogOutputs];
+    const ecgCount = selected.filter((id) => app.catalog.find((metric) => metric.id === id)?.family === "ecg").length;
+    const accCount = selected.filter((id) => app.catalog.find((metric) => metric.id === id)?.family === "acc").length;
     const count = selected.length + custom;
-    const ecgCount = selected.filter((input) => input.closest(".metric-option")?.dataset.family === "ecg").length;
-    const accCount = count - ecgCount;
     elements["dialog-selection-count"].textContent = `${count} selected`;
     elements["dialog-selection-detail"].textContent = `${ecgCount} ECG · ${accCount} ACC · ${custom} custom`;
+  }
+
+  function updateMetricOptionStates() {
+    for (const option of elements["metric-options"].querySelectorAll(".metric-option")) {
+      const active = option.dataset.metricId === app.focusedMetricId;
+      const added = app.dialogOutputs.has(option.dataset.metricId);
+      option.classList.toggle("active", active);
+      option.classList.toggle("added", added);
+      option.setAttribute("aria-pressed", String(active));
+      option.querySelector(".metric-option-state").textContent = added ? "Added" : "Preview";
+    }
+  }
+
+  function focusMetric(metricId) {
+    if (!app.catalog.some((metric) => metric.id === metricId)) return;
+    app.focusedMetricId = metricId;
+    updateMetricOptionStates();
+    updateBreathingConfigVisibility();
+    renderMetricPreview();
+  }
+
+  function toggleFocusedMetric() {
+    if (app.dialogOutputs.has(app.focusedMetricId)) app.dialogOutputs.delete(app.focusedMetricId);
+    else app.dialogOutputs.add(app.focusedMetricId);
+    updateMetricOptionStates();
+    updateDialogCount();
+    validateBreathingAxes();
+    renderMetricPreview();
   }
 
   function setMetricFamily(family) {
@@ -1162,8 +1439,13 @@
     elements["metric-family-description"].textContent = isAcc
       ? "Keep this set small and verify breathing outputs against a reference sensor."
       : "Start here for the H10's established electrical and beat-to-beat signals.";
+    const focused = app.catalog.find((metric) => metric.id === app.focusedMetricId);
+    if (focused?.family !== app.metricFamily) {
+      app.focusedMetricId = app.catalog.find((metric) => metric.family === app.metricFamily)?.id || app.focusedMetricId;
+    }
     filterMetricOptions();
-    updateBreathingConfigVisibility();
+    updateMetricOptionStates();
+    renderMetricPreview();
   }
 
   function filterMetricOptions() {
@@ -1176,7 +1458,14 @@
     }
     elements["metric-result-count"].textContent = `${visible} ${app.metricFamily.toUpperCase()} metric${visible === 1 ? "" : "s"}`;
     elements["metric-empty-search"].hidden = visible !== 0;
+    const focusedOption = elements["metric-options"].querySelector(`[data-metric-id="${app.focusedMetricId}"]`);
+    if (visible && focusedOption?.hidden) {
+      const firstVisible = [...elements["metric-options"].querySelectorAll(".metric-option")].find((option) => !option.hidden);
+      if (firstVisible) app.focusedMetricId = firstVisible.dataset.metricId;
+    }
     updateBreathingConfigVisibility();
+    updateMetricOptionStates();
+    renderMetricPreview();
   }
 
   function syncBreathingControls() {
@@ -1204,9 +1493,7 @@
   }
 
   function validateBreathingAxes() {
-    const breathingSelected = breathingOutputIds.some((id) => (
-      elements["metric-options"].querySelector(`input[value="${id}"]`)?.checked
-    ));
+    const breathingSelected = breathingOutputIds.some((id) => app.dialogOutputs.has(id));
     const axisCount = ["x", "y", "z"].filter((axis) => elements[`breathing-axis-${axis}`].checked).length;
     const invalid = breathingSelected && axisCount < 2;
     elements["breathing-axis-error"].closest("fieldset").classList.toggle("invalid", invalid);
@@ -1220,15 +1507,108 @@
   }
 
   function updateBreathingConfigVisibility() {
-    const selected = breathingOutputIds.some((id) => (
-      elements["metric-options"].querySelector(`input[value="${id}"]`)?.checked
-    ));
-    const query = elements["metric-search"].value.trim().toLowerCase();
-    const classifierMatches = !query || "breathing magnitude estimate continuous curve phase classifier inhale pause exhale tunable acc projection".includes(query);
-    const visible = app.metricFamily === "acc" && selected && classifierMatches;
+    const visible = breathingOutputIds.includes(app.focusedMetricId);
     elements["breathing-config"].hidden = !visible;
-    elements["breathing-config"].closest(".metric-scroll").classList.toggle("with-config", visible);
     validateBreathingAxes();
+  }
+
+  function renderMetricPreview() {
+    const metric = app.catalog.find((candidate) => candidate.id === app.focusedMetricId);
+    if (!metric || !elements["metric-preview"]) return;
+    const knowledge = metricLibrary.knowledge[metric.id] || { summary: "This output is available to downstream tools.", citations: [] };
+    const family = metric.family || (metric.id.includes("acc") ? "acc" : "ecg");
+    elements["metric-preview"].dataset.family = family;
+    elements["metric-preview-mark"].textContent = metric.raw ? "RAW" : family.toUpperCase();
+    elements["metric-preview-title"].textContent = metric.label;
+    elements["metric-preview-detail"].textContent = `${metric.detail} · ${metric.unit}`;
+    elements["metric-preview-unit"].textContent = metric.unit;
+    elements["metric-preview-summary"].textContent = knowledge.summary;
+    elements["metric-preview-stream"].textContent = streamOutputName(metric, elements["stream-name"].value);
+    elements["metric-preview-formula"].textContent = metricExpression(metric) || metric.formula || "Start from a source variable";
+    elements["metric-preview-links"].replaceChildren(...knowledge.citations.map((citation, index) => {
+      const link = document.createElement("a");
+      link.href = citation.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = `${index + 1}. ${citation.label}`;
+      return link;
+    }));
+
+    const settings = metricLibrary.normalizeMetricSettings(app.metricSettingsDraft || app.metricSettings);
+    const windowed = Boolean(knowledge.windowed);
+    elements["metric-window-config"].hidden = !windowed;
+    if (windowed) {
+      const seconds = settings[metric.id]?.windowSeconds || 60;
+      elements["metric-window-seconds"].value = String(seconds);
+      elements["metric-window-value"].textContent = `${seconds} s`;
+    }
+    updateBreathingConfigVisibility();
+
+    const canCustomize = metric.customExpression != null;
+    elements["preview-use-formula"].hidden = !canCustomize;
+    elements["preview-use-formula"].textContent = metric.customExpression === "" ? "Start custom formula" : "Use as custom formula";
+    const added = app.dialogOutputs.has(metric.id);
+    elements["metric-add-button"].textContent = added ? "Remove output" : "＋ Add this output";
+    elements["metric-add-button"].classList.toggle("remove", added);
+
+    const preview = metricLibrary.preview(app.previewRecording, metric.id, settings, readBreathingConfig());
+    elements["metric-preview-note"].textContent = preview.note || "Recorded Polar H10 data";
+    elements["metric-preview-empty"].hidden = preview.series.length > 0;
+    const digits = metric.unit === "µV" || metric.unit === "mg" ? 0 : ["0-1", "g", "ln(ms)"].includes(metric.unit) ? 3 : 1;
+    elements["metric-preview-value"].textContent = Number.isFinite(preview.current) ? Number(preview.current).toFixed(digits) : "—";
+    elements["metric-preview-legend"].replaceChildren(...preview.series.map((series) => {
+      const item = document.createElement("span");
+      const line = document.createElement("i");
+      line.style.background = series.color;
+      item.append(line, document.createTextNode(series.label));
+      return item;
+    }));
+    drawMetricPreview(preview);
+  }
+
+  function drawMetricPreview(preview) {
+    const canvas = elements["metric-preview-canvas"];
+    const width = Math.max(1, canvas.clientWidth);
+    const height = Math.max(1, canvas.clientHeight);
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+    context.strokeStyle = "#dfe6e1";
+    context.lineWidth = 1;
+    for (let row = 1; row < 4; row += 1) {
+      context.beginPath();
+      context.moveTo(0, row * height / 4);
+      context.lineTo(width, row * height / 4);
+      context.stroke();
+    }
+    const values = preview.series.flatMap((series) => series.values).filter(Number.isFinite);
+    if (!values.length) return;
+    let low = Math.min(...values);
+    let high = Math.max(...values);
+    if (Math.abs(high - low) < Number.EPSILON) { low -= 1; high += 1; }
+    const times = preview.series.flatMap((series) => series.times || []);
+    const firstTime = times.length ? Math.min(...times) : 0;
+    const lastTime = times.length ? Math.max(...times) : 1;
+    const timeSpan = Math.max(Number.EPSILON, lastTime - firstTime);
+    for (const series of preview.series) {
+      const stride = Math.max(1, Math.floor(series.values.length / Math.max(1, width * 2)));
+      context.beginPath();
+      context.strokeStyle = series.color;
+      context.lineWidth = 1.5;
+      let started = false;
+      for (let index = 0; index < series.values.length; index += stride) {
+        const value = series.values[index];
+        if (!Number.isFinite(value)) continue;
+        const time = series.times?.[index] ?? index;
+        const x = (time - firstTime) / timeSpan * width;
+        const y = height - 7 - (value - low) / (high - low) * (height - 14);
+        if (!started) { context.moveTo(x, y); started = true; } else context.lineTo(x, y);
+      }
+      context.stroke();
+    }
   }
 
   function renderOutputs() {
@@ -1845,6 +2225,7 @@
       lslEnabled: elements["lsl-toggle"].checked,
       oscEnabled: elements["osc-toggle"].checked,
       outputs: [...app.outputs],
+      metricSettings: metricLibrary.normalizeMetricSettings(app.metricSettings),
       breathingConfig: app.breathingConfig,
       customFormulas: app.customFormulas.map((formula) => ({ ...formula })),
     };
@@ -1945,6 +2326,7 @@
   async function applyWorkspaceProfile(profile) {
     const config = profile.outputConfig || {};
     app.outputs = new Set(config.outputs || []);
+    app.metricSettings = metricLibrary.normalizeMetricSettings(config.metricSettings);
     app.breathingConfig = normalizeBreathingConfig(config.breathingConfig);
     app.customFormulas = (config.customFormulas || []).map(normalizeFormulaDraft);
     app.streamName = normalizeStreamBase(config.streamName) || "Polar-H10";

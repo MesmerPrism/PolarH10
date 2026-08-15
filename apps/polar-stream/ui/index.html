@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="preferences.js" defer></script>
     <script src="preview-fixture.js" defer></script>
+    <script src="metric-library.js" defer></script>
+    <script src="formula-preview.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -264,7 +266,72 @@
           </div>
         </div>
         <div class="metric-scroll">
-          <div class="metric-options" id="metric-options"></div>
+          <div class="metric-library-layout">
+            <div class="metric-browser">
+              <div class="metric-options" id="metric-options"></div>
+              <div class="metric-empty-search" id="metric-empty-search" hidden>
+                <strong>No matching metrics</strong>
+                <span>Try a broader search within this family.</span>
+              </div>
+            </div>
+
+            <aside class="metric-preview" id="metric-preview" aria-live="polite">
+              <header class="metric-preview-header">
+                <span class="metric-preview-mark" id="metric-preview-mark">ECG</span>
+                <div>
+                  <p class="eyebrow">Outcome preview</p>
+                  <h3 id="metric-preview-title">Raw ECG</h3>
+                  <span id="metric-preview-detail">130 Hz · 1 channel · µV</span>
+                </div>
+                <div class="metric-preview-value">
+                  <strong id="metric-preview-value">—</strong>
+                  <span id="metric-preview-unit">µV</span>
+                </div>
+              </header>
+
+              <div class="metric-preview-chart">
+                <canvas id="metric-preview-canvas" role="img" aria-label="Recorded output preview"></canvas>
+                <div class="metric-preview-empty" id="metric-preview-empty" hidden>
+                  <strong>Preview unavailable</strong>
+                  <span>The recorded fixture could not be loaded.</span>
+                </div>
+              </div>
+              <div class="metric-preview-caption">
+                <span id="metric-preview-legend"></span>
+                <span id="metric-preview-note">Recorded Polar H10 data</span>
+              </div>
+
+              <section class="metric-window-config" id="metric-window-config" hidden>
+                <label for="metric-window-seconds">
+                  <span><strong>Rolling time window</strong><output id="metric-window-value">60 s</output></span>
+                  <input id="metric-window-seconds" type="range" min="10" max="300" step="10" value="60" />
+                  <small>Move the control to see this exact output recomputed from the recording.</small>
+                </label>
+              </section>
+
+              <div class="metric-preview-settings" id="metric-preview-settings"></div>
+
+              <section class="metric-context" aria-labelledby="metric-context-title">
+                <p class="eyebrow" id="metric-context-title">What it is · what the evidence supports</p>
+                <p id="metric-preview-summary"></p>
+                <div class="metric-preview-links" id="metric-preview-links"></div>
+              </section>
+
+              <div class="metric-output-example">
+                <span>Published stream</span>
+                <code id="metric-preview-stream">Polar-H10_rawECG</code>
+              </div>
+              <div class="metric-output-example metric-formula-example">
+                <span>Equivalent formula</span>
+                <code id="metric-preview-formula">ecg</code>
+              </div>
+
+              <footer class="metric-preview-actions">
+                <button class="secondary-button compact" id="preview-use-formula" type="button">Use as custom formula</button>
+              </footer>
+            </aside>
+          </div>
+
           <section class="formula-builder" id="formula-builder" aria-labelledby="formula-builder-title">
             <header>
               <div>
@@ -273,12 +340,29 @@
               </div>
               <button class="secondary-button compact" id="add-custom-formula" type="button">＋ New formula</button>
             </header>
-            <p class="formula-intro">Each expression produces one scalar LSL/OSC stream at its source rate. Formulas run in the native bounded DSP engine.</p>
+            <p class="formula-intro">Build one scalar output at a time with templates or the insert keyboard, then compare the input and result on the recorded Polar H10 data before applying it. Time is always the chart's x-axis; the expression computes the output y-value.</p>
+            <div class="formula-onboarding">
+              <section class="formula-variable-map" aria-labelledby="formula-variable-map-title">
+                <header><strong id="formula-variable-map-title">Signal variable map</strong><span>Choose one source clock per formula</span></header>
+                <div>
+                  <article><code>ecg</code><span>ECG amplitude · µV · 130 Hz</span></article>
+                  <article><code>x y z</code><span>ACC axes · mg · 200 Hz</span></article>
+                  <article><code>hr</code><span>Device heart rate · bpm · event rate</span></article>
+                  <article><code>rr</code><span>Beat interval · ms · HRV source</span></article>
+                </div>
+                <p>You do not provide an x-coordinate: sample or event time is retained automatically. For example, RMSSD uses the history of <code>rr</code>, not ECG amplitude.</p>
+              </section>
+              <section class="formula-templates" aria-labelledby="formula-templates-title">
+                <header><strong id="formula-templates-title">Load a working metric</strong><span>Formula + preview + editable settings</span></header>
+                <div id="formula-template-buttons"></div>
+              </section>
+            </div>
             <details class="formula-help">
               <summary>Formula syntax &amp; DSP functions</summary>
               <p><code>+ - * / % ^</code> · comparisons · <code>&amp;&amp; || !</code> · constants <code>pi</code>, <code>e</code> · lazy <code>if(condition, yes, no)</code></p>
-              <p><strong>Math:</strong> <code>abs sqrt cbrt exp ln log10 sin cos tan asin acos atan atan2 pow min max clamp floor ceil round sign</code></p>
-              <p><strong>DSP:</strong> <code>delay moving_mean moving_rms moving_std zscore ema lowpass highpass bandpass derivative integral</code>. Add <code>_n</code> to moving/z-score functions for sample-count windows; <code>rmssd(rr, count)</code> is available for RR.</p>
+              <p><strong>Math:</strong> <code>abs sqrt cbrt exp ln log10 sin cos tan asin acos atan atan2 pow min max clamp floor ceil round sign normal_cdf</code></p>
+              <p><strong>Sampled DSP:</strong> <code>delay moving_mean moving_rms moving_std zscore ema lowpass highpass bandpass derivative integral</code>. Add <code>_n</code> for sample-count windows.</p>
+              <p><strong>RR metrics:</strong> <code>rr_mean rr_mean_hr rr_rmssd rr_ln_rmssd rr_sdnn rr_pnn50 rr_sd1 excitement</code> take <code>(rr, seconds)</code>; <code>rmssd</code> and <code>pnn50</code> take <code>(rr, beat_count)</code>.</p>
             </details>
             <div class="formula-boxes" id="formula-boxes"></div>
             <div class="formula-empty" id="formula-empty">
@@ -340,17 +424,16 @@
               <span><i class="circle-icon" aria-hidden="true"></i> Three-state phase</span>
             </div>
           </section>
-          <div class="metric-empty-search" id="metric-empty-search" hidden>
-            <strong>No matching metrics</strong>
-            <span>Try a broader search within this family.</span>
-          </div>
         </div>
         <footer>
           <div class="selection-summary">
             <strong id="dialog-selection-count">2 selected</strong>
             <span id="dialog-selection-detail">1 ECG · 1 ACC</span>
           </div>
-          <button class="primary-button compact" value="confirm">Apply outputs</button>
+          <div class="dialog-footer-actions">
+            <button class="primary-button compact metric-add-button" id="metric-add-button" type="button">＋ Add this output</button>
+            <button class="primary-button compact" value="confirm">Apply outputs</button>
+          </div>
         </footer>
       </form>
     </dialog>

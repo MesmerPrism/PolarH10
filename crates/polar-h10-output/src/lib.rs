@@ -7,8 +7,9 @@ mod osc;
 use std::{collections::HashMap, sync::Mutex};
 
 pub use config::{
-    BreathingConfig, CustomFormulaConfig, FormulaHealth, FormulaSource, MetricSpec, OutputConfig,
-    OutputHealth, custom_output_stream_name, normalize_stream_base, output_stream_name,
+    BreathingConfig, CustomFormulaConfig, FormulaHealth, FormulaSource, MetricSettings, MetricSpec,
+    OutputConfig, OutputHealth, custom_output_stream_name, normalize_stream_base,
+    output_stream_name,
 };
 use lsl::LslPublisher;
 use osc::{OSC_TARGET, OscPublisher};

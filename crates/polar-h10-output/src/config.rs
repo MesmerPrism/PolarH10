@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 pub use polar_h10_math::{CustomFormulaConfig, FormulaSource};
@@ -9,6 +11,8 @@ pub struct OutputConfig {
     pub lsl_enabled: bool,
     pub osc_enabled: bool,
     pub outputs: Vec<String>,
+    #[serde(default)]
+    pub metric_settings: HashMap<String, MetricSettings>,
     #[serde(default)]
     pub breathing_config: BreathingConfig,
     #[serde(default)]
@@ -22,6 +26,7 @@ impl Default for OutputConfig {
             lsl_enabled: false,
             osc_enabled: false,
             outputs: vec!["raw_ecg".into(), "raw_acc".into()],
+            metric_settings: HashMap::new(),
             breathing_config: BreathingConfig::default(),
             custom_formulas: Vec::new(),
         }
@@ -34,6 +39,10 @@ impl OutputConfig {
         self.outputs.sort();
         self.outputs.dedup();
         self.outputs.retain(|id| MetricSpec::for_id(id).is_some());
+        self.metric_settings.retain(|id, _| uses_rr_window(id));
+        for settings in self.metric_settings.values_mut() {
+            *settings = settings.normalized();
+        }
         self.breathing_config = self.breathing_config.normalized();
         if self.custom_formulas.len() > polar_h10_math::MAX_FORMULAS {
             return Err(format!(
@@ -77,6 +86,49 @@ impl OutputConfig {
 
     pub(crate) fn includes(&self, id: &str) -> bool {
         self.outputs.iter().any(|candidate| candidate == id)
+    }
+
+    pub fn metric_window_seconds(&self, id: &str) -> f32 {
+        self.metric_settings
+            .get(id)
+            .copied()
+            .unwrap_or_default()
+            .window_seconds
+    }
+}
+
+fn uses_rr_window(id: &str) -> bool {
+    matches!(
+        id,
+        "mean_nn"
+            | "mean_hr"
+            | "rmssd"
+            | "ln_rmssd"
+            | "sdnn"
+            | "pnn50"
+            | "sd1"
+            | "excitement_index"
+    )
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MetricSettings {
+    pub window_seconds: f32,
+}
+
+impl Default for MetricSettings {
+    fn default() -> Self {
+        Self {
+            window_seconds: 60.0,
+        }
+    }
+}
+
+impl MetricSettings {
+    fn normalized(mut self) -> Self {
+        self.window_seconds = self.window_seconds.clamp(10.0, 300.0);
+        self
     }
 }
 
@@ -155,7 +207,7 @@ pub struct MetricSpec {
 }
 
 impl MetricSpec {
-    pub fn all() -> [Self; 8] {
+    pub fn all() -> [Self; 15] {
         [
             Self::for_id("raw_ecg").expect("known metric"),
             Self::for_id("raw_acc").expect("known metric"),
@@ -164,7 +216,14 @@ impl MetricSpec {
             Self::for_id("acc_magnitude").expect("known metric"),
             Self::for_id("acc_breathing_magnitude").expect("known metric"),
             Self::for_id("acc_breathing_phase").expect("known metric"),
+            Self::for_id("mean_nn").expect("known metric"),
+            Self::for_id("mean_hr").expect("known metric"),
             Self::for_id("rmssd").expect("known metric"),
+            Self::for_id("ln_rmssd").expect("known metric"),
+            Self::for_id("sdnn").expect("known metric"),
+            Self::for_id("pnn50").expect("known metric"),
+            Self::for_id("sd1").expect("known metric"),
+            Self::for_id("excitement_index").expect("known metric"),
         ]
     }
 
@@ -241,6 +300,69 @@ impl MetricSpec {
                 channels: 1,
                 rate_hz: 0.0,
                 suffix: "rmssd",
+            },
+            "mean_nn" => Self {
+                id: "mean_nn",
+                label: "Mean-NN",
+                stream_type: "HRV",
+                unit: "milliseconds",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "meanNN",
+            },
+            "mean_hr" => Self {
+                id: "mean_hr",
+                label: "Mean-HR",
+                stream_type: "HRV",
+                unit: "bpm",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "meanHR",
+            },
+            "ln_rmssd" => Self {
+                id: "ln_rmssd",
+                label: "lnRMSSD",
+                stream_type: "HRV",
+                unit: "ln-ms",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "lnRMSSD",
+            },
+            "sdnn" => Self {
+                id: "sdnn",
+                label: "SDNN",
+                stream_type: "HRV",
+                unit: "milliseconds",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "sdnn",
+            },
+            "pnn50" => Self {
+                id: "pnn50",
+                label: "pNN50",
+                stream_type: "HRV",
+                unit: "percent",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "pNN50",
+            },
+            "sd1" => Self {
+                id: "sd1",
+                label: "SD1",
+                stream_type: "HRV",
+                unit: "milliseconds",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "sd1",
+            },
+            "excitement_index" => Self {
+                id: "excitement_index",
+                label: "Excite-O-Meter-index",
+                stream_type: "ExperimentalArousal",
+                unit: "score-0-1",
+                channels: 1,
+                rate_hz: 0.0,
+                suffix: "excitementIndex",
             },
             _ => return None,
         })
@@ -333,6 +455,33 @@ mod tests {
         assert_eq!(config.breathing_config.sensitivity, 0.0);
         assert!(!config.breathing_config.normalize);
         assert!(config.breathing_config.invert);
+    }
+
+    #[test]
+    fn metric_windows_are_scoped_to_windowed_rr_outputs_and_clamped() {
+        let config = OutputConfig {
+            metric_settings: HashMap::from([
+                (
+                    "rmssd".into(),
+                    MetricSettings {
+                        window_seconds: 4.0,
+                    },
+                ),
+                (
+                    "raw_ecg".into(),
+                    MetricSettings {
+                        window_seconds: 90.0,
+                    },
+                ),
+            ]),
+            ..OutputConfig::default()
+        }
+        .normalized()
+        .unwrap();
+
+        assert_eq!(config.metric_window_seconds("rmssd"), 10.0);
+        assert!(!config.metric_settings.contains_key("raw_ecg"));
+        assert_eq!(config.metric_window_seconds("sdnn"), 60.0);
     }
 
     #[test]

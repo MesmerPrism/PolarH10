@@ -12,18 +12,28 @@ Windows CLI for scan, doctor, record, replay, and protocol inspection.
 The fork now includes **Polar Stream**, an HTML-driven Tauri/Rust application
 with only three surfaces: Input, Output, and Visualization. Raw ECG and raw ACC
 are the default outputs; LSL and OSC each have one switch; extra metrics are
-added from one compact output library. A bounded native math module lets each
-user-defined formula turn ECG, ACC, HR, or RR input into its own scalar LSL/OSC
-stream and live chart. Last session and named profiles retain the complete
+added one at a time from a responsive output library. Every built-in metric has
+a recorded Polar H10 outcome preview, concise scientific context, and primary
+citations; time-window and breathing settings recompute the preview live. A
+bounded native math module lets each user-defined formula turn ECG, ACC, HR, or
+RR input into its own scalar LSL/OSC stream and live chart. A signal-variable
+map, built-in templates, insert keyboard with contextual help, and recorded
+before/after chart make the formula module usable without memorizing its
+grammar. Last session and named profiles retain the complete
 output/formula/layout workspace. Its native implementation is split into
-independent protocol, BLE-input, math/DSP, and LSL/OSC-output crates so it can be
-extracted cleanly into a new repository. Stream names use one predictable convention
-(`participant_rawECG`, `participant_rawACC`, and so on), while the last accepted
-name and last successfully connected H10 are remembered between launches. See
+independent protocol, BLE-input, math/DSP, and LSL/OSC-output crates so it can
+be extracted cleanly into a new repository. Stream names use one predictable
+convention (`participant_rawECG`, `participant_rawACC`, and so on), while the
+last accepted name and last successfully connected H10 are remembered between
+launches. See
 [Polar Stream](apps/polar-stream/README.md) and its
 [architecture](apps/polar-stream/ARCHITECTURE.md).
 
 ![Real Polar H10 ECG and accelerometer preview loop](docs/assets/polar-stream-recorded-preview.svg)
+
+![Polar Stream output library with recorded RMSSD outcome preview](docs/assets/polar-stream-output-library.png)
+
+![Polar Stream guided formula editor and recorded before/after preview](docs/assets/polar-stream-formula-lab.png)
 
 Start with [Docs Home](docs/index.md) or the live
 [Pages site](https://mesmerprism.github.io/PolarH10/).

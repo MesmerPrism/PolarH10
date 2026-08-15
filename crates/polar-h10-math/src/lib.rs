@@ -20,6 +20,7 @@ pub const MAX_AST_NODES: usize = 256;
 pub const MAX_AST_DEPTH: usize = 32;
 pub const MAX_STATEFUL_CALLS: usize = 16;
 pub const MAX_WINDOW_SECONDS: f64 = 60.0;
+pub const MAX_RR_WINDOW_SECONDS: f64 = 300.0;
 pub const MAX_COUNT_WINDOW: usize = 4_096;
 pub const MAX_TOTAL_STATE_SAMPLES: usize = 1_000_000;
 const MAX_OPERATIONS_PER_SAMPLE: usize = 512;
@@ -847,6 +848,14 @@ fn validate_node(
                     node.span,
                 ));
             }
+            if specification.rr_only && config.source != FormulaSource::RrInterval {
+                return Err(FormulaError::expression(
+                    "wrong_source",
+                    &config.id,
+                    format!("Function '{name}' is available only for RR-interval formulas."),
+                    node.span,
+                ));
+            }
             if specification.fixed_rate_only && config.source.rate_hz() <= 0.0 {
                 return Err(FormulaError::expression(
                     "fixed_rate_required",
@@ -1001,6 +1010,7 @@ struct FunctionSpec {
     stateful: bool,
     fixed_rate_only: bool,
     acc_only: bool,
+    rr_only: bool,
 }
 
 impl FunctionSpec {
@@ -1024,10 +1034,11 @@ fn function_spec(name: &str) -> Option<FunctionSpec> {
         stateful: false,
         fixed_rate_only: false,
         acc_only: false,
+        rr_only: false,
     };
     Some(match name {
         "abs" | "sqrt" | "cbrt" | "exp" | "ln" | "log10" | "sin" | "cos" | "tan" | "asin"
-        | "acos" | "atan" | "floor" | "ceil" | "round" | "sign" => pure(1),
+        | "acos" | "atan" | "floor" | "ceil" | "round" | "sign" | "normal_cdf" => pure(1),
         "pow" | "atan2" | "min" | "max" => pure(2),
         "clamp" | "if" => pure(3),
         "delay" | "moving_mean" | "moving_rms" | "moving_std" | "zscore" | "ema" | "lowpass"
@@ -1037,6 +1048,7 @@ fn function_spec(name: &str) -> Option<FunctionSpec> {
             stateful: true,
             fixed_rate_only: true,
             acc_only: false,
+            rr_only: false,
         },
         "bandpass" => FunctionSpec {
             min_arity: 3,
@@ -1044,6 +1056,7 @@ fn function_spec(name: &str) -> Option<FunctionSpec> {
             stateful: true,
             fixed_rate_only: true,
             acc_only: false,
+            rr_only: false,
         },
         "derivative" | "integral" => FunctionSpec {
             min_arity: 1,
@@ -1051,13 +1064,26 @@ fn function_spec(name: &str) -> Option<FunctionSpec> {
             stateful: true,
             fixed_rate_only: true,
             acc_only: false,
+            rr_only: false,
         },
-        "moving_mean_n" | "moving_rms_n" | "moving_std_n" | "zscore_n" | "rmssd" => FunctionSpec {
+        "moving_mean_n" | "moving_rms_n" | "moving_std_n" | "zscore_n" | "rmssd" | "pnn50" => {
+            FunctionSpec {
+                min_arity: 2,
+                max_arity: 2,
+                stateful: true,
+                fixed_rate_only: false,
+                acc_only: false,
+                rr_only: false,
+            }
+        }
+        "rr_mean" | "rr_mean_hr" | "rr_rmssd" | "rr_ln_rmssd" | "rr_sdnn" | "rr_pnn50"
+        | "rr_sd1" | "excitement" => FunctionSpec {
             min_arity: 2,
             max_arity: 2,
             stateful: true,
             fixed_rate_only: false,
             acc_only: false,
+            rr_only: true,
         },
         "breathing_magnitude" => FunctionSpec {
             min_arity: 9,
@@ -1065,6 +1091,7 @@ fn function_spec(name: &str) -> Option<FunctionSpec> {
             stateful: true,
             fixed_rate_only: true,
             acc_only: true,
+            rr_only: false,
         },
         "breathing_phase" => FunctionSpec {
             min_arity: 9,
@@ -1072,6 +1099,7 @@ fn function_spec(name: &str) -> Option<FunctionSpec> {
             stateful: true,
             fixed_rate_only: true,
             acc_only: true,
+            rr_only: false,
         },
         _ => return None,
     })
@@ -1123,6 +1151,21 @@ fn duration_capacity(node: &Node, config: &CustomFormulaConfig) -> Result<usize,
     Ok((seconds * config.source.rate_hz()).round().max(1.0) as usize)
 }
 
+fn rr_duration_capacity(node: &Node, config: &CustomFormulaConfig) -> Result<usize, FormulaError> {
+    let seconds = constant_number(node, config)?;
+    if !seconds.is_finite() || !(5.0..=MAX_RR_WINDOW_SECONDS).contains(&seconds) {
+        return Err(FormulaError::expression(
+            "invalid_window",
+            &config.id,
+            format!("RR metric duration must be between 5 and {MAX_RR_WINDOW_SECONDS} seconds."),
+            node.span,
+        ));
+    }
+    // 250 ms is the shortest accepted RR interval, so this is the strict
+    // upper bound on values retained by a duration-based RR window.
+    Ok((seconds * 4.0).ceil() as usize + 1)
+}
+
 fn count_capacity(node: &Node, config: &CustomFormulaConfig) -> Result<usize, FormulaError> {
     let count = constant_number(node, config)?;
     if !count.is_finite()
@@ -1161,9 +1204,11 @@ fn state_capacity(
         "delay" | "moving_mean" | "moving_rms" | "moving_std" | "zscore" => {
             duration_capacity(&arguments[1], config)
         }
-        "moving_mean_n" | "moving_rms_n" | "moving_std_n" | "zscore_n" | "rmssd" => {
+        "moving_mean_n" | "moving_rms_n" | "moving_std_n" | "zscore_n" | "rmssd" | "pnn50" => {
             count_capacity(&arguments[1], config)
         }
+        "rr_mean" | "rr_mean_hr" | "rr_rmssd" | "rr_ln_rmssd" | "rr_sdnn" | "rr_pnn50"
+        | "rr_sd1" | "excitement" => rr_duration_capacity(&arguments[1], config),
         "ema" => {
             let _ = duration_capacity(&arguments[1], config)?;
             Ok(1)
@@ -1344,9 +1389,23 @@ fn create_state(
             previous: None,
             total: 0.0,
         },
-        "rmssd" => DspState::Rmssd {
+        "rmssd" | "pnn50" => DspState::RrCount {
             values: VecDeque::new(),
             samples: count_capacity(&arguments[1], config)?,
+            kind: if name == "rmssd" {
+                RrMetricKind::Rmssd
+            } else {
+                RrMetricKind::Pnn50
+            },
+        },
+        "rr_mean" | "rr_mean_hr" | "rr_rmssd" | "rr_ln_rmssd" | "rr_sdnn" | "rr_pnn50"
+        | "rr_sd1" | "excitement" => DspState::RrTimed {
+            values: VecDeque::new(),
+            retained_ms: 0.0,
+            window_ms: constant_number(&arguments[1], config)? * 1_000.0,
+            kind: RrMetricKind::from_function(name).ok_or_else(|| {
+                FormulaError::field("internal_error", &config.id, "Unknown RR metric function.")
+            })?,
         },
         "breathing_magnitude" | "breathing_phase" => DspState::Breathing {
             classifier: ExperimentalBreathingClassifier::new(validate_breathing_arguments(
@@ -1388,14 +1447,49 @@ enum DspState {
         previous: Option<f64>,
         total: f64,
     },
-    Rmssd {
+    RrCount {
         values: VecDeque<f64>,
         samples: usize,
+        kind: RrMetricKind,
+    },
+    RrTimed {
+        values: VecDeque<f64>,
+        retained_ms: f64,
+        window_ms: f64,
+        kind: RrMetricKind,
     },
     Breathing {
         classifier: ExperimentalBreathingClassifier,
         phase: bool,
     },
+}
+
+#[derive(Clone, Copy)]
+enum RrMetricKind {
+    Mean,
+    MeanHeartRate,
+    Rmssd,
+    LnRmssd,
+    Sdnn,
+    Pnn50,
+    Sd1,
+    Excitement,
+}
+
+impl RrMetricKind {
+    fn from_function(name: &str) -> Option<Self> {
+        Some(match name {
+            "rr_mean" => Self::Mean,
+            "rr_mean_hr" => Self::MeanHeartRate,
+            "rr_rmssd" => Self::Rmssd,
+            "rr_ln_rmssd" => Self::LnRmssd,
+            "rr_sdnn" => Self::Sdnn,
+            "rr_pnn50" => Self::Pnn50,
+            "rr_sd1" => Self::Sd1,
+            "excitement" => Self::Excitement,
+            _ => return None,
+        })
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -1660,6 +1754,7 @@ fn evaluate_pure(name: &str, values: &[EvalValue]) -> Result<EvalValue, String> 
         "ceil" => one()?.ceil(),
         "round" => one()?.round(),
         "sign" => one()?.signum(),
+        "normal_cdf" => normal_cdf_value(one()?),
         "pow" => {
             let (left, right) = two()?;
             left.powf(right)
@@ -1727,7 +1822,11 @@ fn evaluate_stateful(
             *previous = Some(input);
             *total
         }
-        DspState::Rmssd { values, samples } => {
+        DspState::RrCount {
+            values,
+            samples,
+            kind,
+        } => {
             if (250.0..=2_500.0).contains(&input) {
                 values.push_back(input);
                 if values.len() > *samples {
@@ -1737,15 +1836,32 @@ fn evaluate_stateful(
             if values.len() < 2 {
                 return Ok(EvalValue::NotReady);
             }
-            let mut previous: Option<f64> = None;
-            let mut squared_sum = 0.0;
-            for value in values.iter().copied() {
-                if let Some(previous) = previous {
-                    squared_sum += (value - previous).powi(2);
+            rr_metric_value(values, *kind).ok_or_else(|| "RR metric is not ready.".to_string())?
+        }
+        DspState::RrTimed {
+            values,
+            retained_ms,
+            window_ms,
+            kind,
+        } => {
+            if (250.0..=2_500.0).contains(&input) {
+                values.push_back(input);
+                *retained_ms += input;
+                while values.len() > 2
+                    && *retained_ms - values.front().copied().unwrap_or_default() >= *window_ms
+                {
+                    *retained_ms -= values.pop_front().unwrap_or_default();
                 }
-                previous = Some(value);
             }
-            (squared_sum / (values.len() - 1) as f64).sqrt()
+            let minimum = if matches!(kind, RrMetricKind::Excitement) {
+                10
+            } else {
+                2
+            };
+            if values.len() < minimum {
+                return Ok(EvalValue::NotReady);
+            }
+            rr_metric_value(values, *kind).ok_or_else(|| "RR metric is not ready.".to_string())?
         }
         DspState::Breathing { classifier, phase } => {
             let sample = AccSample {
@@ -1770,9 +1886,86 @@ fn evaluate_stateful(
     Ok(EvalValue::Number(value))
 }
 
+fn rr_metric_value(values: &VecDeque<f64>, kind: RrMetricKind) -> Option<f64> {
+    if values.len() < 2 {
+        return None;
+    }
+    let intervals: Vec<_> = values.iter().copied().collect();
+    let mean = intervals.iter().sum::<f64>() / intervals.len() as f64;
+    let differences: Vec<_> = intervals.windows(2).map(|pair| pair[1] - pair[0]).collect();
+    let rmssd = (differences.iter().map(|value| value * value).sum::<f64>()
+        / differences.len() as f64)
+        .sqrt();
+    Some(match kind {
+        RrMetricKind::Mean => mean,
+        RrMetricKind::MeanHeartRate => 60_000.0 / mean,
+        RrMetricKind::Rmssd => rmssd,
+        RrMetricKind::LnRmssd => rmssd.max(f64::MIN_POSITIVE).ln(),
+        RrMetricKind::Sdnn => (intervals
+            .iter()
+            .map(|value| (value - mean).powi(2))
+            .sum::<f64>()
+            / (intervals.len() - 1) as f64)
+            .sqrt(),
+        RrMetricKind::Pnn50 => {
+            100.0
+                * differences
+                    .iter()
+                    .filter(|value| value.abs() > 50.0)
+                    .count() as f64
+                / differences.len() as f64
+        }
+        RrMetricKind::Sd1 => rmssd / std::f64::consts::SQRT_2,
+        RrMetricKind::Excitement => excitement_value(&intervals)?,
+    })
+}
+
+fn excitement_value(intervals: &[f64]) -> Option<f64> {
+    if intervals.len() < 10 {
+        return None;
+    }
+    let rmssd_history: Vec<_> = (2..=intervals.len())
+        .map(|end| {
+            let start = end.saturating_sub(5);
+            let window = &intervals[start..end];
+            let differences: Vec<_> = window.windows(2).map(|pair| pair[1] - pair[0]).collect();
+            (differences.iter().map(|value| value * value).sum::<f64>() / differences.len() as f64)
+                .sqrt()
+        })
+        .collect();
+    let rr_percentile = normal_cdf_value(z_score_value(*intervals.last()?, intervals)?);
+    let rmssd_percentile = normal_cdf_value(z_score_value(*rmssd_history.last()?, &rmssd_history)?);
+    Some((1.0 - (rr_percentile + rmssd_percentile) / 2.0).clamp(0.0, 1.0))
+}
+
+fn z_score_value(value: f64, values: &[f64]) -> Option<f64> {
+    if values.len() < 2 {
+        return None;
+    }
+    let mean = values.iter().sum::<f64>() / values.len() as f64;
+    let deviation = (values
+        .iter()
+        .map(|candidate| (candidate - mean).powi(2))
+        .sum::<f64>()
+        / (values.len() - 1) as f64)
+        .sqrt();
+    (deviation > f64::EPSILON).then_some((value - mean) / deviation)
+}
+
+fn normal_cdf_value(value: f64) -> f64 {
+    let absolute = value.abs();
+    let t = 1.0 / (1.0 + 0.231_641_9 * absolute);
+    let polynomial = t
+        * (0.319_381_54
+            + t * (-0.356_563_78 + t * (1.781_477_9 + t * (-1.821_255_978 + t * 1.330_274_429))));
+    let upper = 1.0 - (-0.5 * absolute * absolute).exp() / (2.0 * PI).sqrt() * polynomial;
+    if value >= 0.0 { upper } else { 1.0 - upper }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use polar_h10_core::RrTracker;
 
     fn formula(source: FormulaSource, expression: &str) -> CustomFormulaConfig {
         CustomFormulaConfig {
@@ -1874,6 +2067,59 @@ mod tests {
             .value
             .unwrap();
         assert!((value - 31.622_776).abs() < 0.001);
+    }
+
+    #[test]
+    fn duration_based_rr_formula_metrics_match_the_core_tracker() {
+        let intervals = [
+            800.0, 820.0, 780.0, 760.0, 840.0, 810.0, 790.0, 850.0, 805.0, 775.0, 830.0, 795.0,
+            815.0, 785.0, 825.0,
+        ];
+        let mut tracker = RrTracker::default();
+        for interval in intervals {
+            tracker.push(interval);
+        }
+        let metrics = tracker.metrics(10.0).unwrap();
+        let cases = [
+            ("rr_mean(rr, 10)", metrics.mean_nn_ms),
+            ("rr_mean_hr(rr, 10)", metrics.mean_heart_rate_bpm),
+            ("rr_rmssd(rr, 10)", metrics.rmssd_ms),
+            ("rr_ln_rmssd(rr, 10)", metrics.ln_rmssd),
+            ("rr_sdnn(rr, 10)", metrics.sdnn_ms),
+            ("rr_pnn50(rr, 10)", metrics.pnn50_percent),
+            ("rr_sd1(rr, 10)", metrics.sd1_ms),
+            (
+                "excitement(rr, 10)",
+                tracker.excitement_index(10.0).unwrap(),
+            ),
+        ];
+        for (expression, expected) in cases {
+            let mut compiled =
+                CompiledFormula::compile(formula(FormulaSource::RrInterval, expression)).unwrap();
+            let mut actual = None;
+            for interval in intervals {
+                actual = compiled.process(FormulaFrame::rr_interval(interval)).value;
+            }
+            assert!(
+                (actual.unwrap() - expected).abs() < 0.001,
+                "{expression} did not match the built-in metric"
+            );
+        }
+    }
+
+    #[test]
+    fn pnn50_and_normal_cdf_are_available_to_custom_formulas() {
+        let mut compiled = CompiledFormula::compile(formula(
+            FormulaSource::RrInterval,
+            "pnn50(rr, 4) + normal_cdf(0)",
+        ))
+        .unwrap();
+        let mut value = None;
+        for interval in [800.0, 900.0, 850.0, 700.0] {
+            value = compiled.process(FormulaFrame::rr_interval(interval)).value;
+        }
+        let value = value.unwrap();
+        assert!((value - (200.0 / 3.0 + 0.5)).abs() < 0.01);
     }
 
     #[test]

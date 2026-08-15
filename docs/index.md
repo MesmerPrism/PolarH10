@@ -65,6 +65,12 @@ dotnet run --project src/PolarH10.Cli -- scan
 - [Polar Stream Recorded Preview](polar-stream-preview.md)
 - Open the browser interface and choose **Mock Data** to loop a real 60-second
   Polar H10 ECG and accelerometer recording.
+- Open **Add output** to inspect each ECG/ACC metric's recorded outcome,
+  scientific context, and citations before adding it; settings update the
+  selected preview immediately.
+- Start custom output from a built-in metric, then use the variable map, insert
+  keyboard, and recorded before/after chart to edit it without memorizing the
+  expression language.
 - Build the native Tauri app when you want live Polar H10 input with LSL or OSC
   output; recorded-preview mode remains browser-only.
 

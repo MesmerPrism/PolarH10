@@ -16,6 +16,45 @@ the same interval.
 
 ![Real Polar H10 ECG and accelerometer preview loop](assets/polar-stream-recorded-preview.svg)
 
+## Preview an output before adding it
+
+Open **Add output** and select a metric row. The right-hand outcome panel is
+computed from this same recorded ECG/ACC fixture and shows the exact stream
+name, current example value, a concise evidence summary, and links to the most
+relevant literature or technical documentation. Adding is explicit—there are no
+checkboxes—and the chosen outputs remain visible in the dialog footer.
+
+![Responsive output library showing an RMSSD preview and live time-window control](assets/polar-stream-output-library.png)
+
+RR-derived metrics expose independent 10–300 second rolling windows. The ACC
+breathing previews react immediately to axes, smoothing, sensitivity,
+normalization, and inversion settings. Longer RR windows use the available
+60-second fixture as a clearly labeled warm-up preview rather than inventing
+additional data.
+
+The ECG catalog covers raw ECG, heart rate, RR interval, mean NN, mean heart
+rate, RMSSD, lnRMSSD, SDNN, pNN50, Poincaré SD1, and an experimental causal
+adaptation of the Excite-O-Meter excitement level. ACC options cover raw X/Y/Z,
+3D magnitude, and the two experimental breathing outputs.
+
+## Build a custom formula without memorizing its syntax
+
+Custom formulas use the fixture too: load a scalar built-in metric or use the
+source-aware insert keyboard, then compare the recorded input and formula output
+in the draft card before applying it. Every key explains its operation on hover
+or keyboard focus, and the variable map distinguishes ECG amplitude (`ecg`),
+ACC axes (`x y z`), device heart rate (`hr`), and accepted beat interval (`rr`).
+
+![Guided RMSSD formula with an insert keyboard and recorded before/after chart](assets/polar-stream-formula-lab.png)
+
+Time is always the automatic chart x-axis; the expression computes one output
+y-value per source sample or event. HRV metrics therefore operate on the rolling
+history of `rr`, not by averaging raw ECG amplitude. The RR keyboard includes
+exact duration-based equivalents for Mean NN, Mean HR, RMSSD, lnRMSSD, SDNN,
+pNN50, SD1, and the rolling Excite-O-Meter adaptation. The preview parser is
+deliberately restricted and cannot execute arbitrary JavaScript; native Rust
+validation remains authoritative for published output.
+
 ## Try the interface without a strap
 
 Serve the frontend from the repository root:
@@ -50,6 +89,7 @@ the sensor's BLE address and serial number.
 
 ```bash
 npm run preview:fixture:test
+npm run polar-stream:ui:test
 npm run pages:build
 ```
 

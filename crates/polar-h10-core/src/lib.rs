@@ -499,37 +499,172 @@ pub fn stop_command(measurement: u8) -> [u8; 2] {
     [0x03, measurement]
 }
 
-/// Small rolling RR store used by applications that opt into RMSSD output.
-/// Acquisition code deliberately does not depend on this derived metric.
+/// Time-domain metrics from one accepted RR window.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RrMetrics {
+    pub mean_nn_ms: f32,
+    pub mean_heart_rate_bpm: f32,
+    pub rmssd_ms: f32,
+    pub ln_rmssd: f32,
+    pub sdnn_ms: f32,
+    pub pnn50_percent: f32,
+    pub sd1_ms: f32,
+    pub sample_count: usize,
+    pub coverage_01: f32,
+}
+
+/// Rolling RR store used by applications that opt into real-time HRV output.
+/// Acquisition code deliberately does not depend on these derived metrics.
 #[derive(Default)]
 pub struct RrTracker {
-    intervals: Vec<f32>,
+    intervals: VecDeque<f32>,
 }
 
 impl RrTracker {
+    const MAX_HISTORY_SECONDS: f32 = 300.0;
+
     pub fn push(&mut self, value: f32) {
         if (250.0..=2_500.0).contains(&value) {
-            self.intervals.push(value);
-            if self.intervals.len() > 60 {
-                self.intervals.remove(0);
+            self.intervals.push_back(value);
+            let mut retained_ms: f32 = self.intervals.iter().sum();
+            while retained_ms > Self::MAX_HISTORY_SECONDS * 1_000.0 && self.intervals.len() > 2 {
+                retained_ms -= self.intervals.pop_front().unwrap_or_default();
             }
         }
     }
 
+    /// Preserves the original 60-beat RMSSD behavior for callers that have not
+    /// opted into a time-based window.
     pub fn rmssd(&self) -> Option<f32> {
-        if self.intervals.len() < 2 {
+        let intervals: Vec<_> = self
+            .intervals
+            .iter()
+            .rev()
+            .take(60)
+            .rev()
+            .copied()
+            .collect();
+        rmssd(&intervals)
+    }
+
+    pub fn metrics(&self, window_seconds: f32) -> Option<RrMetrics> {
+        let window_seconds = window_seconds.clamp(5.0, Self::MAX_HISTORY_SECONDS);
+        let intervals = self.window(window_seconds);
+        if intervals.len() < 2 {
             return None;
         }
-        let squared_sum: f32 = self
-            .intervals
-            .windows(2)
-            .map(|pair| {
-                let difference = pair[1] - pair[0];
+
+        let mean_nn_ms = intervals.iter().sum::<f32>() / intervals.len() as f32;
+        let rmssd_ms = rmssd(&intervals)?;
+        let deviation_sum = intervals
+            .iter()
+            .map(|value| {
+                let difference = *value - mean_nn_ms;
                 difference * difference
             })
-            .sum();
-        Some((squared_sum / (self.intervals.len() - 1) as f32).sqrt())
+            .sum::<f32>();
+        let sdnn_ms = (deviation_sum / (intervals.len() - 1) as f32).sqrt();
+        let pnn50_percent = 100.0
+            * intervals
+                .windows(2)
+                .filter(|pair| (pair[1] - pair[0]).abs() > 50.0)
+                .count() as f32
+            / (intervals.len() - 1) as f32;
+        let retained_ms = intervals.iter().sum::<f32>();
+
+        Some(RrMetrics {
+            mean_nn_ms,
+            mean_heart_rate_bpm: 60_000.0 / mean_nn_ms,
+            rmssd_ms,
+            ln_rmssd: rmssd_ms.max(f32::MIN_POSITIVE).ln(),
+            sdnn_ms,
+            pnn50_percent,
+            sd1_ms: rmssd_ms / std::f32::consts::SQRT_2,
+            sample_count: intervals.len(),
+            coverage_01: (retained_ms / (window_seconds * 1_000.0)).clamp(0.0, 1.0),
+        })
     }
+
+    /// Causal rolling adaptation of the Excite-O-Meter paper's post-session
+    /// index. The original algorithm standardizes a complete session; this
+    /// version standardizes the current RR and five-beat RMSSD against the
+    /// retained real-time baseline so it can be streamed without future data.
+    pub fn excitement_index(&self, baseline_seconds: f32) -> Option<f32> {
+        let intervals = self.window(baseline_seconds.clamp(10.0, Self::MAX_HISTORY_SECONDS));
+        if intervals.len() < 10 {
+            return None;
+        }
+
+        let mut rmssd_history = Vec::with_capacity(intervals.len().saturating_sub(1));
+        for end in 2..=intervals.len() {
+            let start = end.saturating_sub(5);
+            if let Some(value) = rmssd(&intervals[start..end]) {
+                rmssd_history.push(value);
+            }
+        }
+        let current_rmssd = *rmssd_history.last()?;
+        let rr_percentile = normal_cdf(z_score(*intervals.last()?, &intervals)?);
+        let rmssd_percentile = normal_cdf(z_score(current_rmssd, &rmssd_history)?);
+        Some((1.0 - (rr_percentile + rmssd_percentile) / 2.0).clamp(0.0, 1.0))
+    }
+
+    fn window(&self, window_seconds: f32) -> Vec<f32> {
+        let target_ms = window_seconds * 1_000.0;
+        let mut retained_ms = 0.0;
+        let mut values = Vec::new();
+        for value in self.intervals.iter().rev().copied() {
+            values.push(value);
+            retained_ms += value;
+            if retained_ms >= target_ms {
+                break;
+            }
+        }
+        values.reverse();
+        values
+    }
+}
+
+fn rmssd(intervals: &[f32]) -> Option<f32> {
+    if intervals.len() < 2 {
+        return None;
+    }
+    let squared_sum = intervals
+        .windows(2)
+        .map(|pair| {
+            let difference = pair[1] - pair[0];
+            difference * difference
+        })
+        .sum::<f32>();
+    Some((squared_sum / (intervals.len() - 1) as f32).sqrt())
+}
+
+fn z_score(value: f32, values: &[f32]) -> Option<f32> {
+    if values.len() < 2 {
+        return None;
+    }
+    let mean = values.iter().sum::<f32>() / values.len() as f32;
+    let variance = values
+        .iter()
+        .map(|candidate| {
+            let difference = *candidate - mean;
+            difference * difference
+        })
+        .sum::<f32>()
+        / (values.len() - 1) as f32;
+    let standard_deviation = variance.sqrt();
+    (standard_deviation > f32::EPSILON).then_some((value - mean) / standard_deviation)
+}
+
+fn normal_cdf(value: f32) -> f32 {
+    // Abramowitz and Stegun 7.1.26; adequate for a bounded operator preview.
+    let absolute = value.abs();
+    let t = 1.0 / (1.0 + 0.231_641_9 * absolute);
+    let polynomial = t
+        * (0.319_381_54
+            + t * (-0.356_563_78 + t * (1.781_477_9 + t * (-1.821_256 + t * 1.330_274_5))));
+    let density = (-0.5 * absolute * absolute).exp() / (2.0 * std::f32::consts::PI).sqrt();
+    let upper = 1.0 - density * polynomial;
+    if value >= 0.0 { upper } else { 1.0 - upper }
 }
 
 #[cfg(test)]
@@ -615,7 +750,33 @@ mod tests {
         for value in [100.0, 1_000.0, 3_000.0, 1_010.0] {
             tracker.push(value);
         }
-        assert_eq!(tracker.intervals, [1_000.0, 1_010.0]);
+        assert_eq!(tracker.intervals, VecDeque::from([1_000.0, 1_010.0]));
+    }
+
+    #[test]
+    fn computes_the_complete_time_domain_metric_family() {
+        let mut tracker = RrTracker::default();
+        for value in [1_000.0, 1_020.0, 980.0, 1_060.0] {
+            tracker.push(value);
+        }
+        let metrics = tracker.metrics(10.0).unwrap();
+        assert_eq!(metrics.sample_count, 4);
+        assert!((metrics.mean_nn_ms - 1_015.0).abs() < 0.001);
+        assert!((metrics.mean_heart_rate_bpm - 59.1133).abs() < 0.001);
+        assert!((metrics.rmssd_ms - 52.9150).abs() < 0.001);
+        assert!((metrics.sd1_ms - metrics.rmssd_ms / std::f32::consts::SQRT_2).abs() < 0.001);
+        assert!((metrics.pnn50_percent - 33.3333).abs() < 0.001);
+        assert!(metrics.coverage_01 > 0.4 && metrics.coverage_01 < 0.41);
+    }
+
+    #[test]
+    fn excitement_adaptation_is_bounded_after_baseline_warmup() {
+        let mut tracker = RrTracker::default();
+        for index in 0..30 {
+            tracker.push(800.0 + (index as f32 * 0.7).sin() * 35.0);
+        }
+        let value = tracker.excitement_index(60.0).unwrap();
+        assert!((0.0..=1.0).contains(&value));
     }
 
     #[test]

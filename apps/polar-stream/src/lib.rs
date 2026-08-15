@@ -67,11 +67,19 @@ enum AppEvent {
         heart_rate_bpm: u16,
         rr_intervals_ms: Vec<f32>,
         rmssd_ms: Option<f32>,
+        metrics: Vec<BuiltinMetricSample>,
         formulas: FormulaPublishBatch,
     },
     Error {
         message: String,
     },
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct BuiltinMetricSample {
+    id: &'static str,
+    value: f32,
 }
 
 #[derive(Serialize)]
@@ -128,7 +136,10 @@ impl MetricDescriptor {
             } else {
                 "ecg"
             },
-            experimental: matches!(id, "acc_breathing_magnitude" | "acc_breathing_phase"),
+            experimental: matches!(
+                id,
+                "acc_breathing_magnitude" | "acc_breathing_phase" | "excitement_index"
+            ),
             formula: formula.into(),
             custom_expression,
             formula_source: match id {
@@ -136,7 +147,8 @@ impl MetricDescriptor {
                     FormulaSource::Accelerometer
                 }
                 "heart_rate" => FormulaSource::HeartRate,
-                "rr_interval" | "rmssd" => FormulaSource::RrInterval,
+                "rr_interval" | "mean_nn" | "mean_hr" | "rmssd" | "ln_rmssd" | "sdnn" | "pnn50"
+                | "sd1" | "excitement_index" => FormulaSource::RrInterval,
                 _ => FormulaSource::Ecg,
             },
         }
@@ -175,8 +187,13 @@ fn get_bootstrap(state: State<'_, Arc<AppState>>) -> Bootstrap {
         config.breathing_config.sensitivity,
         config.breathing_config.invert
     );
+    let rr_formula = |function: &str, metric_id: &str| {
+        format!(
+            "{function}(rr, {:.0})",
+            config.metric_window_seconds(metric_id)
+        )
+    };
     Bootstrap {
-        config,
         platform: std::env::consts::OS,
         metric_catalog: vec![
             MetricDescriptor::new(
@@ -243,17 +260,81 @@ fn get_bootstrap(state: State<'_, Arc<AppState>>) -> Bootstrap {
                 Some(phase_formula),
             ),
             MetricDescriptor::new(
-                "rmssd",
-                "RMSSD",
-                "Rolling 60-beat window",
+                "mean_nn",
+                "Mean NN",
+                "Average accepted beat interval",
                 "ms",
                 false,
-                "rmssd(rr, 60)",
-                Some("rmssd(rr, 60)".into()),
+                rr_formula("rr_mean", "mean_nn"),
+                Some(rr_formula("rr_mean", "mean_nn")),
+            ),
+            MetricDescriptor::new(
+                "mean_hr",
+                "Mean heart rate",
+                "Window mean derived from accepted NN",
+                "bpm",
+                false,
+                rr_formula("rr_mean_hr", "mean_hr"),
+                Some(rr_formula("rr_mean_hr", "mean_hr")),
+            ),
+            MetricDescriptor::new(
+                "rmssd",
+                "RMSSD",
+                "Rolling RR window",
+                "ms",
+                false,
+                rr_formula("rr_rmssd", "rmssd"),
+                Some(rr_formula("rr_rmssd", "rmssd")),
+            ),
+            MetricDescriptor::new(
+                "ln_rmssd",
+                "lnRMSSD",
+                "Natural log of rolling RMSSD",
+                "ln(ms)",
+                false,
+                rr_formula("rr_ln_rmssd", "ln_rmssd"),
+                Some(rr_formula("rr_ln_rmssd", "ln_rmssd")),
+            ),
+            MetricDescriptor::new(
+                "sdnn",
+                "SDNN",
+                "Standard deviation of accepted NN",
+                "ms",
+                false,
+                rr_formula("rr_sdnn", "sdnn"),
+                Some(rr_formula("rr_sdnn", "sdnn")),
+            ),
+            MetricDescriptor::new(
+                "pnn50",
+                "pNN50",
+                "Adjacent NN differences over 50 ms",
+                "%",
+                false,
+                rr_formula("rr_pnn50", "pnn50"),
+                Some(rr_formula("rr_pnn50", "pnn50")),
+            ),
+            MetricDescriptor::new(
+                "sd1",
+                "SD1",
+                "Poincaré short-axis variability",
+                "ms",
+                false,
+                rr_formula("rr_sd1", "sd1"),
+                Some(rr_formula("rr_sd1", "sd1")),
+            ),
+            MetricDescriptor::new(
+                "excitement_index",
+                "Excite-O-Meter excitement level",
+                "Experimental rolling adaptation",
+                "0–1",
+                false,
+                rr_formula("excitement", "excitement_index"),
+                Some(rr_formula("excitement", "excitement_index")),
             ),
         ],
         last_session,
         profiles: state.profiles.summaries(),
+        config,
     }
 }
 
@@ -325,6 +406,7 @@ async fn connect_device(
                     for rr in &rr_intervals_ms {
                         rr_tracker.push(*rr);
                     }
+                    let config = output.config();
                     let rmssd_ms = rr_tracker.rmssd();
                     let mut metrics = vec![MetricValue {
                         id: "heart_rate",
@@ -336,15 +418,47 @@ async fn connect_device(
                             value: *rr,
                         });
                     }
-                    if let Some(value) = rmssd_ms {
-                        metrics.push(MetricValue { id: "rmssd", value });
+                    for id in [
+                        "mean_nn", "mean_hr", "rmssd", "ln_rmssd", "sdnn", "pnn50", "sd1",
+                    ] {
+                        let Some(values) = rr_tracker.metrics(config.metric_window_seconds(id))
+                        else {
+                            continue;
+                        };
+                        let value = match id {
+                            "mean_nn" => values.mean_nn_ms,
+                            "mean_hr" => values.mean_heart_rate_bpm,
+                            "rmssd" => values.rmssd_ms,
+                            "ln_rmssd" => values.ln_rmssd,
+                            "sdnn" => values.sdnn_ms,
+                            "pnn50" => values.pnn50_percent,
+                            "sd1" => values.sd1_ms,
+                            _ => unreachable!(),
+                        };
+                        metrics.push(MetricValue { id, value });
                     }
+                    if let Some(value) = rr_tracker
+                        .excitement_index(config.metric_window_seconds("excitement_index"))
+                    {
+                        metrics.push(MetricValue {
+                            id: "excitement_index",
+                            value,
+                        });
+                    }
+                    let metric_samples = metrics
+                        .iter()
+                        .map(|metric| BuiltinMetricSample {
+                            id: metric.id,
+                            value: metric.value,
+                        })
+                        .collect();
                     let formulas =
                         output.publish_metrics(beats_per_minute, &rr_intervals_ms, &metrics);
                     AppEvent::Metrics {
                         heart_rate_bpm: beats_per_minute,
                         rr_intervals_ms,
                         rmssd_ms,
+                        metrics: metric_samples,
                         formulas,
                     }
                 }

@@ -5,9 +5,10 @@ working areas:
 
 1. **Input** — scan, connect, connection state, and battery.
 2. **Output** — raw ECG/ACC readings, stream base name, LSL/OSC switches, an
-   extensible output list, and a custom math module. Each formula is bound to
-   one source clock and emits one processed scalar stream. The ACC family
-   intentionally labels its breathing classifier as experimental.
+   add-one-at-a-time output library with recorded outcome previews, and a custom
+   math module. Each formula is bound to one source clock and emits one
+   processed scalar stream. The ACC family intentionally labels its breathing
+   classifier as experimental.
 3. **Visualization** — a resizable tile workspace whose views independently
    select from the active outputs. Raw acceleration uses one selection with X,
    Y, and Z shown as three vertically stacked traces. The experimental breathing
@@ -51,6 +52,12 @@ actionable message.
 
 ![Real Polar H10 ECG and accelerometer preview loop](../../docs/assets/polar-stream-recorded-preview.svg)
 
+The same fixture drives the output library's per-metric charts. Settings such
+as the RR time window, ACC axes, smoothing, sensitivity, normalization, and
+direction update the selected outcome preview before the output is added.
+
+![Polar Stream add-one-at-a-time output library with an RMSSD preview](../../docs/assets/polar-stream-output-library.png)
+
 ```bash
 npx browser-sync start --server apps/polar-stream/ui --no-open --no-ui
 ```
@@ -79,6 +86,25 @@ accelerometer is `participant_07_rawACC`. Additional metrics follow the same
 rule, for example `participant_07_heartRate`. Spaces and protocol-unsafe
 characters in the user-entered base are collapsed to underscores.
 
+Open **Add output** to focus one metric at a time, inspect its recorded outcome,
+read its concise scientific context and primary citations, then explicitly add
+or remove it. The responsive dialog expands to 1,280 px on a large display and
+collapses to a single-column browser/preview layout on smaller screens.
+
+The built-in ECG family includes raw ECG, heart rate, RR interval, mean NN,
+mean heart rate, RMSSD, lnRMSSD, SDNN, pNN50, Poincaré SD1, and the experimental
+Excite-O-Meter excitement level. The ACC family includes raw X/Y/Z,
+three-dimensional magnitude, experimental breathing magnitude, and experimental
+breathing phase. RR-derived windows are independently configurable from 10 to
+300 seconds and are stored with profiles.
+
+The excitement output is a causal rolling-baseline adaptation of the
+[Excite-O-Meter](https://sites.google.com/view/exciteometer/eom) proposal, not an
+exact reproduction of its post-session standardization. The original
+four-person feasibility result did not significantly distinguish the tested
+high- and low-arousal videos, so the app labels the metric experimental and
+links both the paper and project page beside its preview.
+
 ACC breathing is limited to two explicitly experimental, independently
 selectable streams. `participant_07_accBreathingMagnitude` retains the
 continuous configured ACC projection so downstream tools can inspect the curve
@@ -105,12 +131,24 @@ configuration without touching acquisition or visualization code.
 
 ## Custom math outputs
 
-Open **Add output**, then use **New formula** or **Use as custom** beside an
-existing metric. A formula has a stable UUID, stream suffix, source, expression,
+Open **Add output**, then use **New formula** or **Use as custom formula** in a
+metric's preview. A formula has a stable UUID, stream suffix, source, expression,
 unit, and enabled flag. Its discoverable name is
 `<base>_<formula suffix>` in both LSL and OSC. Enabled formulas are also
 available as live visualization sources, including detached visualization
 windows.
+
+![Guided custom formula card with insert keyboard and recorded before/after preview](../../docs/assets/polar-stream-formula-lab.png)
+
+The editor includes a variable map, source-aware insert keyboard with
+hover/focus explanations, and templates for every scalar built-in metric. Every
+valid draft gets a recorded before/after chart that overlays its source signal
+and computed result, so changing the expression or source shows the outcome
+before the formula is applied. Time is the automatic x-axis and the expression
+computes one output y-value per source sample or event; this browser-side
+preview uses a restricted expression parser over the same canonical fixture,
+while the native bounded Rust engine remains authoritative for validation and
+live publishing.
 
 The four source clocks deliberately expose only their own variables:
 
@@ -125,10 +163,14 @@ Expressions support arithmetic, comparisons, Boolean operators, `pi`, `e`, and
 bounded functions including `abs`, `sqrt`, trigonometry, `min`, `max`, `clamp`,
 and lazy `if`. Stateful DSP includes time- or sample-count moving mean/RMS/
 standard-deviation/z-score, delay, EMA, low/high/band-pass filters, derivative,
-integral, RMSSD, and the existing experimental ACC breathing magnitude/phase
-classifier. The editor displays the executable expression used by every
-built-in metric; raw ACC is documented as `channels(x, y, z)` because the
-built-in is three-channel, while a custom scalar ACC formula starts blank.
+integral, beat-count RMSSD/pNN50, duration-based RR metrics (`rr_mean`,
+`rr_mean_hr`, `rr_rmssd`, `rr_ln_rmssd`, `rr_sdnn`, `rr_pnn50`, `rr_sd1`), the
+experimental `excitement` adaptation, and the existing experimental ACC
+breathing magnitude/phase classifier. The editor displays the executable
+expression used by every scalar built-in metric. Raw ACC is documented as
+`channels(x, y, z)` because that built-in is three-channel, while a custom
+scalar ACC formula starts from one axis or a combination such as
+`sqrt(x*x + y*y + z*z)`.
 
 Formulas are parsed by `polar-h10-math`; they are not JavaScript, Rust, or shell
 code. There are no statements, assignments, loops, strings, filesystem calls,
